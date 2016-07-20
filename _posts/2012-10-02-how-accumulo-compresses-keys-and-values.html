@@ -1,0 +1,32 @@
+---
+layout: post
+title: How Accumulo Compresses Keys and Values
+date: '2012-10-02T18:02:00.001-04:00'
+author: David Medinets
+tags:
+- accumulo
+modified_time: '2012-10-16T23:31:04.072-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-4885081106020955119
+blogger_orig_url: http://affy.blogspot.com/2012/10/how-accumulo-compresses-keys-and-values.html
+---
+
+From the <code>Acccumulo User</code> mailing list, Keith T said:<br />
+<blockquote>There are two levels of compression in Accumulo.  First redundant<br />
+parts of the key are not stored.  If the row in a key is the same as<br />
+the previous row, then its not stored again.   The same is done for<br />
+columns and time stamps.   After the relative encoding is done a block<br />
+of key values is then compressed with gzip.<br />
+<br />
+<br />
+As data is read from an RFile, when the row of a key is the same as<br />
+the previous key it will just point to the previous keys row.  This is<br />
+carried forward over the wire.  As keys are transferred, duplicate<br />
+fields in the key are not transferred.<br />
+</blockquote><br />
+General consensus seemed to favor <bold>double compression</bold> - compression both at the application level (i.e., compress the values) and let Accumulo compress as well (i.e., the relative encoding).<br />
+<br />
+In support of double compression, Ameet K. said:<br />
+<blockquote>I've switched to double compression as per previous posts and<br />
+its working nicely. I see about 10-15% more compression over just<br />
+application level Value compression.<br />
+</blockquote>

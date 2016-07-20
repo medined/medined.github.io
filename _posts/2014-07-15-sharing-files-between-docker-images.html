@@ -1,0 +1,109 @@
+---
+layout: post
+title: Sharing Files Between Docker Images Using Volumes
+date: '2014-07-15T14:17:00.001-04:00'
+author: David Medinets
+tags:
+- docker
+modified_time: '2014-07-15T15:12:41.755-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-8614353736853698906
+blogger_orig_url: http://affy.blogspot.com/2014/07/sharing-files-between-docker-images.html
+---
+
+<p>Recently I wanted to provide the same configuration file to two different Docker containers. I choose to solve this using a Docker volume. The configuration file will be sourced from within each container and looks like this:</p><br />
+<pre><code>$ cat bridge-env.sh 
+export BRIDGENAME=brbob
+export IMAGENAME=bob
+export IPADDR=10.0.10.1/24
+</code></pre><br />
+<p>Before any explanations, let's look at the files we'll be using:</p><br />
+<pre><code>./configuration/build_image.sh - wrapper for _docker build_.
+./configuration/run_image.sh - wrapper for _docker run_.
+./configuration/Dockerfile - control file for Docker image.
+./configuration/files/bridge-env.sh - environment setting script.
+</code></pre><br />
+<p>All of the files are fairly small. Since our main topic today is Docker, let's look at the Docker configuration file first.</p><br />
+<pre><code>$ cat Dockerfile
+FROM stackbrew/busybox:latest
+MAINTAINER David Medinets &lt;david.medinets@gmail.com&gt;
+RUN mkdir /configuration
+VOLUME /configuration
+ADD files /configuration
+</code></pre><br />
+<p>And you can build this image.</p><br />
+<pre><code>$ cat build_image.sh
+sudo DOCKER_HOST=$DOCKER_HOST docker build --rm=true -t medined/shared-configuration .
+</code></pre><br />
+<blockquote><p>I setup my docker to use a port instead of a UNIX socket. Therefore my DOCKER<em>HOST is "tcp://0.0.0.0:4243". Since _sudo</em> is being used, the environment variable needs to be set inside the sudo enviroment. If you want to use the default UNIX socker, leave DOCKER_HOST empty. The command will still work.</p></blockquote><br />
+<p>Then run it.</p><br />
+<pre><code>$ cat run_image.sh
+sudo DOCKER_HOST=$DOCKER_HOST docker run --name shared-configuration -t medined/shared-configuration true
+</code></pre><br />
+<p>This command runs a docker container called <em>shared</em>configuration<em>. You'll notice that the _true</em> command is run which exits immediately. Since this container will only hold files, it's ok there are no processes running in it. <b>However, be very careful not to delete this container.</b> Here is the output from <em>docker ps</em> showing the container.</p><br />
+<pre><code>$ docker ps -a
+CONTAINER ID        IMAGE                               COMMAND             CREATED             STATUS                      PORTS               NAMES
+d4a2aa46b5d9        medined/shared-configuration:latest   true                7 seconds ago       Exited (0) 7 seconds ago                       -shared-configuration
+</code></pre><br />
+<p>Now it's time to spin up two plain Ubuntu containers that can access the shared file.</p><br />
+<pre><code>$ sudo DOCKER_HOST=$DOCKER_HOST docker run --name A --volumes-from=shared-configuration -d -t ubuntu /bin/bash
+94638de8b615f356f1240bbe602c0b7862e0589f1711fbff242b6d6f74c7de7d
+$ sudo DOCKER_HOST=$DOCKER_HOST docker run --name B --volumes-from=shared-configuration -d -t ubuntu /bin/bash
+sudo DOCKER_HOST=$DOCKER_HOST docker run --name B --volumes-from=shared-configuration -d -t ubuntu /bin/bash
+</code></pre><br />
+<p>How can we see the shared file? Let's turn to a very useful tool called <em>nsenter</em> (or namespace enter). The following command installs nsenter if isn't already installed.</p><br />
+<pre><code>hash nsenter 2&gt;/dev/null \
+  || { echo &gt;&amp;2 "Installing nsenter"; \
+  sudo DOCKER_HOST=$DOCKER_HOST \
+  docker run -v /usr/local/bin:/target jpetazzo/nsenter;  }
+</code></pre><br />
+<p>I use a little script file to make nsenter easier to use:</p><br />
+<pre><code>$ cat enter_image.sh
+#!/bin/bash
+
+IMAGENAME=$1
+
+usage() {
+  echo "Usage: $0 [image name]"
+  exit 1
+}
+
+if [ -z $IMAGENAME ]
+then
+  echo "Error: missing image name parameter."
+  usage
+fi
+
+PID=$(sudo DOCKER_HOST=$DOCKER_HOST docker inspect --format {{ "{{" }}.State.Pid}} $IMAGENAME)
+sudo nsenter --target $PID --mount --uts --ipc --net --pid
+</code></pre><br />
+<p>This script is used by specifying the image name to use. For example,</p><br />
+<pre><code>$ ./enter_image.sh A
+root@94638de8b615:/# cat /configuration/bridge-env.sh 
+export BRIDGENAME=brbob
+export IMAGENAME=bob
+export IPADDR=10.0.10.1/24
+root@94638de8b615:/# exit
+logout
+$ ./enter_image.sh B
+root@925365faded2:/# cat /configuration/bridge-env.sh 
+export BRIDGENAME=brbob
+export IMAGENAME=bob
+export IPADDR=10.0.10.1/24
+root@925365faded2:/# exit
+logout
+</code></pre><br />
+<p>We see the same information in both containers. Let's prove that the bridge-env.sh file is shared instead of being two copies.</p><br />
+<pre><code>$ ./enter_image.sh A
+root@94638de8b615:/# echo "export NEW_VARIABLE=VALUE" &gt;&gt; /configuration/bridge-env.sh 
+root@94638de8b615:/# exit
+logout
+$ ./enter_image.sh B
+root@925365faded2:/# cat /configuration/bridge-env.sh 
+export BRIDGENAME=brbob
+export IMAGENAME=bob
+export IPADDR=10.0.10.1/24
+export NEW_VARIABLE=VALUE
+</code></pre><br />
+<p>We changed the file in the first container and saw the changes in the second container. As an alternative to using nsenter, you can simply run a container to list the files.</p><br />
+<pre><code>$ docker run --volumes-from shared-configuration busybox ls -al /configuration
+</code></pre>

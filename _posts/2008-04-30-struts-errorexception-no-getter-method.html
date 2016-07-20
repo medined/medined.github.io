@@ -1,0 +1,84 @@
+---
+layout: post
+title: 'Struts Error/Exception: No getter method available for property name for bean
+  under name'
+date: '2008-04-30T14:47:00.002-04:00'
+author: David Medinets
+tags: 
+modified_time: '2008-04-30T14:55:23.585-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-8494821981766779448
+blogger_orig_url: http://affy.blogspot.com/2008/04/struts-errorexception-no-getter-method.html
+---
+
+<p>Recently I was using Struts v1.x and I needed to display a select list. The information about how to use the html:optionsCollection tag was sketchy. I was able to get the tag working this way:</p>
+<p>On the JSP page, I added this inside the html:form tag:</p>
+<pre>&lt;html:select property="selectedEquipment"&gt;
+  &lt;html:optionsCollection property="equipment" label="name" value="id"/&gt;
+&lt;/html:select&gt;</pre>
+<p>Then I create a Java class called SelectOption like this:</p>
+<pre>package com.codebits.struts;
+
+public class SelectOption {
+
+    String id;
+    String name;
+
+    SelectOption() {
+    }
+
+    SelectOption(final String _id, final String _name) {
+        setId(_id);
+        setName(_name);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}</pre>
+<p>Next I created an ActionForm bean:<p>
+<pre>package com.codebits.struts;
+
+public class AddForm extends ActionForm {
+
+    private Integer           selectedEquipment = null;
+
+    private List              equipment         = new ArrayList();
+    
+    public Integer getSelectedEquipment() {
+        return selectedEquipment;
+    }
+    
+    public void setSelectedEquipment(Integer selectedEquipment) {
+        this.selectedEquipment = selectedEquipment;
+    }
+    
+    public List getEquipment() {
+        return equipment;
+    }
+    
+    public void addEquipment(final String equipmentId, final String emtEquipmentId) {
+        this.equipment.add(new SelectOption(equipmentId, emtEquipmentId));
+    }
+    
+    public void setEquipment(List equipment) {
+        this.equipment = equipment;
+    }
+
+}</pre>
+<p>And finally, in my action class, I prepopulated the ActionForm bean:</p>
+<pre>  AddForm addForm = (AddForm)form;
+  addForm.addEquipment("1", "AAA");
+  addForm.addEquipment("2", "BBBB");
+</pre>

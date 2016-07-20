@@ -1,0 +1,27 @@
+---
+layout: post
+title: Database Sequences Needed for JBoss Portal & Oracle
+date: '2007-02-05T18:37:00.000-05:00'
+author: David Medinets
+tags: 
+modified_time: '2007-02-07T08:12:12.807-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-812921501548635817
+blogger_orig_url: http://affy.blogspot.com/2007/02/database-sequences-needed-for-jboss.html
+---
+
+When I just installed JBoss it was configured to use Oracle. However, JBoss Portal did not work immediately. I needed to perform the following steps:
+
+1. Copy the Oracle JDBC jar file to [JBOSS.HOME]/server/default/lib.
+
+2. Create database sequences:
+
+<code>create sequence hibernate_sequence;
+create sequence portal_seq;
+create sequence sec_seq;
+create sequence instance_seq;
+create sequence portlet_seq;
+create sequence user_seq;
+</code>
+I'm not sure when Hibernate didn't create these sequences automatically. I may be an issue specific to Oracle since I don't recall the same problem when using other databases.
+
+UPDATE: JBoss Portal did not automatically create the sequences because I did not copy the Oracle JDBC jar file into the JBOSS.HOME/lib directory <span style="font-style: italic;">immediately</span> after the installation process completed.

@@ -1,0 +1,254 @@
+---
+layout: post
+title: Setting Up a Ubuntu Perforce Server
+date: '2007-09-08T05:20:00.000-04:00'
+author: David Medinets
+tags: 
+modified_time: '2007-09-08T05:25:07.629-04:00'
+thumbnail: http://farm2.static.flickr.com/1063/1043837898_dc3536a25a_t.jpg
+blogger_id: tag:blogger.com,1999:blog-3207985.post-2919798430130318842
+blogger_orig_url: http://affy.blogspot.com/2007/09/setting-up-ubuntu-perforce-server.html
+---
+
+<h1>Setting Up a Ubuntu Perforce Server</h1>
+
+<p>This is a step-by-step guide to installing and configuring Perforce on a Ubuntu server. It assumes that you have already created a Basic Ubuntu Server. There are several sections below:</p>
+
+<ul>
+  <li>Download Perforce</li>
+  <li>Configure Perforce</li>
+  <li>Run Perforce Server For the First Time</li>
+  <li>Setup Perforce As Bootup Service</li>
+  <li>ToDo</li>
+  <li>Resources</li>
+</ul>
+
+<h2>Download Perforce</h2>
+<ol>
+  <li>Use Lynx to download the P4D software.
+<pre>
+  lynx http://www.perforce.com/perforce/downloads/linux26x86.html
+</pre></li>
+
+  <li>Enter Y to allow the cookie from Perforce.com.</li>
+
+  <li>Press the Down Arrow until the <i>Downloads</i> link is selected. Then press Enter.
+
+  <img src="http://farm2.static.flickr.com/1063/1043837898_dc3536a25a.jpg" /></li>
+
+  <li>Press the Down Arrow until the <i>Linux Kernel 2.6 for x86</i> link is selected. Then press Enter.
+
+  <img src="http://farm2.static.flickr.com/1101/1043002623_d8b7d92afc.jpg" /></li>
+
+  <li>Press the Down Arrow until the <i>Download</i> link is selected. Then press Enter.
+
+  <img src="http://farm2.static.flickr.com/1173/1043875116_475742739e.jpg" /></li>
+
+  <li>Press D to start the download.
+
+  <img src="http://farm2.static.flickr.com/1025/1043033233_7a1bec424a.jpg" /></li>
+
+  <li>Press the Down Arrow to highlight the ''Save to disk'' link. Then press Enter.
+
+  <img src="http://farm2.static.flickr.com/1028/1043046835_3df57fd07b.jpg" /></li>
+
+  <li>Use the default filename of `p4d`.
+
+  <img src="http://farm2.static.flickr.com/1385/1043911614_e1f4fc1110.jpg" /></li>
+
+  <li>Press q, then press Enter to exit Lynx.</li>
+
+ <li>Use Lynx to download the P4 software by retrace the steps above expect selecting to download `P4` instead of `P4D`.</li>
+</ol>
+
+<h2>Configure Perforce</h2>
+
+This information is a reprise of the [http://www.perforce.com/perforce/doc.072/manuals/p4sag/index.html Perforce Administration Guide] along with some additional information.
+<ol>
+  <li>Download the `daemon` utility. This utility allows `p4d` to be run by the `perforce` user instead of `root`.
+<pre>
+  sudo apt-get daemon
+</pre></li>
+
+  <li>Connect to the directory where the `p4` and `p4d` files where downloaded (probably the home directory).
+<pre>
+  cd ~
+</pre></li>
+
+  <li>Make the `p4` and `p4d` files executable.
+<pre>
+  chmod +x p4 p4d
+</pre></li>
+
+  <li>Copy the Perforce executables to `/usr/local/bin` which is already in the system PATH environment variable.
+<pre>
+  sudo mv p4 /usr/local/bin
+  sudo mv p4d /usr/local/bin
+</pre></li>
+
+  <li>Create a group for Perforce files.
+<pre>
+  sudo addgroup p4admin
+</pre></li>
+
+  <li>Create a user for Perforce administrative work.
+<pre>
+  sudo adduser perforce
+</pre></li>
+
+  <li>Use `visudo` to give the perforce user account the ability to use `sudo`. Add the following line at the end o f the file.
+<pre>
+  perforce ALL = ALL
+</pre></li>
+
+  <li>Log off your default user account.</li>
+
+  <li>Log in using the `perforce` account.</li>
+
+ <li>Create a directory to hold the repository.
+<pre>
+  sudo mkdir /perforce_depot
+  sudo chown perforce:p4admin /perforce_depot  
+</pre></li>
+
+ <li>Create a directory to hold Perforce log files.
+<pre>
+  sudo mkdir /var/log/perforce
+  sudo chown perforce:p4admin /var/log/perforce
+</pre></li>
+
+ <li>Add the following lines to the end of /etc/profile. These settings will be used by client programs run on the Linux server - not by the Perforce server.
+<pre>
+  # Perforce Settings
+  export P4JOURNAL=/var/log/perforce/journal
+  export P4LOG=/var/log/perforce/p4err
+  export P4PORT=localhost:1666
+  export P4ROOT=/perforce_depot
+  export P4USER=perforce
+</pre></li>
+
+ <li>Load the Perforce settings.
+<pre>
+  source /etc/profile
+</pre></li>
+
+ <li>Create a Perforce group to limit resource usage using `sudo p4 group developers` to set the following values. See http://kb.perforce.com/P4dServerReference/Performance/ViewsProtect..Maxlocktime for more information.
+<pre>
+  Group: developers
+  MaxResults:  50000
+  MaxScanRows: 250000
+  MaxLocktime: 30000
+  Timeout:     4320
+  Subgroups:
+  Users:
+    developer
+</pre></li>
+</ol>
+
+<h2>Setup Perforce As Bootup Service</h2>
+<ol>
+  <li>Connect to the initialization control directory.
+<pre>
+  cd /etc/init.d
+</pre></li>
+
+  <li>Create the Perforce control script using `sudo vi perforce`.
+<pre>
+  #!/bin/sh -e
+
+  export P4JOURNAL=/var/log/perforce/journal
+  export P4LOG=/var/log/perforce/p4err
+  export P4ROOT=/perforce_depot
+  export P4PORT=1666
+
+  PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+
+  . /lib/lsb/init-functions
+
+  p4start="p4d -d"
+  p4stop="p4 admin stop"
+  p4user=perforce
+
+  case "$1" in
+  start)
+    log_action_begin_msg "Starting Perforce Server"
+    daemon -u $p4user $p4start;
+    ;;
+
+  stop)
+    log_action_begin_msg "Stopping Perforce Server"
+    daemon -u $p4user $p4stop;
+    ;;
+
+  restart)
+    stop
+    start
+    ;;
+
+  *)
+    echo "Usage: /etc/init.d/perforce (start|stop|restart)
+    exit 1
+    ;;
+
+esac
+
+exit 0
+</pre></li>
+
+  <li>Integrate the Perforce control script into the boot process.
+<pre>
+  sudo update-rc.d perforce defaults
+</pre></li>
+
+  <li>Goto your home directory then use the control script to start the Perforce server.
+<pre>
+  cd ~
+  sudo /etc/init.d/perforce start
+</pre></li>
+
+  <li>Use the control script to restart the Perforce server.
+<pre>
+  sudo /etc/init.d/perforce restart
+</pre></li>
+</ol>
+
+<h2>Run Perforce Server For the First Time</h2>
+
+Before Perforce can be used by a team there are two housekeeping task that need to be done - creating the journal and closing a security hole.
+
+<ol>
+  <li>Set the Perforce environment variables.
+<pre>
+  source /etc/profile
+</pre></li>
+
+  <li>Start the perforce server. The command line is short because all of the settings are provided by the variables exported by /etc/profile.
+<pre>
+  sudo p4d –d
+</pre></li>
+
+  <li>Create the journal.
+<pre>
+  sudo p4d –jc
+</pre></li>
+
+  <li>By default, all users connected to Perforce are administrators. However, that level of security is not acceptable for a normal development environment. Run the `protect` option to switch out of the default security mode. For now, accept the default protections by typing `:wq` and pressing Enter.
+<pre>
+  sudo p4 protect
+</pre></li>
+
+  <li>Stop the Perforce server.
+<pre>
+  sudo p4 admin stop
+</pre></li>
+</ol>
+<h2>TODO</h2>
+
+  * Journalling<br/>
+  * checkpointing<br/>
+  * backups<br/>
+
+<h2>Resources</h2>
+
+  * <a href="http://public.perforce.com/public/index.html">Perforce's public depot</a><br/>
+  * <a href="http://kb.perforce.com/AdminTasks/InstallAndUpgrade/RunningAPerf..InetdOnUnix">http://kb.perforce.com/AdminTasks/InstallAndUpgrade/RunningAPerf..InetdOnUnix How to start `p4d` via `inetd` instead of a startup script.</a><br/>

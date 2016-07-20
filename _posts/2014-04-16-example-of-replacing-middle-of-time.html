@@ -1,0 +1,99 @@
+---
+layout: post
+title: Example of Replacing The Middle of a Time Series in R
+date: '2014-04-16T09:49:00.001-04:00'
+author: David Medinets
+tags: 
+modified_time: '2014-04-16T13:32:18.739-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-1708727980948378175
+blogger_orig_url: http://affy.blogspot.com/2014/04/example-of-replacing-middle-of-time.html
+---
+
+Exploration of replacing part of a Time Series<br />
+<br />
+<pre>install.packages('zoo')
+library('zoo')
+timeSeries <- ts(1:96, freq=12, start=2001); timeSeries
+
+     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+2001   1   2   3   4   5   6   7   8   9  10  11  12
+2002  13  14  15  16  17  18  19  20  21  22  23  24
+2003  25  26  27  28  29  30  31  32  33  34  35  36
+2004  37  38  39  40  41  42  43  44  45  46  47  48
+2005  49  50  51  52  53  54  55  56  57  58  59  60
+2006  61  62  63  64  65  66  67  68  69  70  71  72
+2007  73  74  75  76  77  78  79  80  81  82  83  84
+2008  85  86  87  88  89  90  91  92  93  94  95  96
+
+#
+# If you already know the indexes of the elements to 
+# replace, just do it:
+#
+timeSeries[13:36] <- NA
+timeSeries
+
+     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+2001   1   2   3   4   5   6   7   8   9  10  11  12
+2002  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+2003  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+2004  37  38  39  40  41  42  43  44  45  46  47  48
+2005  49  50  51  52  53  54  55  56  57  58  59  60
+2006  61  62  63  64  65  66  67  68  69  70  71  72
+2007  73  74  75  76  77  78  79  80  81  82  83  84
+2008  85  86  87  88  89  90  91  92  93  94  95  96
+
+#
+# However, sometimes you might want to refer to the
+# Time Series part by date. Below is one way to do
+# that.
+#
+
+#
+# Reset the Time Series and then look at just two years, 2002 and 2003
+#
+timeSeries <- ts(1:96, freq=12, start=2001);
+window(timeSeries, start=c(2002,1), end=c(2003,12))
+
+     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+2002  13  14  15  16  17  18  19  20  21  22  23  24
+2003  25  26  27  28  29  30  31  32  33  34  35  36
+
+#
+# Copy this part of the timeSeries for safety.
+#
+original = window(timeSeries, start=c(2002,1), end=c(2003,12))
+
+#
+# Change 2002 and 2003 to NA because a lawsuit is pending.
+# 
+window(timeSeries, start=c(2002,1), end=c(2003,12)) <- NA
+timeSeries
+
+     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+2001   1   2   3   4   5   6   7   8   9  10  11  12
+2002  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+2003  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+2004  37  38  39  40  41  42  43  44  45  46  47  48
+2005  49  50  51  52  53  54  55  56  57  58  59  60
+2006  61  62  63  64  65  66  67  68  69  70  71  72
+2007  73  74  75  76  77  78  79  80  81  82  83  84
+2008  85  86  87  88  89  90  91  92  93  94  95  96
+
+#
+# The lawsuit is over and you won. Retrieve the data.
+#
+
+window(timeSeries, start=c(2002,1), end=c(2003,12)) <- original
+
+> timeSeries
+     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+2001   1   2   3   4   5   6   7   8   9  10  11  12
+2002  13  14  15  16  17  18  19  20  21  22  23  24
+2003  25  26  27  28  29  30  31  32  33  34  35  36
+2004  37  38  39  40  41  42  43  44  45  46  47  48
+2005  49  50  51  52  53  54  55  56  57  58  59  60
+2006  61  62  63  64  65  66  67  68  69  70  71  72
+2007  73  74  75  76  77  78  79  80  81  82  83  84
+2008  85  86  87  88  89  90  91  92  93  94  95  96
+
+</pre>

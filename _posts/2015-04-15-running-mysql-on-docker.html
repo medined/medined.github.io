@@ -1,0 +1,69 @@
+---
+layout: post
+title: Running MySQL on Docker
+date: '2015-04-15T23:53:00.000-04:00'
+author: David Medinets
+tags: 
+modified_time: '2015-04-15T23:53:07.526-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-6219763085323656729
+blogger_orig_url: http://affy.blogspot.com/2015/04/running-mysql-on-docker.html
+---
+
+This entry doesn't reveal any hidden secrets just the simple steps to start using MySQL on Docker.<br />
+<br />
+* Install docker<br />
+<br />
+* Install docker-compose<br />
+<br />
+* mkdir firstdb<br />
+<br />
+* cd firstdb<br />
+<br />
+* vi docker-compose.yml<br />
+<br />
+<span style="font-family: 'Courier New', Courier, monospace;">mysql:</span><br />
+<span style="font-family: Courier New, Courier, monospace;">image: mysql:latest</span><br />
+<span style="font-family: Courier New, Courier, monospace;">environment:</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_DATABASE: sample</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_USER: mysql</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_PASSWORD: mysql</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_ROOT_PASSWORD: supersecret</span><br />
+<br />
+* docker-compose up<br />
+* docker-compose ps<br />
+<br />
+<span style="font-family: Courier New, Courier, monospace;">Name                   Command          State    Ports</span><br />
+<span style="font-family: Courier New, Courier, monospace;">-----------------------------------------------------------------</span><br />
+<span style="font-family: Courier New, Courier, monospace;">firstdb_mysql_1   /entrypoint.sh mysqld   Up      3306/tcp</span><br />
+<br />
+* Use a one-shot Docker instance to display environment variables. Notice <br />
+the variables that start with MYSQL? Your programs can use these variables<br />
+to make the database connection.<br />
+<br />
+<span style="font-family: Courier New, Courier, monospace;"><b>docker run --link=firstdb_mysql_1:mysql ubuntu env</b></span><br />
+<span style="font-family: Courier New, Courier, monospace;">PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin</span><br />
+<span style="font-family: Courier New, Courier, monospace;">HOSTNAME=abfc8d50633b</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_PORT=tcp://172.17.0.23:3306</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_PORT_3306_TCP=tcp://172.17.0.23:3306</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_PORT_3306_TCP_ADDR=172.17.0.23</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_PORT_3306_TCP_PORT=3306</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_PORT_3306_TCP_PROTO=tcp</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_NAME=/nostalgic_rosalind/mysqldb</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_ENV_MYSQL_PASSWORD=mysql</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_ENV_MYSQL_ROOT_PASSWORD=supersecret</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_ENV_MYSQL_USER=mysql</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_ENV_MYSQL_DATABASE=sample</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_ENV_MYSQL_MAJOR=5.6</span><br />
+<span style="font-family: Courier New, Courier, monospace;">MYSQL_ENV_MYSQL_VERSION=5.6.24</span><br />
+<span style="font-family: Courier New, Courier, monospace;">HOME=/root</span><br />
+<br />
+* Use a one-shot Docker instance for a MySQL command-line interface. Once this<br />
+is running, you'll be able to use command like 'show databases'.<br />
+<br />
+<span style="font-family: Courier New, Courier, monospace;">docker run -it \</span><br />
+<span style="font-family: Courier New, Courier, monospace;">--link=firstcompose_mysqldb_1:mysql \</span><br />
+<span style="font-family: Courier New, Courier, monospace;">--rm \</span><br />
+<span style="font-family: Courier New, Courier, monospace;">mysql/mysql-server:latest \</span><br />
+<span style="font-family: Courier New, Courier, monospace;">sh -c 'exec mysql -h"$MYSQL_PORT_3306_TCP_ADDR" -P"$MYSQL_PORT_3306_TCP_PORT" -uroot -p"$MYSQL_ENV_MYSQL_ROOT_PASSWORD"'</span><br />
+<br />
+That's all it takes to start.

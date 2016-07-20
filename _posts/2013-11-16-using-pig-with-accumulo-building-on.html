@@ -1,0 +1,31 @@
+---
+layout: post
+title: Using Pig with Accumulo (building on Jason Trost's work)
+date: '2013-11-16T23:33:00.001-05:00'
+author: David Medinets
+tags:
+- accumulo
+modified_time: '2013-11-24T22:53:42.825-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-6548511325736179387
+blogger_orig_url: http://affy.blogspot.com/2013/11/using-pig-with-accumulo-building-on.html
+---
+
+https://github.com/medined/accumulo-pig shows how to use Accumulo as a simple source for Apache Pig. (By the way, I haven't tested writing to Accumulo yet)<br />
+<br />
+After the quick setup, you'll be able to read from Accumulo using a script like the following. The '\' character represents a line continuation. Be careful with your security because the password is sent via plain text. And stored in your history buffer. Probably this should be changed to use a property file.<br />
+<br />
+<pre style="background-color: #f8f8f8; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; border-top-left-radius: 3px; border-top-right-radius: 3px; border: 1px solid rgb(221, 221, 221); color: #333333; font-family: Consolas, 'Liberation Mono', Courier, monospace; font-size: 13px; line-height: 19px; margin-bottom: 15px; margin-top: 15px; overflow: auto; padding: 6px 10px; word-wrap: normal;"><code style="background-color: transparent; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; border-top-left-radius: 3px; border-top-right-radius: 3px; border: none; font-family: Consolas, 'Liberation Mono', Courier, monospace; font-size: 12px; margin: 0px; padding: 0px; word-wrap: normal;">pig
+register /home/vagrant/accumulo_home/bin/accumulo/lib/accumulo-core.jar
+register /home/vagrant/accumulo_home/bin/accumulo/lib/accumulo-fate.jar
+register /home/vagrant/accumulo_home/bin/accumulo/lib/accumulo-trace.jar
+register /home/vagrant/accumulo_home/bin/accumulo/lib/libthrift.jar
+register /home/vagrant/accumulo_home/bin/zookeeper/zookeeper-3.4.5.jar
+register /vagrant/accumulo-pig/target/accumulo-pig-1.4.0.jar
+
+DATA = LOAD 'accumulo://people?instance=instance&amp;user=root&amp;password=secret\
+&amp;zookeepers=affy-master:2181&amp;columns=attribute' \
+using org.apache.accumulo.pig.AccumuloStorage() AS (row, cf, cq, cv, ts, val);
+
+HEIGHTS = FOREACH DATA GENERATE row, cq, val;
+SORTED_SET = ORDER HEIGHTS BY val DESC;
+dump SORTED_SET;</code></pre>

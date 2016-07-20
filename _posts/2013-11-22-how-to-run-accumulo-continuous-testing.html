@@ -1,0 +1,60 @@
+---
+layout: post
+title: How to Run Accumulo Continuous Testing (well ... some of them)
+date: '2013-11-22T17:05:00.001-05:00'
+author: David Medinets
+tags:
+- accumulo
+modified_time: '2013-11-22T17:07:56.905-05:00'
+thumbnail: http://1.bp.blogspot.com/-FqnzxTyJKT8/Uo7VhCOFo0I/AAAAAAAACHw/kpLjcdBlGxE/s72-c/ContinuousIngestExample.tiff
+blogger_id: tag:blogger.com,1999:blog-3207985.post-1326250397863554004
+blogger_orig_url: http://affy.blogspot.com/2013/11/how-to-run-accumulo-continuous-testing.html
+---
+
+Accumulo comes with a lot of tests. This note is about the scripts in the test/system/continuous directory. The README is very descriptive so there is no need for me to discuss what the tests do. I'm just doing a show and tell.<br />
+<br />
+After creating an Accumulo cluster, you'll ssh to the master node to install Parallel SSH (pssh).<br />
+<ol style="background-color: white;">
+<li style="color: #333333;"><span style="font-family: Georgia, serif;">Start an Accumulo cluster using </span><span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><a href="https://github.com/medined/Accumulo_1_5_0_By_Vagrant">https://github.com/medined/Accumulo_1_5_0_By_Vagrant</a></span></li>
+<li style="color: #333333;"><span style="font-family: Courier New, Courier, monospace; font-size: x-small;">vagrant ssh master</span></li>
+<li style="color: #333333;"><span style="font-family: Courier New, Courier, monospace; font-size: x-small;">cd ~/accumulo_home/software</span></li>
+<li style="color: #333333;"><span style="font-family: Courier New, Courier, monospace; font-size: x-small;">git clone http://code.google.com/p/parallel-ssh</span></li>
+<li><span style="color: #333333;"><span style="font-family: Courier New, Courier, monospace; font-size: x-small;">cd parallel-ssh</span></span></li>
+<li><span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><span style="color: #333333;">sudo python setup.py</span><span style="color: #333333;">&nbsp;install</span></span> </li>
+</ol>
+<div>
+<span style="color: #333333; font-family: Monaco;"><span style="font-size: 12px;">Now you can run the continuous programs. I've created the editable files so you can just copy my versions (Step two below). The start_ingest.sh script starts ingest processes on the slave nodes which was not immediately obvious to me. Watch&nbsp;</span></span><span style="font-family: Arial; font-size: 13px;">Watch&nbsp;</span><span style="color: #0f3bee; font-family: Arial; font-size: 13px;"><u><a href="http://affy-master:50095/">http://affy-master:50095/</a></u></span><span style="font-family: Arial; font-size: 13px;">&nbsp;to see the ingest rate. When you've got enough entries, run the stop-ingest.sh.</span></div>
+<div>
+<ol>
+<li><span style="color: #333333; font-family: Monaco;"><span style="font-size: 12px;"><span style="font-family: Arial; font-size: 13px;">cd ~/accumulo_home/bin/accumulo/test/system/continuous</span> </span></span></li>
+<li><span style="color: #333333; font-family: Monaco;"><span style="font-size: 12px;"><span style="font-family: Arial; font-size: 13px;">cp /vagrant/files/config/accumulo/continuous/* . </span></span></span></li>
+<li><span style="color: #333333; font-family: Monaco;"><span style="font-size: 12px;"><span style="font-family: Arial; font-size: 13px;">./start-ingest.sh</span></span></span></li>
+<li><span style="color: #333333; font-family: Monaco;"><span style="font-size: 12px;"><span style="font-family: Arial; font-size: 13px;">./stop-ingest.sh</span></span></span></li>
+</ol>
+<div>
+<span style="color: #333333; font-family: Arial; font-size: x-small;">The figure below shows the ingest rate running two nodes on my MacBook Pro inside VirtualBox. My setup won't win any speed awards!</span></div>
+</div>
+<br />
+<div class="separator" style="clear: both; text-align: center;">
+<a href="http://1.bp.blogspot.com/-FqnzxTyJKT8/Uo7VhCOFo0I/AAAAAAAACHw/kpLjcdBlGxE/s1600/ContinuousIngestExample.tiff" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="287" src="http://1.bp.blogspot.com/-FqnzxTyJKT8/Uo7VhCOFo0I/AAAAAAAACHw/kpLjcdBlGxE/s320/ContinuousIngestExample.tiff" width="320" /></a></div>
+<br />
+<div>
+The next scripts we'll run are the walker scripts. They walk the entries produced by the ingest script. The output from the walker scripts are found on the slave nodes in the&nbsp;<span style="font-family: Arial; font-size: 13px;">/home/vagrant/accumulo_home/bin/accumulo/test/system/continuous/logs directory.&nbsp;</span><span style="font-family: Arial; font-size: 13px;">Watch&nbsp;</span><span style="color: #0f3bee; font-family: Arial; font-size: 13px;"><u>http://affy-master:50095/</u></span><span style="font-family: Arial; font-size: 13px;">&nbsp;to see the scan rate.</span></div>
+<div>
+<ol>
+<li><span style="font-family: Courier New, Courier, monospace; font-size: x-small;">./start-walkers.sh</span></li>
+<li><span style="font-family: Courier New, Courier, monospace; font-size: x-small;">./stop-walkers.sh</span></li>
+</ol>
+<div>
+<span style="font-family: Arial; font-size: x-small;">Below is an example of the scan rate&nbsp;</span></div>
+<div>
+<a href="http://1.bp.blogspot.com/-42X239I5uL8/Uo7Vmxr3EaI/AAAAAAAACH4/-ff1akufvGM/s1600/ContinuousWalkerExample.tiff" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" height="139" src="http://1.bp.blogspot.com/-42X239I5uL8/Uo7Vmxr3EaI/AAAAAAAACH4/-ff1akufvGM/s320/ContinuousWalkerExample.tiff" width="320" /></a><br />
+<br />
+And finally there is the verify script which took about 15 minutes to run on my setup. You can&nbsp;<span style="font-family: Arial; font-size: 13px;">visit&nbsp;</span><span style="color: #0f3bee; font-family: Arial; font-size: 13px;"><u>http://affy-master:50030/jobtracker.jsp</u></span><span style="font-family: Arial; font-size: 13px;">&nbsp;to see the job running</span><br />
+<br />
+<br />
+<ol>
+<li><span style="font-family: Courier New, Courier, monospace; font-size: x-small;">./run-verify.sh</span></li>
+</ol>
+</div>
+</div>

@@ -1,0 +1,125 @@
+---
+layout: post
+title: Technologies Used In Developing Applications Using Apache Accumulo
+date: '2013-09-23T23:25:00.002-04:00'
+author: David Medinets
+tags:
+- accumulo
+modified_time: '2013-11-24T22:55:30.152-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-8790637650845556941
+blogger_orig_url: http://affy.blogspot.com/2013/09/technologies-used-in-developing.html
+---
+
+I was recently talking about how people train themselves for Big Data projects. The technology stack is fairly daunting. Below are the technologies that I find helpful. I'll add the list as I remember more:<br />
+<br />
+<b>Systems Administration Technologies</b><br />
+<br />
+<i>System administrators are absolutely essential to successful projects. They ensure that software is installed and configured correctly. More importantly, they ensure repeatable builds and deployments. Oh, and they really need to understand the widely varying failure modes. Read the excellently written&nbsp;<a href="http://aphyr.com/" target="_blank">Aphyr</a>&nbsp;blog to learn about some of them.</i><br />
+<br />
+<a href="http://www.openstack.org/" target="_blank">OpenStack</a> - The technology consists of a series of interrelated projects that 
+control pools of processing, storage, and networking resources 
+throughout a datacenter, all managed through a dashboard that gives 
+administrators control while empowering its users to provision resources
+ through a web interface. <br />
+<div>
+<br /></div>
+<div>
+<a href="http://puppetlabs.com/" target="_blank">Puppet</a> - Puppet Open Source is a flexible, customizable framework available under
+ the Apache 2.0 license designed to help system administrators automate 
+the many repetitive tasks they regularly perform.</div>
+<div>
+<br /></div>
+<div>
+<a href="http://en.wikipedia.org/wiki/Bash_%28Unix_shell%29" target="_blank">Bash</a> - The command-line for Unix-based operating systems. While you learn about the Bash shell, make sure you also become proficient in <a href="http://www.perl.org/" target="_blank">Perl</a>, <a href="https://www.ruby-lang.org/en/" target="_blank">Ruby</a>, or <a href="http://www.python.org/" target="_blank">Python</a> scripting language.</div>
+<div>
+</div>
+<div>
+<div>
+<a href="http://jenkins-ci.org/" target="_blank">Jenkins</a> - An application that monitors executions of repeated jobs, such as building a software project or jobs run by cron.</div>
+<div>
+<br /></div>
+<a href="http://ganglia.sourceforge.net/" target="_blank">Ganglia</a> -&nbsp; (optional) A scalable distributed monitoring system for high-performance computing systems such as clusters and Grids. </div>
+<div>
+<br /></div>
+<div>
+<a href="https://gitorious.org/" target="_blank">Gitorious</a> - (optional) A infrastructure for hosting open source
+    projects that use Git. It can be used inside your firewalls to provide secure access to git repositories. </div>
+<div>
+<br /></div>
+<div>
+<a href="https://www.atlassian.com/software/jira" target="_blank">Jira</a> - (optional) Issue Tracker software. If you're using the Agile methodology, make sure to get the Jira Agile version.</div>
+<br />
+<div>
+<b>Application Developer Technologies</b></div>
+<div>
+</div>
+<div>
+</div>
+<div>
+</div>
+<div>
+</div>
+<div>
+</div>
+<div>
+</div>
+<div>
+<br />
+<a href="http://www.vim.org/" target="_blank">Vim</a> - While you may prefer to use a nice graphical IDE like <a href="https://netbeans.org/" target="_blank">NetBeans</a>, <a href="http://eclipse.org/" target="_blank">Eclipse</a> or <a href="http://www.jetbrains.com/idea/" target="_blank">IntelliJ</a>, you'll be totally lost if you don't understand Vim. It can easily open large files that utterly crush any IDE.</div>
+<div>
+<br /></div>
+<a href="http://www.oracle.com/technetwork/java/index.html" target="_blank">Java </a>- The programming language for Accumulo. Actually you can probably use most JVM-based languages. <br />
+<div>
+<div>
+<br />
+<a href="http://ant.apache.org/" target="_blank">Ant </a>- While knowledge if Ant is not required, I use it to run both Java and Map-Reduce jobs. Its ability to orchestrate multiple targets can prove valuable.<br />
+<br /></div>
+</div>
+<div>
+<a href="http://git-scm.com/" target="_blank">Git</a> - A distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
+This is the version control system used by Accumulo. It seems fairly safe to say that you need at least a basic knowledge of Git to excel.<br />
+<br /></div>
+<div>
+<a href="http://maven.apache.org/" target="_blank">Maven</a> - A software project management and comprehension tool. Based on the concept of a project object model
+        (POM), Maven can manage a project's build, reporting and documentation from a central piece of information. Apache Accumulo uses Maven to compile, test and build jar files.<br />
+<br /></div>
+<div>
+<a href="http://tomcat.apache.org/" target="_blank">Tomcat</a> or <a href="http://www.eclipse.org/jetty/" target="_blank">Jetty</a> - (optional) Web applications are the main way to interact with users and these two web servers are good to develop with.<br />
+<br /></div>
+<a href="http://hadoop.apache.org/" target="_blank">Hadoop</a> - The Hadoop project develops open-source software for
+      reliable, scalable, distributed computing. There are several distributions of the Hadoop stack (MapR, Cloudera, etc...) that you can use.<br />
+<div>
+<br /></div>
+<div>
+<a href="http://zookeeper.apache.org/" target="_blank">Zookeeper</a> - A centralized service for maintaining configuration information, naming,
+ providing distributed synchronization, and providing group services. 
+All of these kinds of services are used in some form or another by 
+distributed applications. Accumulo depends on Zookeeper.</div>
+<a href="http://accumulo.apache.org/" target="_blank">Accumulo</a> - a sorted, distributed key/value store is a robust, scalable, high performance 
+data storage and retrieval system.<br />
+<br />
+<div>
+<div>
+<a href="http://jenkins-ci.org/" target="_blank">Jenkins</a> - An application that monitors executions of repeated jobs, such as building a software project or jobs run by cron.<br />
+<br />
+<a href="http://lucene.apache.org/solr/" target="_blank">Solr</a>&nbsp; - includes powerful full-text search, hit highlighting, faceted search, near
+ real-time indexing, dynamic clustering, database integration, rich 
+document (e.g., Word, PDF) handling, and geo-spatial search. Solr is extremely useful when integrating between Big Data and applications. You can analyze the heck out of your data and then store the results in Solr.</div>
+<div>
+<br /></div>
+<a href="https://gitorious.org/" target="_blank">Gitorious</a> - (optional) A infrastructure for hosting open source
+    projects that use Git. It can be used inside your firewalls to provide secure access to git repositories.</div>
+<div>
+<br /></div>
+<div>
+<div>
+<a href="https://www.atlassian.com/software/jira" target="_blank">Jira</a> - (optional) Issue Tracker software. If you're using the Agile methodology, make sure to get the Jira Agile version.<br />
+<br />
+<a href="http://www.gnuplot.info/" target="_blank">Gnuplot</a> - (optional) plotting software<br />
+<br />
+<a href="http://www.graphviz.org/" target="_blank">Graphviz</a> - (optional) diagramming software<br />
+<br />
+<br /></div>
+<div>
+<br /></div>
+</div>
