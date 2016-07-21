@@ -3,17 +3,16 @@ layout: post
 title: Cardinality Estimation for the D4M Schema in Accumulo
 date: '2014-05-19T15:46:00.002-04:00'
 author: David Medinets
-tags:
-- accumulo
-- Cardinality Estimation
-- D4M
+categories: accumulo D4M
 modified_time: '2014-05-19T15:46:32.048-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-1178804098087337152
 blogger_orig_url: http://affy.blogspot.com/2014/05/cardinality-estimation-for-d4m-schema.html
 ---
 
-<br />
-After dumping random datasets into my D4M schema, I was curious about the cardinality of the fields. I wanted to answer the question:<br />
+After dumping random datasets into my D4M schema, I was curious about the cardinality of the fields.
+
+
+I wanted to answer the question:<br />
 <br />
 <blockquote>How many different first names exist?</blockquote><br />
 Not wanting to overload RAM with a large HashMap I investigated alternatives and settled on the HyperLogLog approach used by the _streamlib_ project from AddThis. You can add the jar files to your project using this Maven dependency:<br />

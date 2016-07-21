@@ -3,13 +3,16 @@ layout: post
 title: Spring, Fluent APIs, and BeanInfo
 date: '2006-04-12T21:31:00.000-04:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2006-04-16T02:15:15.756-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-114489189610553159
 blogger_orig_url: http://affy.blogspot.com/2006/04/spring-fluent-apis-and-beaninfo.html
 ---
 
-<p>Fluent APIs use setters that return objects instead of void. Normally, Spring won't be able to use classes that implement a fluent API because the setter method won't be found. However, I have learned that it is possible to write a BeanInfo class which helps the Java reflection system. Here is a simple example:</p>
+Fluent APIs use setters that return objects instead of void. Normally, Spring won't be able to use classes that implement a fluent API because the setter method won't be found.
+
+
+However, I have learned that it is possible to write a BeanInfo class which helps the Java reflection system. Here is a simple example:
 <pre>
 package com.codebits;
 

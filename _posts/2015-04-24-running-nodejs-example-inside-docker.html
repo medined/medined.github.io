@@ -3,13 +3,15 @@ layout: post
 title: Running the NodeJS Example Inside Docker Container
 date: '2015-04-24T23:01:00.001-04:00'
 author: David Medinets
-tags: 
+categories: docker node
 modified_time: '2015-04-24T23:01:09.022-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-6617868992146015197
 blogger_orig_url: http://affy.blogspot.com/2015/04/running-nodejs-example-inside-docker.html
 ---
 
 Yesterday, I showed how to run NodeJS inside a Docker container. Today, I updated my Github project (https://github.com/medined/docker-nodejs) so that the Example server works correctly.<br />
+
+
 <br />
 The trick is for the NodeJS code inside the container to find the container's IP address and listen on that address instead of localhost or 127.0.0.1. This is not difficult.<br />
 <br />

@@ -3,13 +3,16 @@ layout: post
 title: Rational ClearCase; Java; a utlity to recursively add files to ClearCase.
 date: '2003-01-23T19:40:00.000-05:00'
 author: David Medinets
-tags: 
+categories: java 
 modified_time: '2003-01-23T19:43:08.000-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-90226546
 blogger_orig_url: http://affy.blogspot.com/2003/01/rational-clearcase-java-utlity-to.html
 ---
 
-The inability to add entire directories to ClearCase annoyed me endlessly. I didn't know about the <code>clearfsimport</code> command. And even if I did, I might have written my own utility just for fun. In either case, the code below performs the task. The underlying interaction with ClearCase is handled by the <a href="http://sourceforge.net/projects/clearcase-java/">http://sourceforge.net/projects/clearcase-java/</a> project. If you need to use the ClearcaseCLI class instead of ClearcaseJNI then simply change the <code>import</code> line and the <code>start</code> method. Have Fun!
+The inability to add entire directories to ClearCase annoyed me endlessly. I didn't know about the <code>clearfsimport</code> command.
+
+
+And even if I did, I might have written my own utility just for fun. In either case, the code below performs the task. The underlying interaction with ClearCase is handled by the <a href="http://sourceforge.net/projects/clearcase-java/">http://sourceforge.net/projects/clearcase-java/</a> project. If you need to use the ClearcaseCLI class instead of ClearcaseJNI then simply change the <code>import</code> line and the <code>start</code> method. Have Fun!
 <pre>
 package com.cordiem.clearcase;
 

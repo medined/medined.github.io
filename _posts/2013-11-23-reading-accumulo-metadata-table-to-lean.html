@@ -3,15 +3,16 @@ layout: post
 title: Reading Accumulo Metadata Table to Learn How Many Entries Are In Each Tablet.
 date: '2013-11-23T00:15:00.001-05:00'
 author: David Medinets
-tags:
-- accumulo
+categories: accumulo
 modified_time: '2013-11-24T22:52:20.725-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-4599393110099659080
 blogger_orig_url: http://affy.blogspot.com/2013/11/reading-accumulo-metadata-table-to-lean.html
 ---
 
-After compacting the table, you can run the following program to learn how many entries are in each table. Accumulo does a nice job of splitting tables by byte size but if you have small records then it's fairly easy to run the "Curse of the Last Reducer!" I've run into situations where some tablets have 50K and other with 50M.<br />
-<br />
+After compacting the table, you can run the following program to learn how many entries are in each table. Accumulo does a nice job of splitting tables by byte size but if you have small records then it's fairly easy to run the "Curse of the Last Reducer!" I've run into situations where some tablets have 50K and other with 50M.
+
+
+
 <span style="font-family: Courier New, Courier, monospace; font-size: x-small;">package com.affy;</span><br />
 <span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
 <span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import java.io.IOException;</span><br />

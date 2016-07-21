@@ -3,18 +3,17 @@ layout: post
 title: Using Apache Accumulo as the backing store for Apache Gora - a tutorial
 date: '2013-05-29T23:18:00.000-04:00'
 author: David Medinets
-tags:
-- accumulo
-- gora
+categories: accumulo
 modified_time: '2013-05-29T23:18:07.110-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-5218276916890532051
 blogger_orig_url: http://affy.blogspot.com/2013/05/using-apache-accumulo-as-backing-store.html
 ---
 
-Apache Gora (http://gora.apache.org/) provides an abstraction layer to work with various <br />
-data storage engines. In this tutorial, we'll see how to use Gora with Apache Accumulo <br />
-as the storage engine.<br />
-<br />
+Apache Gora (http://gora.apache.org/) provides an abstraction layer to work with various 
+data storage engines. In this tutorial, we'll see how to use Gora with Apache Accumulo 
+as the storage engine.
+
+
 I like to start projects with the Maven `pom.xml` file. So here is mine. It's important to <br />
 use Accumulo 1.4.3 instead of the newly released 1.5.0 because of an API incompatibility.<br />
 Otherwise, the `pom.xml` file is straightforward.<br />

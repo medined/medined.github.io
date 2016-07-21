@@ -1,16 +1,17 @@
 ---
 layout: post
-title: 'Struts Error/Exception: No getter method available for property name for bean
-  under name'
+title: 'Struts Error/Exception: No getter method available for property name for bean under name'
 date: '2008-04-30T14:47:00.002-04:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2008-04-30T14:55:23.585-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-8494821981766779448
 blogger_orig_url: http://affy.blogspot.com/2008/04/struts-errorexception-no-getter-method.html
 ---
 
 <p>Recently I was using Struts v1.x and I needed to display a select list. The information about how to use the html:optionsCollection tag was sketchy. I was able to get the tag working this way:</p>
+
+
 <p>On the JSP page, I added this inside the html:form tag:</p>
 <pre>&lt;html:select property="selectedEquipment"&gt;
   &lt;html:optionsCollection property="equipment" label="name" value="id"/&gt;

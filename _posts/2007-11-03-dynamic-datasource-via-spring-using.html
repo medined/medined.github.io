@@ -3,13 +3,14 @@ layout: post
 title: Dynamic Datasource via Spring using HotSwappableTargetSource
 date: '2007-11-03T14:29:00.000-04:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2007-12-13T15:51:52.352-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-5839819924202522085
 blogger_orig_url: http://affy.blogspot.com/2007/11/dynamic-datasource-via-spring-using.html
 ---
 
 My goal was to create a jar file that encapsulates an application domain objects and their persistence. However, I wanted to provide a way for the calling routines to change the datasource as needed. This feature was not intended to allow swapping datasources in the middle of an application's running but rather to allow the jar file to be ignorant of the test and production configurations.
+
 
 We'll start by creating hypersonic.properties:
 <pre>

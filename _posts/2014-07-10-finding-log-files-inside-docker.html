@@ -3,14 +3,16 @@ layout: post
 title: Finding Log Files Inside Docker Containers
 date: '2014-07-10T08:34:00.005-04:00'
 author: David Medinets
-tags:
-- docker
+categories: docker
 modified_time: '2014-07-10T08:34:50.520-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-5916354884103280973
 blogger_orig_url: http://affy.blogspot.com/2014/07/finding-log-files-inside-docker.html
 ---
 
-As a simple lay programmer, I sometimes have trouble figuring out where log files are stored on unix systems. Sometimes logs are within application directories. Other times they are in /var/log. With Docker containers, this uncertainty is eliminated. How? By the 'docker diff' command. I will show why. When connecting to a Docker-based system, you can see the running containers:<br />
+As a simple lay programmer, I sometimes have trouble figuring out where log files are stored on unix systems. Sometimes logs are within application directories. Other times they are in /var/log. With Docker containers, this uncertainty is eliminated. How? By the 'docker diff' command. I will show why.
+
+
+When connecting to a Docker-based system, you can see the running containers:<br />
 <br />
 <pre>$ docker ps
 CONTAINER ID        IMAGE                     COMMAND             CREATED             STATUS              PORTS                                                                                                                                                                                                                                                                                                                                    NAMES

@@ -1,13 +1,16 @@
 ---
 layout: post
-title: CodeBit; Using Perl to Process HTML Form Information
+title: Using Perl to Process HTML Form Information
 date: '2003-03-01T10:20:00.000-05:00'
 author: David Medinets
-tags: 
+categories: perl
 modified_time: '2003-03-01T10:21:16.000-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-90392829
 blogger_orig_url: http://affy.blogspot.com/2003/03/codebit-using-perl-to-process-html.html
 ---
+
+Using Perl to Process HTML Form Information
+
 
 <p>I've found using a hash variable to hold form information to be the easiest way to work. The function shown below is called <code>getFormData</code>. It reads each form field into a hash, with either 'scalar_' or 'array_'  prepended to the field names. This technique works well when you have form field with the same name, like checkboxes.</p>
 <p>In order to effectively use this code, you need to be familiar with references. If you need a refresher on this topic, please see Chapter 8 of my book at  <a href="http://www.CodeBits.com/p5be/ch08.cfm">http://www.CodeBits.com/p5be/ch08.cfm</a>.</p>

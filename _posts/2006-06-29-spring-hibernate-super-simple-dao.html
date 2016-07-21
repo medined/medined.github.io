@@ -3,13 +3,14 @@ layout: post
 title: Spring; Hibernate; A Super Simple DAO Layer
 date: '2006-06-29T12:38:00.000-04:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2007-01-18T15:03:11.873-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-115159910900649485
 blogger_orig_url: http://affy.blogspot.com/2006/06/spring-hibernate-super-simple-dao.html
 ---
 
 This note provides a Super Simple example of Spring and Hibernate usage. The main advantage of the technique that I discuss is that the same DAO layer can be used to create, read, update, and delete (CRUD) <i>any</i> Java object. So if your project doesn't need relationships between tables controlled by the DAO layer, you'll be able to use this technique.
+
 
 One caveat that I should mention; each action (create, update, etc.) happens inside its own transaction. So if you need to perform more than one database operation inside a transaction, you'll need to extend this technique slightly. When database operations are discussed, I'll come back to this topic.
 

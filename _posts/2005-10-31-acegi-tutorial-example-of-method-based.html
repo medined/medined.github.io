@@ -3,14 +3,17 @@ layout: post
 title: 'ACEGI Tutorial: An Example of Method-based Access Control and JUnit for Testing'
 date: '2005-10-31T11:17:00.000-05:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2006-05-10T21:44:43.370-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-113077569049172784
 blogger_orig_url: http://affy.blogspot.com/2005/10/acegi-tutorial-example-of-method-based.html
 ---
 
-<p><b>NOTE: Updated 2006, May 10 - changed net.sf to org in package names. And updated code to work with ACEGI v1.0 RC2</b></p>
 <p>This ACEGI tutorial shows how to implement the following security requirements for the BookBean class:<p>
+
+
+
+<p><b>NOTE: Updated 2006, May 10 - changed net.sf to org in package names. And updated code to work with ACEGI v1.0 RC2</b></p>
 <ul>
 <li>Only MANAGER users can replace the existing value (ie, call setValue)</li>
 <li>Only MANAGER users and WORKER users can change the value (ie, call changeValue)</li>

@@ -3,14 +3,15 @@ layout: post
 title: Sharing Files Between Docker Images Using Volumes
 date: '2014-07-15T14:17:00.001-04:00'
 author: David Medinets
-tags:
-- docker
+categories: docker
 modified_time: '2014-07-15T15:12:41.755-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-8614353736853698906
 blogger_orig_url: http://affy.blogspot.com/2014/07/sharing-files-between-docker-images.html
 ---
 
-<p>Recently I wanted to provide the same configuration file to two different Docker containers. I choose to solve this using a Docker volume. The configuration file will be sourced from within each container and looks like this:</p><br />
+Recently I wanted to provide the same configuration file to two different Docker containers. I choose to solve this using a Docker volume. The configuration file will be sourced from within each container and looks like this:
+
+
 <pre><code>$ cat bridge-env.sh 
 export BRIDGENAME=brbob
 export IMAGENAME=bob

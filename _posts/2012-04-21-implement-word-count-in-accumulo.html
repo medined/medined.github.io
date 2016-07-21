@@ -3,15 +3,15 @@ layout: post
 title: Implement Word Count in Accumulo
 date: '2012-04-21T22:28:00.000-04:00'
 author: David Medinets
-tags:
-- accumulo
+categories: accumulo
 modified_time: '2012-05-17T08:41:46.165-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-8959476583185408058
 blogger_orig_url: http://affy.blogspot.com/2012/04/implement-word-count-in-accumulo.html
 ---
 
-It seems like the first map-reduce program that everyone tries is counting words. This first program reads a piece of text using the mapper to tokenize the text and outputs a "1" for each token. Then the reducer adds up the "1" values to produce the word counts. <br />
-<br />
+It seems like the first map-reduce program that everyone tries is counting words. This first program reads a piece of text using the mapper to tokenize the text and outputs a "1" for each token. Then the reducer adds up the "1" values to produce the word counts. 
+
+
 Accumulo provides the same functionality without needing to write a single line of code by using a SummingCombiner iterator. Below is a complete example.<br />
 <br />
 Actually this example is more powerful because the same code can be used to sum across any time dimension.<br />

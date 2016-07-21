@@ -4,13 +4,16 @@ title: Java; Struts Validator; How to Create Standard Field Definitions in the V
   XML Files
 date: '2003-02-06T14:25:00.000-05:00'
 author: David Medinets
-tags: 
+categories: java 
 modified_time: '2003-02-06T14:25:05.036-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-90287430
 blogger_orig_url: http://affy.blogspot.com/2003/02/java-struts-validator-how-to-create.html
 ---
 
-Hopefully, you read my last post about creating Field Groups. This post shows how to create a standard field defnitions that can reused over and over in form definitions. My field definitions look like this in my XML:
+Hopefully, you read my last post about creating Field Groups. This post shows how to create a standard field defnitions that can reused over and over in form definitions.
+
+
+My field definitions look like this in my XML:
 <pre>
   &lt;form name="FieldDefinitions"&gt;
     &lt;field property="PROJECT_NAME" depends="required,alphanumeric,maxLength"&gt;

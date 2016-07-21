@@ -3,14 +3,15 @@ layout: post
 title: Java - Writing a Custom Web Server to Interpolate Velocity Templates.
 date: '2004-07-15T00:18:00.000-04:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2006-05-03T08:39:20.373-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-108986732341567548
 blogger_orig_url: http://affy.blogspot.com/2004/07/java-writing-custom-web-server-to.html
 ---
 
-<blockquote>This is the first entry of several that will chronicle my writing a self-contained web application designed to attach keywords to photo (or images). I did search with Google, but I saw no open-source applications that let you search through an image database. I'll be using my own embedded http server, Lucene, Prevayler, and Velocity.
-</blockquote>
+<blockquote>This is the first entry of several that will chronicle my writing a self-contained web application designed to attach keywords to photo (or images). I did search with Google, but I saw no open-source applications that let you search through an image database. I'll be using my own embedded http server, Lucene, Prevayler, and Velocity.</blockquote>
+
+
 <p>Quite frankly, I don't like to deal with the configuration and deployment issues associated with Tomcat and JBoss. So I've modified the SingleFileHTTPServer written by Elliot Harrold to serve interpolated Velocity templates.</p>
 <p>In order to get the MugTrapServer class to work, you'll need a config\mugtrap.properties file:</p>
 <pre>

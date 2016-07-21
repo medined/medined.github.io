@@ -3,13 +3,16 @@ layout: post
 title: Java; Struts Validator; How to Create Field Groups in the Validation XML Files
 date: '2003-02-06T11:45:00.000-05:00'
 author: David Medinets
-tags: 
+categories: java 
 modified_time: '2003-02-06T14:25:43.000-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-90286375
 blogger_orig_url: http://affy.blogspot.com/2003/02/java-struts-validator-how-to-create_06.html
 ---
 
-We've been using a slightly modified version o the Struts Validator on my project. And we've found that it was neccessary to repeat the field definitions over and over again. Since we have (or will have) several hundred forms I needed a way to reduce the amount of repetition. I took a low-tech approach that only needed a few lines of code to implement by adding a <b><code>formRefList</code></b> attribute to the <code>form</code> tag. So my XML file might look like this:
+We've been using a slightly modified version o the Struts Validator on my project. And we've found that it was neccessary to repeat the field definitions over and over again. Since we have (or will have) several hundred forms I needed a way to reduce the amount of repetition.
+
+
+I took a low-tech approach that only needed a few lines of code to implement by adding a <b><code>formRefList</code></b> attribute to the <code>form</code> tag. So my XML file might look like this:
 <pre>
   &lt;form name="FieldGroupOne"&gt;
     &lt;field property="STATUS /&gt;

@@ -3,12 +3,14 @@ layout: post
 title: Considerations for a Manual Partitioning Strategy in Accumulo
 date: '2012-10-30T16:59:00.001-04:00'
 author: David Medinets
-tags:
-- accumulo
+categories: accumulo
 modified_time: '2012-10-30T16:59:47.266-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-5354106522752298411
 blogger_orig_url: http://affy.blogspot.com/2012/10/considerations-for-manual-partitioning.html
 ---
+
+Considerations for a Manual Partitioning Strategy in Accumulo
+
 
 On the Accumulo Users mailing list, Adam F. suggested:<br />
 <blockquote>1. Parallelism and balance at ingest time. You need to find a happy medium between too few partitions (not enough parallelism) and too many partitions (tablet server resource contention and inefficient indexes). Probably at least one partition per tablet server being actively written to is good, and you'll want to pre-split so they can be distributed evenly. Ten partitions per tablet server is probably not too many -- I wouldn't expect to see contention at that point.<br />

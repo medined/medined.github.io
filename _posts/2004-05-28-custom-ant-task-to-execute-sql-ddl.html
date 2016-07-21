@@ -3,13 +3,14 @@ layout: post
 title: Custom Ant Task to Execute SQL DDL Statements And Ignoring Certain Errors.
 date: '2004-05-28T15:40:00.000-04:00'
 author: David Medinets
-tags: 
+categories: java ant
 modified_time: '2004-05-28T15:43:54.963-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-108577343496369949
 blogger_orig_url: http://affy.blogspot.com/2004/05/custom-ant-task-to-execute-sql-ddl.html
 ---
 
 <p>This Ant task executes any DDL SQL statements. The value of this task over the standard Ant SQL task is that some errors, like 'Table already exists' are ignored. The ReadWimConfiguration class simply sets the Oracle URL, username, and password. The OracleBootstrap class gets an Oracle DataSource object and provides a method to get a connection. I can post that class if needed.</p>
+
 
 <pre>
 package org.wwre.ant.tasks;

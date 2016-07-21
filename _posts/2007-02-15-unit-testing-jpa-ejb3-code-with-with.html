@@ -3,13 +3,15 @@ layout: post
 title: Unit Testing JPA (EJB3) Code With With an EntityListener.
 date: '2007-02-15T12:54:00.000-05:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2007-02-15T13:14:28.731-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-3236286474863073240
 blogger_orig_url: http://affy.blogspot.com/2007/02/unit-testing-jpa-ejb3-code-with-with.html
 ---
 
 <p>My goal was to verify that some objects were pulled from the EJB3 cache (ie, that I was actually getting cache hits) using unit tests. I did not see any way to get statistical information or cache information using the  EJB3 API. However, I did read the about EntityListeners annotation.</p>
+
+
 <pre>@Entity
 <b>@EntityListeners( { DomainObjectListener.class })</b>
 public class DomainObject  {

@@ -3,13 +3,17 @@ layout: post
 title: Lucene; Enhancement; The PrecedenceQuery Class.
 date: '2003-04-24T14:27:00.000-04:00'
 author: David Medinets
-tags: 
+categories: java lucene
 modified_time: '2003-04-24T14:27:21.623-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-200194642
 blogger_orig_url: http://affy.blogspot.com/2003/04/lucene-enhancement-precedencequery.html
 ---
 
-<p>As I was working with Lucene the other day, I envisioned looking for a document about a terrorist (call me XXX) and how the resulting list of results should be ranked. So I created the PrecedenceQuery class so that I could ask for all document containing XXX <b>and</b> a series of tokens such as /iraq/syria/israel/usa/united states. The document should be ranked higher (more relevant) as the list moves from left to right. This type of search is applicable to many different situations. In the realm of computer applications, this technique could be used in configuration management so that global values are overridden by environment which in turn can be overridden by machine-specific information. Here is the code for the class:</p>
+As I was working with Lucene the other day, I envisioned looking for a document about a terrorist (call me XXX) and how the resulting list of results should be ranked. So I created the PrecedenceQuery class so that I could ask for all document containing XXX <b>and</b> a series of tokens such as /iraq/syria/israel/usa/united states.
+
+
+The document should be ranked higher (more relevant) as the list moves from left to right. This type of search is applicable to many different situations. In the realm of computer applications, this technique could be used in configuration management so that global values are overridden by environment which in turn can be overridden by machine-specific information. Here is the code for the class:
+
 <pre>
 /*
  * Created on Apr 24, 2003

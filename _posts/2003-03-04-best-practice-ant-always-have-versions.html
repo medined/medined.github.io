@@ -3,13 +3,17 @@ layout: post
 title: Best Practice; Ant; Always Have a Versions Task
 date: '2003-03-04T02:03:00.000-05:00'
 author: David Medinets
-tags: 
+categories: ant
 modified_time: '2003-03-04T02:03:44.643-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-90403493
 blogger_orig_url: http://affy.blogspot.com/2003/03/best-practice-ant-always-have-versions.html
 ---
 
-<p>This task is designed to display the version of every software application used during the build process. It will mainly be used when sending a debugging report to vendors. However, it could also be useful when creating archival information. Here is my implementation of a VERSIONS task:</p>
+This task is designed to display the version of every software application used during the build process. It will mainly be used when sending a debugging report to vendors.
+
+
+However, it could also be useful when creating archival information. Here is my implementation of a VERSIONS task:
+
 <pre>
 &lt;target name="versions"&gt;
 	&lt;!-- DOS version --&gt;

@@ -3,14 +3,17 @@ layout: post
 title: Is using JDBC's Prepared Class really faster than the Statement Class?
 date: '2003-03-04T12:39:00.000-05:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2003-03-04T12:39:04.473-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-90405513
 blogger_orig_url: http://affy.blogspot.com/2003/03/is-using-jdbcs-prepared-class-really.html
 ---
 
+Most of my reading about JDBC indicated that we should use the PreparedStatement class to take advantage of bind variables and pre-compilation of SQL. However, one article said that using the Statement class was better because of how vendors implement the JDBC drivers. So, of couse, I felt compelled to perform my own timing tests.
+
+
 <p>NOTE: I used the OracleConnectionPoolDataSource class to connect to Oracle9i for these tests.</p>
-<p>Most of my reading about JDBC indicated that we should use the PreparedStatement class to take advantage of bind variables and pre-compilation of SQL. However, one article said that using the Statement class was better because of how vendors implement the JDBC drivers. So, of couse, I felt compelled to perform my own timing tests.</p>
+
 <p>I executed the following simple select statement 1,000 times with both classes. Of course, when using the PreparedStatement, the string literal was replaced by a bind variable.</p>
 <pre>
   select uuid, display_name, description from dr_locales where uuid = 'EN-US'

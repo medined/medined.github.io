@@ -3,14 +3,16 @@ layout: post
 title: How Can I Use Reverse Sort On Generic Accumulo Keys?
 date: '2012-11-12T16:02:00.002-05:00'
 author: David Medinets
-tags:
-- accumulo
+categories: accumulo
 modified_time: '2012-11-12T16:50:34.531-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-536813126529061410
 blogger_orig_url: http://affy.blogspot.com/2012/11/how-can-i-use-reverse-sort-on-generic.html
 ---
 
-<p>This note shows how to reverse the sorting of Accumulo (actually, the row values). As you might know, the standard sort order is lexical. This first example shows a standard usage of a mock Accumulo instance. Notice that records inserted in reverse order (5, 4, 3, 2, 1) but are printed in lexical order.</p><pre>public static void main(String[] args) throws Exception {
+his note shows how to reverse the sorting of Accumulo (actually, the row values). As you might know, the standard sort order is lexical. This first example shows a standard usage of a mock Accumulo instance.
+
+
+ Notice that records inserted in reverse order (5, 4, 3, 2, 1) but are printed in lexical order.</p><pre>public static void main(String[] args) throws Exception {
   // connect to a mock Accumulo instance.
   Instance mock = new MockInstance("development");
   Connector connector = mock.getConnector("root", "password".getBytes());

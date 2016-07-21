@@ -3,13 +3,14 @@ layout: post
 title: Why Use UUID Values?
 date: '2003-03-04T13:41:00.000-05:00'
 author: David Medinets
-tags: 
+categories: uuid
 modified_time: '2003-03-04T13:41:52.190-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-90405845
 blogger_orig_url: http://affy.blogspot.com/2003/03/why-use-uuid-values.html
 ---
 
 <p>In this note, I attempt to articulate why I feel strongly that using UUID values is better than Sequences (or Autonumbering) for Primary Keys.</p>
+
 
 <p><b>Debugging Production Issues</b> - When subtle production issues arise, it is often good to be able to copy production data into a development database. When using Sequences, the process of copying production data normally involves a DBA because Primary Keys in the production system may already exist in development leads to various insert and update errors. When UUID values are used, there is no possibility of duplicate values. Therefore, moving production data back to staging and/or the development environments is much easier.</p>
 

@@ -3,13 +3,16 @@ layout: post
 title: Java; POI Optimization - Speeding up the RecordFactory class.
 date: '2004-04-22T13:43:00.000-04:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2004-04-22T13:48:01.996-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-108265583476561569
 blogger_orig_url: http://affy.blogspot.com/2004/04/java-poi-optimization-speeding-up_22.html
 ---
 
-<p>This optimization needs two posts. This post presents a class that maps short values to a <code>Constructor</code> object. The <code>RecordFactory</code> class maps the short id value in the Excel file to a Java class. In the current version of POI, that relationship is kept, quite logically, in a <code>Map</code> object. However, using a <code>Map</code> object required that the short value be converted into a <code>Short</code> object quite frequently. This conversion is inefficient and, if some specially coding is done, unneeded. Note that the following class, <code>shortToConstructorCache</code>, is derivative of my earlier <code>shortShortCache</code> class.</p>
+This optimization needs two posts. This post presents a class that maps short values to a <code>Constructor</code> object.
+
+
+The <code>RecordFactory</code> class maps the short id value in the Excel file to a Java class. In the current version of POI, that relationship is kept, quite logically, in a <code>Map</code> object. However, using a <code>Map</code> object required that the short value be converted into a <code>Short</code> object quite frequently. This conversion is inefficient and, if some specially coding is done, unneeded. Note that the following class, <code>shortToConstructorCache</code>, is derivative of my earlier <code>shortShortCache</code> class.</p>
 <pre>
 /**
  * Cache a mapping from a short value to a Constructor object.

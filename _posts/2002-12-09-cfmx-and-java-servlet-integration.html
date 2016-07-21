@@ -3,16 +3,16 @@ layout: post
 title: CFMX and Java Servlet Integration
 date: '2002-12-09T23:11:00.000-05:00'
 author: David Medinets
-tags:
-- cfmx
-- servlet
-- java
+categories: java
 modified_time: '2007-11-21T12:09:46.177-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-90033334
 blogger_orig_url: http://affy.blogspot.com/2002/12/cfmx-and-java-servlet-integration.html
 ---
 
-<p>Recently, I was investigating how to integrate CFMX and Java Servlets. I found that I needed to cycle the CFMX application after each change to my Java classes. In order to make this process less onerous I developed the following ant build file. You'll notice that the CFMX log files are deleted. This was done so that I didn't have to wade through large files in order to find the messages related to whatever change I was making at the time. You might also notice that I've added a four second delay before each delete task. This delay gives the operating system time to write its buffers to disk and close the files after the service has been stopped.</p>
+Recently, I was investigating how to integrate CFMX and Java Servlets.
+
+
+I found that I needed to cycle the CFMX application after each change to my Java classes. In order to make this process less onerous I developed the following ant build file. You'll notice that the CFMX log files are deleted. This was done so that I didn't have to wade through large files in order to find the messages related to whatever change I was making at the time. You might also notice that I've added a four second delay before each delete task. This delay gives the operating system time to write its buffers to disk and close the files after the service has been stopped.</p>
 <pre>
 &lt;project name="dispatcher" default="" basedir="."&gt;
 

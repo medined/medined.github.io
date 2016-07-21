@@ -3,13 +3,15 @@ layout: post
 title: Getting flickrfs to Work on Ubuntu Heron
 date: '2008-06-02T08:22:00.002-04:00'
 author: David Medinets
-tags: 
+categories: ubuntu
 modified_time: '2008-06-02T08:33:52.619-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-3796429448198419260
 blogger_orig_url: http://affy.blogspot.com/2008/06/getting-flickrfs-to-work-on-ubuntu.html
 ---
 
 <p>I found this <a href="http://manishrjain.googlepages.com/flickrfs#ubuntu">site</a> which provides step-by-step instructions how to use <code>flickrfs</code> in order to mount your Flickr account as a file system. The steps required a little tweaking to work. Here are the steps that I followed:</p>
+
+
 <ol>
 <li><code>sudo apt-get install libfuse2 fuse-utils python2.4-fuse imagemagick</code> - the original instructions used a capital i for imagemagick.</li>
 <li><code>sudo modprobe fuse</code></li>

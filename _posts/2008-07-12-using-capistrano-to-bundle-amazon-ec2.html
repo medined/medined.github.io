@@ -3,15 +3,14 @@ layout: post
 title: Using Capistrano to Bundle Amazon EC2 Images
 date: '2008-07-12T11:29:00.002-04:00'
 author: David Medinets
-tags:
-- Amazon EC2
-- capistrano
+categories: ruby ec2
 modified_time: '2008-07-12T11:34:49.736-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-7408550948774074738
 blogger_orig_url: http://affy.blogspot.com/2008/07/using-capistrano-to-bundle-amazon-ec2.html
 ---
 
-<p>I've found the following bit of Capistrano script to be useful when tinkering with EC2 images. I can make a change and then bundle the image with just one command: <code>cap admin:bundle</code></p>
+I've found the following bit of Capistrano script to be useful when tinkering with EC2 images. I can make a change and then bundle the image with just one command: <code>cap admin:bundle</code>
+
 
 <p>The most difficult part of this script was finding out how to upload files to the remote instance using <code>scp</code>. The rest is fairly straightforward. I am only posting this script because I haven't seen this functionality posted anywhere else.</p><p>
 

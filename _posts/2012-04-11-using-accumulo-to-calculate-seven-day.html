@@ -3,14 +3,14 @@ layout: post
 title: Using Accumulo To Calculate Seven Day Rolling Average
 date: '2012-04-11T22:49:00.003-04:00'
 author: David Medinets
-tags:
-- accumulo
+categories: accumulo
 modified_time: '2012-05-17T08:42:00.358-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-2828584452363165131
 blogger_orig_url: http://affy.blogspot.com/2012/04/using-accumulo-to-calculate-seven-day.html
 ---
 
 Without commenting on if this is a good idea, let me show how you can use Accumulo to store the seven values needed to perform a rolling average.
+
 
 Log into the shell. Create the table. Then configure iterators to retain seven values instead of just the default single value. Finally insert some values.
 

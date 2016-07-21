@@ -3,13 +3,15 @@ layout: post
 title: POI Optimization - Speeding up org.apache.poi.hssf.record.BlankRecord.compareTo()
 date: '2004-04-22T15:28:00.000-04:00'
 author: David Medinets
-tags: 
+categories: java
 modified_time: '2004-04-22T15:32:33.436-04:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-108266210589477241
 blogger_orig_url: http://affy.blogspot.com/2004/04/poi-optimization-speeding-up_22.html
 ---
 
 <p>This optimization is nearly identical to the one applied to <code>HSSFRow.compareTo()</code> - just used a local copy of the row and column values. This change reduced exceution time in my test case by 17.5 seconds.</p>
+
+
 <pre>
     /**
      * switched to using a local copy of the row and column. Also moved the equality test to 

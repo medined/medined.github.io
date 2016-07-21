@@ -1,0 +1,411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0037)ch01.htm -->
+<HTML><HEAD><TITLE>Perl 5 by Example: Getting Your Feet Wet</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META 
+content="Perl, Perl Manual, Introduction to Perl, Perl Tutorial, Programming, Electronic Book, ebook" 
+name=keywords>
+<META 
+content="Perl 5 by Example teaches you how to use the Perl programming language by showing examples that demonstrate the concepts being discussed. The examples are designed to give you a chance to experiment - which clarifies the material." 
+name=description>
+<META content="MSHTML 6.00.2723.2500" name=GENERATOR></HEAD>
+<BODY bgColor=silver background=images/back2.jpg><A name=top></A>
+<TABLE cellSpacing=0 cellPadding=0>
+  <TBODY>
+  <TR>
+    <TD><IMG height=71 alt=Title src="images/title.jpg" width=443 
+    border=0></TD></TR></TBODY></TABLE>
+<TABLE cellSpacing=0 cellPadding=0 width=140 align=left border=0>
+  <TBODY>
+  <TR>
+    <TD vAlign=top width=100 background=images/leftbar.jpg height=373>
+      <P><SMALL>
+      <P><A href="ch00.htm"><SMALL>Previous 
+      Chapter</SMALL></A><BR><A 
+      href="ch02.htm"><SMALL>Next 
+      Chapter</SMALL></A><BR></P></SMALL></TD></TR>
+  <TR>
+    <TD>
+      <P>Links<BR><SMALL><A 
+      href="ch01.htm#sections">Sections</A><BR><A 
+      href="ch01.htm#chapters">Chapters</A><BR><A 
+      href="copyright.htm">Copyright</A><BR></SMALL></P><A 
+      name=sections></A>
+      <P>Sections</P><SMALL>
+      <P><A href="ch01.htm#Origins">Origins</A></P>
+      <P><A href="ch01.htm#Similar to C">Similar to 
+      C?</A></P>
+      <P><A href="ch01.htm#Cost and Licensing">Cost 
+      and Licensing</A></P>
+      <P><A 
+      href="ch01.htm#Do You Have Perl Installed">Do 
+      You Have Perl Installed?</A></P>
+      <P><A 
+      href="ch01.htm#Getting and Installing Perl">Getting 
+      and Installing Perl</A></P>
+      <P><A 
+      href="ch01.htm#Your First Perl Program">Your 
+      First Perl Program</A></P>
+      <P><A 
+      href="ch01.htm#Comments in Your Program">Comments 
+      in Your Program</A></P>
+      <P><A href="ch01.htm#Summary">Summary</A></P>
+      <P><A href="ch01.htm#Review Questions">Review 
+      Questions</A></P>
+      <P><A href="ch01.htm#Review Exercises">Review 
+      Exercises</A></P></SMALL><A name=chapters></A>
+      <P>Chapters<BR><FONT size=1>
+      <P><A href="errata.htm">ERRATA</A></P>
+      <P><A href="index.htm">Welcome!</A></P>
+      <P><A href="ch00.htm">Introduction</A></P>
+      <P>Part I: Basic Perl</P>
+      <P><A href="ch01.htm">01-Getting Your Feet 
+      Wet</A></P>
+      <P><A href="ch02.htm">02-Numeric and String 
+      Literals</A></P>
+      <P><A href="ch03.htm">03-Variables</A></P>
+      <P><A href="ch04.htm">04-Operators</A></P>
+      <P><A href="ch05.htm">05-Functions</A></P>
+      <P><A href="ch06.htm">06-Statements</A></P>
+      <P><A href="ch07.htm">07-Control 
+      Statements</A></P>
+      <P><A href="ch08.htm">08-References</A></P>
+      <P>Part II: Intermediate Perl</P>
+      <P><A href="ch09.htm">09-Using Files</A></P>
+      <P><A href="ch10.htm">10-Regular 
+      Expressions</A></P>
+      <P><A href="ch11.htm">11-Creating 
+      Reports</A></P>
+      <P>Part III: Advanced Perl</P>
+      <P><A href="ch12.htm">12-Using Special 
+      Variables</A></P>
+      <P><A href="ch13.htm">13-Handling Errors and 
+      Signals</A></P>
+      <P><A href="ch14.htm">14-What Are 
+      Objects?</A></P>
+      <P><A href="ch15.htm">15-Perl Modules</A></P>
+      <P><A href="ch16.htm">16-Debugging 
+      Perl</A></P>
+      <P><A href="ch17.htm">17-Command line 
+      Options</A></P>
+      <P>Part IV: Perl and the Internet</P>
+      <P><A href="ch18.htm">18-Using Internet 
+      Protocols</A></P>
+      <P><A href="ftplib.htm">ftplib.pl</A></P>
+      <P><A href="ch19.htm">19-What is CGI?</A></P>
+      <P><A href="ch20.htm">20-Form 
+      Processing</A></P>
+      <P><A href="ch21.htm">21-Using Perl with Web 
+      Servers</A></P>
+      <P><A href="ch22.htm">22-Internet 
+      Resources</A></P>
+      <P>Appendixes</P>
+      <P><A href="xp0a.htm">A-Review 
+      Questions</A></P>
+      <P><A href="xp0b.htm">B-Glossary</A></P>
+      <P><A href="xp0c.htm">C-Function List</A></P>
+      <P><A href="xp0d.htm">D-The Windows 
+      Registry</A></P>
+      <P><A href="xp0e.htm">E-What's On the 
+      CD?</A></P></FONT></TD>
+    <TD width=5>&nbsp;</TD>
+    <TD width=5 bgColor=black>&nbsp;</TD>
+    <TD width=5>&nbsp;</TD></TR></TBODY></TABLE>
+<H1>01 - Getting Your Feet Wet</H1>
+<P>You are about to embark on a journey through the world of Perl programming. 
+You'll find that the trip has been made easier by many examples liberally 
+sprinkled along the trail. The beginning of the trip covers the basic concepts 
+of the Perl language. Then you move on to some of the more advanced concepts - 
+how to create Perl statements and whole programs. At the end of the trip, some 
+guideposts are placed - in the form of Internet sites - to show you how to 
+explore more advanced programming topics on your own. 
+<P>Do you know any other programming languages? If so, then learning Perl will 
+be a snap. If not, take it slow, try all of the examples, and have fun 
+experimenting as you read. 
+<P>I thought about adding a section here about programming ideals. Or perhaps, a 
+discussion about the future of Perl. And then I realized that when I was first 
+learning computer languages, I didn't really care about that stuff. I just 
+wanted to know about the language and what I could <I>do</I> with it. 
+<P>With that in mind, the next section on Perl's origin is very short. After 
+all, you can read all the background information you'd like using a web browser 
+by starting at <B><A href="http://www.perl.com/">http://www.perl.com/</A></B> - 
+the Perl home page. </P>
+<H2><A name=Origins>Origins</A></H2>Perl began as the result of one man's 
+frustration and, by his own account, inordinate laziness. It is a unique 
+language in ways that cannot be conveyed simply by describing the technical 
+details of the language. Perl is a state of mind as much as a language grammar. 
+<P>One of the oddities of the language is that its name has been given quite a 
+few definitions. Originally Perl meant the <B>P</B>ractical <B>E</B>xtraction 
+<B>R</B>eport <B>L</B>anguage. However, programmers also refer to is as the 
+<B>P</B>athologically <B>E</B>clectic <B>R</B>ubbish <B>L</B>ister. Or even, 
+<B>P</B>ractically <B>E</B>verything <B>R</B>eally <B>L</B>ikeable. 
+<P>Let's take a few minutes to look at the external forces which provoked Perl 
+into being - it should give you an insight into the way Perl was <I>meant</I> to 
+be used. Back in 1986, Larry Wall found himself working on a task which involved 
+generating reports from a lot of text files with cross references. Being a UNIX 
+programmer, and because the problem involved manipulating the contents of text 
+files, he started to use awk for the task. But it soon became clear that awk 
+wasn't up to the job; with no other obvious candidate for the job, he'd just 
+have to write some code. 
+<P>Now here's the interesting bit: Larry could have just written a utility to 
+manage the particular job at hand and gotten on with his life. He could see, 
+though, that it wouldn't be long before he'd have to write another special 
+utility to handle something else which the standard tools couldn't quite hack. 
+(It's possible that he realized that most programmers were <I>always</I> writing 
+special utilities to handle things which the standard tools couldn't quite 
+hack...) 
+<P>So rather than waste any more of his time, he invented a new language and 
+wrote an interpreter for it. If that seems like a paradox, it isn't really - 
+it's always a bit more of an effort to set yourself up with the right tools, but 
+if you do it right, the effort pays off. 
+<P>The new language had an emphasis on system management and text handling. 
+After a few revisions, it could handle regular expressions, signals, and network 
+sockets too. It became known as Perl and quickly became popular with frustrated, 
+lazy UNIX programmers. And the rest of us. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>Is it "Perl" or "perl"? The definitive word from 
+      Larry Wall is that it doesn't matter. Many programmers like to refer to 
+      languages with capitalized names (Perl) but the program originated on a 
+      UNIX system where short, lower-case names (awk, sed, and so forth) were 
+      the norm. As with so many things about the language, there's no single 
+      "right way" to do it; just use it the way you want. It's a tool, after 
+      all, not a dogma. 
+      <P>If you're sufficiently pedantic, you may want to call it "[Pp]erl" 
+      after you've read Chapter 10, "<A 
+      href="ch10.htm">Regular 
+    Expressions</A>."</P></TD></TR></TBODY></TABLE></P>
+<H2><A name="Similar to C">Similar to C?</A></H2>Perl programs bear a passing 
+resemblance to C programs, perhaps because Perl was written in C, or perhaps 
+because Larry found some of its syntactic conventions handy. But Perl is less 
+pedantic and a lot more concise than C. 
+<P>Perl can handle low-level tasks quite well, particularly since Perl 5, when 
+the whole messy business of references was put on a sound footing. In this sense 
+it has a lot in common with C. But Perl handles the internals of data types, 
+memory allocation and such automatically and seamlessly. 
+<P>This habit of picking up interesting features as it went along - regular 
+expressions here, database handling there - has been regularized in Perl 5. It 
+is now fairly easy to add your favorite bag of tricks to Perl by using modules. 
+It is likely that many of the added - on features of Perl such as socket 
+handling will be dropped from the core of Perl and moved out to modules after a 
+time. 
+<H2><A name="Cost and Licensing">Cost and Licensing</A></H2>Perl is free. The 
+full source code and documentation are free to copy, compile, print, and give 
+away. Any programs you write in Perl are yours to do with as you please; there 
+are no royalties to pay and no restrictions on distributing them as far as Perl 
+is concerned. 
+<P>It's not completely "public domain," though, and for very good reason. If the 
+source were completely public domain, it would be possible for someone to make 
+minor alterations to it, compile it, and sell it - in other words, to rip off 
+its creator. On the other hand, without distributing the source code, it's hard 
+to make sure that everyone who wants to can use it. 
+<P>The GNU General Public License is one way to distribute free software without 
+the danger of someone taking advantage of you. Under this type of license, 
+source code may be distributed freely and used by anybody, but any programs 
+derived using such code must be released under the same type of license. In 
+other words, if you derive any of your source code from GNU-licensed source 
+code, you have to release your source code to anyone who wants it. 
+<P>This is often sufficient to protect the interests of the author, but it can 
+lead to a plethora of derivative versions of the original package. This may 
+deprive the original author of a say in the development of their own creation. 
+It can also lead to confusion on the part of the end users as it becomes hard to 
+establish which is the definitive version of the package, whether a particular 
+script will work with a given version, and so on. </P>
+<P>That's why Perl is released under the terms of the "Artistic" license. This 
+is a variation on the GNU General Public License which says that anyone who 
+releases a package derived from Perl must make it clear that the package is not 
+actually Perl. All modifications must be clearly flagged, executables renamed if 
+necessary, and the original modules distributed along with the modified 
+versions. The effect is that the original author is clearly recognized as the 
+"owner" of the package. The general terms of the GNU General Public license also 
+apply. </P>
+<H2><A name="Do You Have Perl Installed">Do You Have Perl 
+Installed?</A></H2>It's critically important to have Perl installed on your 
+computer before reading too much further. As you read the examples, you'll want 
+to try them. If Perl is not already installed, momentum and time will be lost. 
+<P>It is very easy to see if your system already has Perl installed. Simply go 
+to a command-line prompt and type: <PRE><B>perl -v</B></PRE>Hopefully, the response will be similar to this: 
+<BLOCKQUOTE>This is perl, version 5.001<BR>Unofficial patchlevel 
+  1m.<BR>Copyright 1987-1994, Larry Wall<BR>Win32 port Copyright (c) 1995 
+  Microsoft Corporation.<BR>All rights reserved.<BR>Developed by hip 
+  communications inc., <A 
+  href="http://info.hip.com/info/">http://info.hip.com/info/</A><BR>Perl for 
+  Win32 Build 107<BR>Built Apr 16 1996@14:47:22<BR>Perl may be copied only under 
+  the terms<BR>of either the Artistic License or the<BR>GNU General Public 
+  License, which<BR>may be found in the Perl 5.0 source kit.<BR></BLOCKQUOTE>
+<P>If you get an error message or you have version 4 of Perl, please see your 
+system administrator or install Perl yourself. The next section describes how to 
+get and install Perl. </P>
+<H2><A name="Getting and Installing Perl">Getting and Installing 
+Perl</A></H2>New versions of Perl are released on the Internet and distributed 
+to Web sites and ftp archives across the world. UNIX binaries are generally not 
+made available on the Internet, as it is generally better to build Perl on your 
+system so that you can be certain it will work. All UNIX systems have a C 
+compiler, after all. 
+<P>Each operating system has its own way of getting and installing Perl. 
+<UL>
+  <LI><B>For UNIX and OS/2</B> - The Perl Home Page contains a software link 
+  (<B><A 
+  href="http://www.perl.com/perl/info/software.html">http://www.perl.com/perl/info/software.html</A></B>) 
+  that will enable you to download the latest Perl source code. The page also 
+  explains why Perl binaries are not available. Hopefully, your system will 
+  already have Perl installed. If not, try to get your system administrator to 
+  install it. 
+  <LI><B>For Windows 95/Windows NT</B> - The home page of ActiveState Tool Corp. 
+  (<B><A href="http://www.activestate.com/">http://www.activestate.com/</A></B>) 
+  has a <I>Get Perl!</I> link on the left-hand navigation bar. Download 
+  ActivePerl and start programming today! </LI></UL>
+<P>Instructions for compiling Perl or for installing on each operating system 
+are included with the distribution files. Follow the instructions provided and 
+you should having a working Perl installation rather quickly. If you have 
+trouble installing Perl, skip ahead to Chapter 22, "<A 
+href="ch22.htm">Internet Resources</A>," connect to 
+the #perl IRC channel, and ask for help. Don't be shy! </P>
+<H2><A name="Your First Perl Program">Your First Perl Program</A></H2>Your first 
+Perl program will show how to display a line of text on your monitor. First, you 
+create a text file to hold the Perl program. Then you run or execute the Perl 
+program file. 
+<H3><A name="Creating the Program">Creating the Program</A></H3>A Perl program 
+consists of an ordinary text file containing a series of Perl statements. 
+Statements are written in what looks like a amalgam of C, UNIX shell script, and 
+English. In fact, that's pretty much what it is. 
+<P>Perl code can be quite free-flowing. The broad syntactic rules governing 
+where a statement starts and ends are: 
+<UL>
+  <LI>Leading spaces on a line are ignored. You can start a Perl statement 
+  anywhere you want: At the beginning of the line, indented for clarity 
+  (recommended) or even right-justified (definitely frowned on because the code 
+  would be difficult to understand) if you like. 
+  <LI>Statements are terminated with a semi-colon. 
+  <LI>Spaces, tabs, and blank lines outside of strings are irrelevant - one 
+  space is as good as a hundred. That means you can split statements over 
+  several lines for clarity. A string is basically a series of characters 
+  enclosed in quotes. Chapter 2, "<A 
+  href="ch02.htm">Numeric and String Literals</A>," 
+  contains a better definition for strings. 
+  <LI>Anything after a hash sign (#) is ignored except in strings. Use this fact 
+  to pepper your code with useful comments. </LI></UL>
+<P>Here's a Perl statement inspired by Kurt Vonnegut: </P>
+<BLOCKQUOTE><B>print("My name is Yon Yonson\n");</B></BLOCKQUOTE>No prizes for 
+guessing what happens when Perl runs this code - it prints out <TT>My name is 
+Yon Yonson</TT>. If the "\n" doesn't look familiar, don't worry - it simply 
+means that Perl should print a newline character after the text, or in other 
+words, go to the start of the next line. 
+<P>Printing more text is a matter of either stringing together statements like 
+this, or giving multiple arguments to the <TT>print()</TT> function: 
+<BLOCKQUOTE><B>print("My name is Yon Yonson,\n"); print("I live in 
+  Wisconsin,\n", "I work in a lumbermill there.\n");</B></BLOCKQUOTE>
+<P>So what does a complete Perl program look like? Here's a small example, 
+complete with the invocation line at the top and a few comments: </P>
+<BLOCKQUOTE><B>#!/usr/local/bin/perl -w<BR>print("My name is Yon 
+  Yonson,\n");<BR>print("I live in Wisconsin,\n", "I work in a lumbermill 
+  there.\n"); </B></BLOCKQUOTE>
+<P>That's not at all typical of a Perl program, though; it's just a linear 
+sequence of commands with no complexity. </P>
+<P>You can create your Perl program by starting any text processor: 
+<P>
+<UL>
+  <LI><B>In UNIX</B> - you can use <TT>emacs</TT> or <TT>vi</TT>. 
+  <P></P>
+  <LI><B>In Windows 95/Windows NT</B> - you can use <TT>notepad</TT> or 
+  <TT>edit</TT>. 
+  <P></P>
+  <LI><B>In OS/2</B> - you can use <TT>e</TT> or <TT>epm</TT>.</LI></UL>Create a 
+file called <TT>test.pl</TT> that contains the preceding three lines. <A 
+name="Micheal Campbell"></A>
+<H3><A name=Invocation>Invocation</A></H3>Assuming that Perl is correctly 
+installed and working on your system, the simplest way to run a Perl program is 
+to type the following:
+<P>
+<BLOCKQUOTE><B>perl <I>filename</I>.pl</B></BLOCKQUOTE>The 
+<TT><I>filename</I></TT> should be replaced by the name of the program that you 
+are trying to run or execute. If you created a <TT>sample.pl</TT> file while 
+reading the previous section, you can run it like this: <PRE><B>perl sample.pl</B></PRE>This example assumes that perl is in the 
+execution path; if not, you will need to supply the full path to perl too. For 
+example, on UNIX the command might be: <PRE><B>/usr/local/bin/perl sample.pl</B></PRE>Whereas on Windows NT, you might 
+need to use: <PRE><B>c:\perl5\bin\perl sample.pl</B></PRE>UNIX systems have another way to 
+invoke a program. However, you need to do two things. The first is to place a 
+line like <PRE><B>#!/usr/local/bin/perl</B></PRE>at the start of the Perl file. This tells 
+UNIX that the rest of this script file is to be run by 
+<B>/usr/local/bin/perl</B>. The second step is to make the program file itself 
+executable by changing its mode: <PRE><B>chmod +x sample.pl</B></PRE>Now you can execute the program file 
+directly and let the program file tell the operating system what interpreter to 
+use while running it. The new command line is simply: <PRE><B>sample.pl</B></PRE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan 
+    size=4><B>Clarificaton</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>
+      <P>The printed version of this book used "test" for the name of the Perl 
+      script in the above example. However, it was pointed out that many Unix 
+      systems already have a program named "test", so I changed the name to 
+      "sample" to avoid possible confusion. In addition, the printed version did 
+      not include the .pl extension when executing the script. 
+</P></TD></TR></TBODY></TABLE>
+<H2><A name="Comments in Your Program">Comments in Your Program</A></H2>It is 
+very important to place comments into your Perl programs. Comments will enable 
+you to figure out the intent behind the mechanics of your program. For example, 
+it is very easy to understand that your program adds 66 to another value. But, 
+in two years, you may forget how you derived the number 66 in the first place. 
+<P>Comments are placed inside a program file using the # character. Everything 
+after the # is ignored. For example: 
+<BLOCKQUOTE><B># This is whole line is ignored. print("Perl is easy.\n"); # 
+  Here's a half-line comment.</B></BLOCKQUOTE>
+<H2><A name=Summary>Summary</A></H2>You've finished the first chapter of the 
+book and already written and executed a Perl program. Believe it or not, you've 
+now done more than most people that I talk to on the web. Let's quickly review 
+what you've read so far. 
+<P>Perl was created to solve a need, not to match the ideals of computer 
+science. It has evolved from being a simple hack to a full-fledged modern 
+programming language. Perl's syntax is similar to the C programming language. 
+However, it has a lot a features that were borrowed from UNIX tools. 
+<P>Perl is very cost-effective in a lot of situations because it is free. There 
+are legal restrictions that you need to follow. However, any restrictions are 
+listed in the documentation that comes with Perl, and you don't need that 
+information repeated. 
+<P>You can get Perl by reading the <B><A 
+href="http://www.perl.com/perl/info/software.html">http://www.perl.com/perl/info/software.html</A></B> 
+web page. It has links to both the source code and the executables for Windows95 
+and WindowsNT. 
+<P>Perl programs are simply text files. They are created in any text editor. As 
+long as you give the file an extension of .pl, running the file will be easy. 
+<P>Most systems will run Perl program file called <TT>test.pl</TT> with the 
+following command: <PRE><B>perl test.pl</B></PRE>You can add comments to your Perl program using 
+the # character. Anything after the # character is ignored. 
+<P>I hope the journey has been very smooth so far. The only difficulty may have 
+been if you did not have Perl installed. The next part of the journey will be to 
+learn some basic building blocks in the form of numeric and string literals. But 
+literals will have to wait until the next chapter... 
+<H2><A name="Review Questions">Review Questions</A></H2>Answers to Review 
+Questions are in Appendix A: 
+<P>
+<OL>
+  <LI>What is the address of Perl's home page? 
+  <P></P>
+  <LI>Who was the creator of Perl? 
+  <P></P>
+  <LI>How much does Perl cost? 
+  <P></P>
+  <LI>Why are comments important to programming?</LI></OL>
+<H2><A name="Review Exercises">Review Exercises</A></H2>
+<OL>
+  <LI>Connect to the Perl Home page and spend a few minutes looking at the 
+  links. 
+  <P></P>
+  <LI>Create and run a Perl program that prints <TT>"Hello, World"</TT> on the 
+  monitor.</LI></OL>
+<HR>
+<SMALL><A href="ch01.htm#top">Top of Page</A> | <A 
+href="ch01.htm#sections">Sections</A> | <A 
+href="ch01.htm#chapters">Chapters</A> | <A 
+href="copyright.htm">Copyright</A> </SMALL>
+<HR>
+
+<P></P></BODY></HTML>

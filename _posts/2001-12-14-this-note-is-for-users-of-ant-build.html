@@ -3,16 +3,14 @@ layout: post
 title: How to Find and Execute All JUnit Tests in a Directory Hierarchy
 date: '2001-12-14T09:56:00.000-05:00'
 author: David Medinets
-tags:
-- ant
-- java
-- junit
+categories: ant java
 modified_time: '2007-11-21T12:09:12.733-05:00'
 blogger_id: tag:blogger.com,1999:blog-3207985.post-7926094
 blogger_orig_url: http://affy.blogspot.com/2001/12/this-note-is-for-users-of-ant-build.html
 ---
 
 This note is for users of the Ant build tool. I've modified an AllTests class to automatically add Test classes to a TestSuite by recursively checking a directory hierarchy for classes with "test" or "Test" in their names.
+
 
 The customization needed to incorporate these classes into your own system is minimal. Look for "CUSTOMIZE_THIS" comments.
   - change the package names
