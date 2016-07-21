@@ -1,0 +1,680 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0037)ch13.htm -->
+<HTML><HEAD><TITLE>Perl 5 by Example: Handling Errors and Signals</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META 
+content="Perl, Perl Manual, Introduction to Perl, Perl Tutorial, Programming, Electronic Book, ebook" 
+name=keywords>
+<META 
+content="Perl 5 by Example teaches you how to use the Perl programming language by showing examples that demonstrate the concepts being discussed. The examples are designed to give you a chance to experiment - which clarifies the material." 
+name=description>
+<META content="MSHTML 6.00.2723.2500" name=GENERATOR></HEAD>
+<BODY bgColor=silver background=images/back2.jpg><A name=top></A>
+<TABLE cellSpacing=0 cellPadding=0>
+  <TBODY>
+  <TR>
+    <TD><IMG height=71 alt=Title src="images/title.jpg" width=443 
+    border=0></TD></TR></TBODY></TABLE>
+<TABLE cellSpacing=0 cellPadding=0 width=140 align=left border=0>
+  <TBODY>
+  <TR>
+    <TD vAlign=top width=100 background=images/leftbar.jpg height=373>
+      <P><SMALL>
+      <P><A href="ch12.htm"><SMALL>Previous 
+      Chapter</SMALL></A><BR><A 
+      href="ch14.htm"><SMALL>Next 
+      Chapter</SMALL></A><BR></P></SMALL></TD></TR>
+  <TR>
+    <TD>
+      <P>Links<BR><SMALL><A 
+      href="ch13.htm#sections">Sections</A><BR><A 
+      href="ch13.htm#chapters">Chapters</A><BR><A 
+      href="copyright.htm">Copyright</A><BR></SMALL></P><A 
+      name=sections></A>
+      <P>Sections</P><SMALL>
+      <P><A 
+      href="ch13.htm#Checking for Errors">Checking 
+      for Errors</A></P>
+      <P><A 
+      href="ch13.htm#Example: Using the errno Variable">Example: 
+      Using the errno Variable</A></P>
+      <P><A 
+      href="ch13.htm#Trapping Fatal Errors">Trapping 
+      Fatal Errors</A></P>
+      <P><A href="ch13.htm#What Is a Signal">What 
+      Is a Signal?</A></P>
+      <P><A href="ch13.htm#Summary">Summary</A></P>
+      <P><A href="ch13.htm#Review Questions">Review 
+      Questions</A></P>
+      <P><A href="ch13.htm#Review Exercises">Review 
+      Exercises</A></P></SMALL><A name=chapters></A>
+      <P>Chapters<BR><FONT size=1>
+      <P><A href="errata.htm">ERRATA</A></P>
+      <P><A href="index.htm">Welcome!</A></P>
+      <P><A href="ch00.htm">Introduction</A></P>
+      <P>Part I: Basic Perl</P>
+      <P><A href="ch01.htm">01-Getting Your Feet 
+      Wet</A></P>
+      <P><A href="ch02.htm">02-Numeric and String 
+      Literals</A></P>
+      <P><A href="ch03.htm">03-Variables</A></P>
+      <P><A href="ch04.htm">04-Operators</A></P>
+      <P><A href="ch05.htm">05-Functions</A></P>
+      <P><A href="ch06.htm">06-Statements</A></P>
+      <P><A href="ch07.htm">07-Control 
+      Statements</A></P>
+      <P><A href="ch08.htm">08-References</A></P>
+      <P>Part II: Intermediate Perl</P>
+      <P><A href="ch09.htm">09-Using Files</A></P>
+      <P><A href="ch10.htm">10-Regular 
+      Expressions</A></P>
+      <P><A href="ch11.htm">11-Creating 
+      Reports</A></P>
+      <P>Part III: Advanced Perl</P>
+      <P><A href="ch12.htm">12-Using Special 
+      Variables</A></P>
+      <P><A href="ch13.htm">13-Handling Errors and 
+      Signals</A></P>
+      <P><A href="ch14.htm">14-What Are 
+      Objects?</A></P>
+      <P><A href="ch15.htm">15-Perl Modules</A></P>
+      <P><A href="ch16.htm">16-Debugging 
+      Perl</A></P>
+      <P><A href="ch17.htm">17-Command line 
+      Options</A></P>
+      <P>Part IV: Perl and the Internet</P>
+      <P><A href="ch18.htm">18-Using Internet 
+      Protocols</A></P>
+      <P><A href="ftplib.htm">ftplib.pl</A></P>
+      <P><A href="ch19.htm">19-What is CGI?</A></P>
+      <P><A href="ch20.htm">20-Form 
+      Processing</A></P>
+      <P><A href="ch21.htm">21-Using Perl with Web 
+      Servers</A></P>
+      <P><A href="ch22.htm">22-Internet 
+      Resources</A></P>
+      <P>Appendixes</P>
+      <P><A href="xp0a.htm">A-Review 
+      Questions</A></P>
+      <P><A href="xp0b.htm">B-Glossary</A></P>
+      <P><A href="xp0c.htm">C-Function List</A></P>
+      <P><A href="xp0d.htm">D-The Windows 
+      Registry</A></P>
+      <P><A href="xp0e.htm">E-What's On the 
+      CD?</A></P></FONT></TD>
+    <TD width=5>&nbsp;</TD>
+    <TD width=5 bgColor=black>&nbsp;</TD>
+    <TD width=5>&nbsp;</TD></TR></TBODY></TABLE>
+<H1>13 - Handling Errors and Signals</H1>
+<P>Most of the examples in this book have been ignoring the fact that errors can 
+and probably will occur. An error can occur because the directory you are trying 
+to use does not exist, the disk is full, or any of a thousand other reasons. 
+Quite often, you won't be able to do anything to recover from an error, and your 
+program should exit. However, exiting after displaying a user-friendly error 
+message is much preferable than waiting until the operating system or Perl's own 
+error handling takes over. 
+<P>After looking at errors generated by function calls, we'll look at a way to 
+prevent certain normally fatal activities - like dividing by zero - from 
+stopping the execution of your script; this is by using the <TT>eval()</TT> 
+function. 
+<P>Then, you'll see what a signal is and how to use the <TT>%SIG</TT> 
+associative array to create a signal handling function. 
+<H2><A name="Checking for Errors">Checking for Errors</A></H2>There is only one 
+way to check for errors in any programming language. You need to test the return 
+values of the functions that you call. Most functions return zero or false when 
+something goes wrong. So when using a critical function like <TT>open()</TT> or 
+<TT>sysread()</TT>, checking the return value helps to ensure that your program 
+will work properly. 
+<P>Perl has two special variables - <TT>$?</TT> and <TT>$!</TT> - that help in 
+finding out what happened after an error has occurred. The <TT>$?</TT> variable 
+holds the status of the last pipe close, back-quote string, or <TT>system()</TT> 
+function. The <TT>$!</TT> variable can be used in either a numeric or a string 
+context. In a numeric context it holds the current value of <TT>errno</TT>. If 
+used in a string context, it holds the error string associated with 
+<TT>errno</TT>. The variable, <I>errno</I>, is pre-defined variable that can 
+sometimes be used to determine the last error that took place. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=tomato size=4><B>Caution</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=tomato>You can't rely on these variables to check the status 
+      of pipes, back-quoted strings, or the <TT>system()</TT> function when 
+      executing scripts under the Windows operating system. My recommendation is 
+      to capture the output of the back-quoted string and check it directly for 
+      error messages. Of course, the command writes its errors to 
+      <TT>STDERR</TT> and then can't trap them, and you're out of 
+  luck.</TD></TR></TBODY></TABLE>
+<P>Once you detect an error and you can't correct the problem without outside 
+intervention, you need to communicate the problem to the user. This is usually 
+done with the <TT>die()</TT> and <TT>warn()</TT> functions. 
+<H2><A name="Example: Using the errno Variable">Example: Using the <I>errno</I> 
+Variable</A></H2>When an error occurs, it is common practice for UNIX-based 
+functions and programs to set a variable called <TT>errno</TT> to reflect which 
+error has occurred. If <TT>errno=2</TT>, then your script tried to access a 
+directory or file that did not exist. Table 13.1 lists ten possible values the 
+<TT>errno</TT> variable can take, but there are hundreds more. If you are 
+interested in seeing all the possible error values, run the program in Listing 
+13.1. 
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 13.1 - Ten Possible Values for <TT>errno</TT></CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left></TT>Value </TH>
+    <TH align=left>Description</TH></TR>
+  <TR>
+    <TD vAlign=top>1 </TD>
+    <TD vAlign=top>Operation not permitted</TD></TR>
+  <TR>
+    <TD vAlign=top>2 </TD>
+    <TD vAlign=top>No such file or directory</TD></TR>
+  <TR>
+    <TD vAlign=top>3 </TD>
+    <TD vAlign=top>No such process</TD></TR>
+  <TR>
+    <TD vAlign=top>4 </TD>
+    <TD vAlign=top>Interrupted function call</TD></TR>
+  <TR>
+    <TD vAlign=top>5 </TD>
+    <TD vAlign=top>Input/output error</TD></TR>
+  <TR>
+    <TD vAlign=top>6 </TD>
+    <TD vAlign=top>No such device or address</TD></TR>
+  <TR>
+    <TD vAlign=top>7 </TD>
+    <TD vAlign=top>Arg list too long</TD></TR>
+  <TR>
+    <TD vAlign=top>8 </TD>
+    <TD vAlign=top>Exec format error</TD></TR>
+  <TR>
+    <TD vAlign=top>9 </TD>
+    <TD vAlign=top>Bad file descriptor</TD></TR>
+  <TR>
+    <TD vAlign=top>10 </TD>
+    <TD vAlign=top>No child processes</TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond 
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Loop from 1 to 10,000 using <TT>$!</TT> as the loop variable. 
+      <P>Evaluate the <TT>$!</TT> variable in a string context so that 
+      <TT>$errText</TT> is assigned the error message associated with the value 
+      of <TT>$!</TT>. 
+      <P>Use <TT>chomp()</TT> to eliminate possible newlines at the end of an 
+      error message. Some of the messages have newlines, and some don't. 
+      <P>Print the error message if the message is not <TT>Unknown Error</TT>. 
+      Any error value not used by the system defaults to <TT>Unknown Error</TT>. 
+      Using the <TT>if</TT> statement modifier ensures that only valid error 
+      messages are displayed.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 13.1-13LST01.PL - A Program to List All Possible Values for 
+      <TT>errno</B></FONT></TT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>for ($! = 1; $! &lt;= 10000; $!++) {
+    $errText = $!;
+    chomp($errText);
+    printf("%04d: %s\n", $!, $errText) if $! ne "Unknown Error";
+}</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>Under Windows 95, this program prints 787 error messages. Most of them are 
+totally unrelated to Perl. 
+<H3><A name="Example: Using the or Logical Operator">Example: Using the 
+<I>or</I> Logical Operator</A></H3>Perl provides a special logical operator that 
+is ideal for testing the return values from functions. You may recall that the 
+<TT>or</TT> operator will evaluate only the right operand if the left operand is 
+false. Because most functions return false when an error occurs, you can use the 
+<TT>or</TT> operator to control the display of error messages. For example: 
+<P><B><PRE>chdir('/user/printer') or print("Can't connect to Printer dir.\n");</PRE></B>This 
+code prints only the error message if the program can't change to the 
+<TT>/user/printer</TT> directory. Unfortunately, simply telling the user what 
+the problem is, frequently, is not good enough. The program must also exit to 
+avoid compounding the problems. You could use the comma operator to add a second 
+statement to the right operand of the <TT>or</TT> operator. Adding an 
+<TT>exit()</TT> statement to the previous line of code looks like this: 
+<P><B><PRE>chdir('/usr/printer') or print("failure\n"), exit(1);
+print("success\n");</PRE></B>I added the extra <TT>print</TT> statement to prove 
+that the script really exits. If the printer directory does not exist, the 
+second <TT>print</TT> statement is not executed. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>At the shell or DOS, a zero return value means that 
+      the program ended successfully. While inside a Perl script, a zero return 
+      value frequently means an error has occurred. Be careful when dealing with 
+      return values; you should always check your documentation. 
+</TD></TR></TBODY></TABLE>
+<P>Using the comma operator to execute two statements instead of one is awkward 
+and prone to misinterpretation when other programmers look at the script. 
+Fortunately, you can use the <TT>die()</TT> function to get the same 
+functionality. 
+<H3><A name="Example: Using the die() Function">Example: Using the <I>die()</I> 
+Function</A></H3>The <TT>die()</TT> function is used to quit your script and 
+display a message for the user to read. Its syntax is 
+<P><B><PRE>die(LIST);</PRE></B>The elements of <TT>LIST</TT> are printed to 
+<TT>STDERR</TT>, and then the script will exit, setting the script's return 
+value to <TT>$!</TT> (<TT>errno</TT>). If you were running the Perl script from 
+inside a C program or UNIX script, you could then check the return value to see 
+what went wrong. 
+<P>The simplest way to use the <TT>die()</TT> function is to place it on the 
+right side of the <TT>or</TT> operator 
+<P><B><PRE>chdir('/user/printer') or die();</PRE></B>which displays 
+<P><B><PRE>Died at test.pl line 2.</PRE></B>if the <TT>/user/printer</TT> directory 
+does not exist. The message is not too informative, so you should always include 
+a message telling the user what happened. If you don't know what the error might 
+be, you can always display the error text associated with <TT>errno</TT>. For 
+example: 
+<P><B><PRE>chdir('/user/printer') or die("$!");</PRE></B>This line of code displays 
+<P><B><PRE>No such file or directory at test.pl line 2.</PRE></B>This error message is 
+a bit more informative. It's even better if you append the text <TT>, 
+stopped</TT> to the error message like this: 
+<P><B><PRE>chdir('/user/printer') or die("$!, stopped");</PRE></B>which displays 
+<P><B><PRE>No such file or directory, stopped at test.pl line 2.</PRE></B>Appending 
+the extra string makes the error message look a little more professional. If you 
+are really looking for informative error messages, try this: 
+<P><B><PRE>$code = "chdir('/user/printer')";
+eval($code) or die("PROBLEM WITH LINE: $code\n$! , stopped");</PRE></B>which 
+displays the following: 
+<P><B><PRE>PROBLEM WITH LINE: chdir('/user/printer')
+No such file or directory , stopped at test.pl line 3.</PRE></B>The 
+<TT>eval()</TT> function is discussed in the section "<A 
+href="ch13.htm#Example: Using the eval() Function">Example: 
+Using the eval() Function</A>" later in this chapter. Therefore, I won't explain 
+what this code is doing other than to say that the <TT>eval()</TT> function 
+executes its arguments as semi-isolated Perl code. First, the Perl code in 
+<TT>$code</TT> is executed and then, if an error arises, the Perl code in 
+<TT>$code</TT> is displayed as text by the <TT>die()</TT> function. 
+<P>If you don't want <TT>die()</TT> to add the script name and line number to 
+the error, add a newline to the end of the error message. For example: 
+<P><B><PRE>chdir('/user/printer') or die("$!\n");</PRE></B>displays the following: 
+<P><B><PRE>No such file or directory</PRE></B>
+<H3><A name="Example: Using the warn() Function">Example: Using the 
+<I>warn()</I> Function</A></H3>The <TT>warn()</TT> function has the same 
+functionality that <TT>die()</TT> does except the script is not exited. This 
+function is better suited for nonfatal messages like low memory or disk space 
+conditions. The next example tries to change to the <TT>/text</TT> directory. If 
+the connect fails, the consequences are not fatal because the files can still be 
+written to the current directory. 
+<P><B><PRE>chdir('/text') or warn("Using current directory instead of /text, warning");</PRE></B>This 
+line of code displays 
+<P><B><PRE>Using current directory instead of /text, warning at test.pl line 2.</PRE></B>if 
+the <TT>/text</TT> directory does not exist. As with <TT>die()</TT>, you can 
+eliminate the script name and line number by ending your error message with a 
+newline. You could also use the <TT>$!</TT> variable to display the system error 
+message. 
+<H2><A name="Trapping Fatal Errors">Trapping Fatal Errors</A></H2>There are 
+times when reporting fatal errors and then exiting the script are not 
+appropriate responses to a problem. For example, your script might try to use 
+the <TT>alarm()</TT> function, which is not supported in some versions of Perl. 
+Normally, using an unsupported function causes your problem to exit, but you can 
+use the <TT>eval()</TT> function to trap the error and avoid ending the script. 
+<P>The <TT>eval()</TT> function accepts an expression and then executes it. Any 
+errors generated by the execution will be isolated and not affect the main 
+program. However, all function definitions and variable modifications do affect 
+the main program. 
+<H3><A name="Example: Using the eval() Function">Example: Using the 
+<I>eval()</I> Function</A></H3>You can use the <TT>eval()</TT> function to trap 
+a normally fatal error: 
+<P><B><PRE></B>eval { alarm(15) };
+warn() if $@;
+
+eval { print("The print function worked.\n"); };
+warn() if $@;</PRE></B>This program displays the following: 
+<P><B><PRE>The Unsupported function alarm function is unimplemented at test.pl line 2.
+        ...caught at test.pl line 3.
+The print function worked.</PRE></B>The <TT>$@</TT> special variable holds the 
+error message, if any, returned by the execution of the expression passed to the 
+<TT>eval()</TT> function. If the expression is evaluated correctly, then 
+<TT>$@</TT> is an empty string. You probably remember that an empty string is 
+evaluated as false when used as a conditional expression. 
+<P>In an earlier section, "<A 
+href="ch13.htm#Example: Using the die() Function">Example: 
+Using the die() Function</A>," you saw the following code snippet being used: 
+<P><B><PRE>$code = "chdir('/user/printer')";
+eval($code) or die("PROBLEM WITH LINE: $code\n$! , stopped");</PRE></B>This 
+program shows that <TT>eval()</TT> will execute a line of code that is inside a 
+variable. You can use this capability in many different ways besides simply 
+trapping fatal errors. The program in Listing 13.2 presents a prompt and 
+executes Perl code as you type it. Another way of looking at this program is 
+that it is an interactive Perl interpreter. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond 
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Loop until the user enters <TT>exit</TT>. 
+      <P>Print the prompt. 
+      <P>Get a line of input from <TT>STDIN</TT> and remove the ending linefeed. 
+
+      <P>Execute the line. 
+      <P>If the executed code set the <TT>$@</TT> error message variable, 
+      display the error message as a warning.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 13.2-13LST02.PL - Using Perl Interactively</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>do {
+    print("&gt; ");
+    chop($_ = &lt;&gt;);
+    eval($_);
+    warn() if $@;
+} while ($_ ne "exit");</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>When you run this program, you will see a <TT>&gt;</TT> prompt. At the 
+prompt, you can type in any Perl code. When you press Enter, the line is 
+executed. You can even define functions you can use later in the interactive 
+session. The program can be stopped by typing <TT>exit</TT> at the command line. 
+
+<P>If you like powerful command-line environments, you can build on this small 
+program to create a personalized system. For example, you might need to perform 
+a backup operation before leaving work. Instead of creating a batch file (under 
+DOS) or a shell file (under UNIX), you can add a new command to the Perl 
+interactive program, as in Listing 13.3. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond 
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Loop until the user enters <TT>exit</TT>. 
+      <P>Print the prompt. 
+      <P>Get a line of input from <TT>STDIN</TT> and remove the ending linefeed. 
+
+      <P>If the inputted line begins with <TT>do#</TT>, then a custom command 
+      has been entered. 
+      <P>Process the <TT>do#backup</TT> custom command. 
+      <P>See if the user needs help. 
+      <P>Otherwise, use the <TT>eval()</TT> function to execute the inputted 
+      line. 
+      <P>If the executed code set the <TT>$@</TT> error message variable, 
+      display the error message as a warning.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 13.3-13LST03.PL - An Interactive Perl Interpreter That 
+      Understands Custom Commands</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>sub backItUp {
+    `backup /user/*`;
+    `delete /user/*.bak`
+}
+
+sub help {
+    print("do#backup will perform the nightly backup\n");
+    print("help will display this message.\n\n");
+}
+
+do {
+    print("&gt; ");
+    chop($_ = &lt;&gt;);
+    if (/^do#/) {
+        backItUp() if /backup/;
+    }
+    elsif (/^\s*help/) {
+        help();
+    }
+    else {
+        eval($_);
+        warn() if $@;
+    }
+} while ($_ ne "exit");</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>This program invokes the backup program and deletes the backup files if you 
+enter <TT>do#backup</TT> at the <TT>&gt;</TT> prompt. Of course, you need to 
+modify this program to perform the customized commands you'd like to have. This 
+technique also enables you to centralize your administrative tasks, which will 
+make them easier to document and maintain. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>If you are running Perl on a DOS or Windows machine, 
+      consider replacing your small batch utility programs with one Perl 
+      interpreter and some customized commands. This saves on hard disk space if 
+      you use a lot of batch files because each file may take up to 4,096 bytes, 
+      regardless of its actual size.</TD></TR></TBODY></TABLE>
+<H2><A name="What Is a Signal">What Is a Signal?</A></H2><I>Signals</I> are 
+messages sent by the operating system to the process running your Perl script. 
+At any time, a signal that must be answered can be sent to your process. 
+Normally, a default handler is used to take care of a signal. For example, under 
+Windows 95, when you press the Ctrl+C key combination, your process is sent an 
+<TT>INT</TT> or interrupt signal. The default handler responds by ending the 
+process and displays the following message: 
+<P><B><PRE>^C at test.pl line 22</PRE></B>Of course, the file name and line number 
+change to match the particulars of whatever script happens to be running when 
+Ctrl+C was pressed. The <TT>^C</TT> notation refers to the Ctrl+C key sequence. 
+<H3><A name="Example: How to Handle a Signal">Example: How to Handle a 
+Signal</A></H3>You can cause Perl to ignore the Ctrl+C key sequence by placing 
+the following line of code near the beginning of your program: 
+<P><B><PRE>$SIG{'INT'} = 'IGNORE';</PRE></B>You can restore the default handler like 
+this: 
+<P><B><PRE>$SIG{'INT'} = 'DEFAULT';</PRE></B>If you need to ensure that files are 
+closed, error messages are written, or other cleanup chores are completed, you 
+need to create a custom <TT>INT</TT> handle function. For example: 
+<P><B><PRE>sub INT_handler {
+    # close all files.
+    # send error message to log file.
+    exit(0);
+}
+
+$SIG{'INT'} = 'INT_handler';</PRE></B>If the Ctrl+C key sequence is pressed 
+anytime after the hash assignment is made, the <TT>INT_handler</TT> function is 
+called instead of the default handler. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>In theory, you could remove the <TT>exit()</TT> call 
+      from the signal handler function, and the script should start executing 
+      from wherever it left off. However, this feature is not working on several 
+      platforms. If you want to test your platform, run the following small 
+      program:</TD></TR></TBODY></TABLE>
+<P><B><PRE>sub INT_handler {
+    print("Don't Interrupt!\n");
+}
+
+$SIG{'INT'} = 'INT_handler';
+
+for ($x = 0; $x &lt; 10; $x++) {
+    print("$x\n");
+    sleep 1;
+}</PRE></B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>You should be able to press Ctrl+C while the script 
+      is counting without forcing the script to end.</TD></TR></TBODY></TABLE>
+<P>The <TT>%SIG</TT> associative array holds only entries you have created for 
+your custom signal handler functions. So, unfortunately, you can't find out 
+which signals are supported by looking at the array returned by 
+<TT>keys(%SIG)</TT>. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>If you are running Perl on a UNIX machine, you can 
+      run the <TT>kill -l</TT> command. This command displays a list of possible 
+      signals.</TD></TR></TBODY></TABLE>
+<P>I looked directly into the perl.exe file supplied with my Perl distribution 
+to find out that the hip port of Perl for Win32 supports the following signals: 
+<P>
+<UL>
+  <LI><TT>ABRT</TT> - This signal means that another process is trying to abort 
+  your process. 
+  <P></P>
+  <LI><TT>BREAK</TT> - This signal indicates that a Ctrl+Break key sequence was 
+  pressed under Windows. 
+  <P></P>
+  <LI><TT>TERM</TT> - This signal means that another process is trying to 
+  terminate your process. 
+  <P></P>
+  <LI><TT>SEGV</TT> - This signal indicates that a segment violation has taken 
+  place. 
+  <P></P>
+  <LI><TT>FPE</TT> - This signal catches floating point exceptions. 
+  <P></P>
+  <LI><TT>ILL</TT> - This signal indicates that an illegal instruction has been 
+  attempted. 
+  <P></P>
+  <LI><TT>INT</TT> - This signal indicates that a Ctrl+C key sequence was 
+  pressed under Windows.</LI></UL>
+<P>You can also use the <TT>%SIG </TT>hash to trap a call to the <TT>warn()</TT> 
+and <TT>die()</TT> functions. This comes in handy if you're working with someone 
+else's code and want to keep a log of whenever these functions are called. 
+Rather than finding every place the functions are used, you can define a handler 
+function as in Listing 13.4. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond 
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Define a handler for the <TT>warn()</TT> function. The error message is 
+      passed to the handler as the first element of the <TT>@_</TT> array. 
+      <P>Define a handler for the <TT>die()</TT> function. 
+      <P>Define the <TT>sendToLogfile()</TT> utility function. 
+      <P>Start the signal catching by creating two entries in the <TT>%SIG</TT> 
+      hash. 
+      <P>Invoke the <TT>warn()</TT> and <TT>die()</TT> 
+  functions.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 13.4-13LST04.PL - How to Define Signal Handler Functions for 
+      the <I>warn()</I> and <I>die()</I> Functions</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>sub WARN_handler {
+    my($signal) = @_;
+    sendToLogfile("WARN: $signal");
+}
+
+sub DIE_handler {
+    my($signal) = @_;
+    sendToLogfile("DIE: $signal");
+}
+
+sub sendToLogfile {
+    my(@array) = @_;
+    open(LOGFILE, "&gt;&gt;program.log");
+    print LOGFILE (@array);
+    close(LOGFILE);
+}
+
+$SIG{__WARN__} = 'WARN_handler';
+$SIG{__DIE__}  = 'DIE_handler';
+
+chdir('/printer') or warn($!);
+chdir('/printer') or die($!);</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>When this program is done executing, the <TT>PROGRAM.LOG</TT> file contains 
+these lines: 
+<P><B><PRE></B>WARN: No such file or directory at 13lst02.pl line 22.
+DIE: No such file or directory at 13lst02.pl line 23.</PRE></B>
+<H2><A name=Summary>Summary</A></H2>Your program's capability to handle error 
+conditions that may arise will determine, to a certain extent, how usable your 
+program is. If a user of your program finds that it stops working with no error 
+messages and, therefore, no way to solve whatever problem has arisen, then your 
+program won't be used for long. 
+<P>Displaying error messages is also valuable during the programming and 
+debugging stage. If you mistakenly type a directory name, it may take you an 
+hour to look through the script and find the problem. Handling the <TT>No such 
+directory</TT> error correctly in the first place will tell you what the problem 
+is and which line of the script has the problem. 
+<P>In this chapter, you saw that checking for errors usually means looking at 
+the return value of the functions that are called. Some functions set the 
+<TT>errno</TT> variable while others simply return true or false. While the 
+<TT>errno</TT> variable does have a core set of values that are system 
+independent, it also has system-dependent values. Listing 13.1 showed you how to 
+display the error values applicable to your system. 
+<P>Next, you read about the <TT>or</TT> logical operator. This operator 
+evaluates only the right operand if the left is false. Therefore, it is useful 
+when testing for unsuccessful functions that return false upon failure. 
+<P>The <TT>die()</TT> and <TT>warn()</TT> functions are both used to display an 
+error message. In addition, the <TT>die()</TT> function causes the script to 
+end. 
+<P>Then, the <TT>eval()</TT> function was covered. It is used to execute Perl 
+code in a protected environment so that fatal errors will not end the script. 
+Any error messages that do arise will be placed into the <TT>$@</TT> special 
+variable. All variable value changes and function definitions affect the main 
+program. 
+<P>Lastly, the signals were covered. Signals are messages sent to a process by 
+the operating system. There is a wide range of signals, and they differ 
+depending on which operating system you are using. The <TT>%SIG</TT> associative 
+array is used to set up your own signal handling function. 
+<P>The next chapter discusses object orientation. You learn the definition of an 
+object, how to create one, and how to derive new objects from existing objects. 
+<H2><A name="Review Questions">Review Questions</A></H2>
+<OL>
+  <LI>Why is it important to check for errors? 
+  <P></P>
+  <LI>How is the <TT>die()</TT> function different from the <TT>warn()</TT> 
+  function? 
+  <P></P>
+  <LI>What is the meaning of the <TT>$!</TT> special variable? 
+  <P></P>
+  <LI>What does the <TT>eval()</TT> function do? 
+  <P></P>
+  <LI>What is a signal? 
+  <P></P>
+  <LI>What will the statement <TT>$SIG{'ABRT'} = 'IGNORE'</TT> do?? 
+  <P></P>
+  <LI>Which signal is used to trap floating point exceptions?</LI></OL>
+<H2><A name="Review Exercises">Review Exercises</A></H2>
+<OL>
+  <LI>Write a program that opens a file and uses the <TT>die()</TT> function if 
+  an error occurs. 
+  <P></P>
+  <LI>Write a program that uses the <TT>warn()</TT> function if an existing file 
+  will be overwritten by an <TT>open()</TT> statement. 
+  <P></P>
+  <LI>List three situations where the <TT>warn()</TT> function could be used. 
+  <P></P>
+  <LI>List three situations where the <TT>die()</TT> function could be used. 
+  <P></P>
+  <LI>Modify the interactive Perl interpreter to print a version number when the 
+  <TT>version</TT> custom command is used. 
+  <P></P>
+  <LI>Modify the interactive Perl interpreter to save all commands entered into 
+  a log file. Add a timestamp to each log entry.</LI></OL>
+<HR>
+<SMALL><A href="ch13.htm#top">Top of Page</A> | <A 
+href="ch13.htm#sections">Sections</A> | <A 
+href="ch13.htm#chapters">Chapters</A> | <A 
+href="copyright.htm">Copyright</A> </SMALL>
+<HR>
+
+<P></P></BODY></HTML>

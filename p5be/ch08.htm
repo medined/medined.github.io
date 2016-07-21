@@ -1,0 +1,918 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0037)ch08.htm -->
+<HTML><HEAD><TITLE>Perl 5 by Example: References</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META
+content="Perl, Perl Manual, Introduction to Perl, Perl Tutorial, Programming, Electronic Book, ebook"
+name=keywords>
+<META
+content="Perl 5 by Example teaches you how to use the Perl programming language by showing examples that demonstrate the concepts being discussed. The examples are designed to give you a chance to experiment - which clarifies the material."
+name=description>
+<META content="MSHTML 6.00.2723.2500" name=GENERATOR></HEAD>
+<BODY bgColor=silver background=images/back2.jpg><A name=top></A>
+<TABLE cellSpacing=0 cellPadding=0>
+  <TBODY>
+  <TR>
+    <TD><IMG height=71 alt=Title src="images/title.jpg" width=443
+    border=0></TD></TR></TBODY></TABLE>
+<TABLE cellSpacing=0 cellPadding=0 width=140 align=left border=0>
+  <TBODY>
+  <TR>
+    <TD vAlign=top width=100 background=images/leftbar.jpg height=373>
+      <P><SMALL>
+      <P><A href="ch07.htm"><SMALL>Previous
+      Chapter</SMALL></A><BR><A
+      href="ch09.htm"><SMALL>Next
+      Chapter</SMALL></A><BR></P></SMALL></TD></TR>
+  <TR>
+    <TD>
+      <P>Links<BR><SMALL><A
+      href="ch08.htm#sections">Sections</A><BR><A
+      href="ch08.htm#chapters">Chapters</A><BR><A
+      href="copyright.htm">Copyright</A><BR></SMALL></P><A
+      name=sections></A>
+      <P>Sections</P><SMALL>
+      <P><A
+      href="ch08.htm#Reference Types">Reference
+      Types</A></P>
+      <P><A href="ch08.htm#Summary">Summary</A></P>
+      <P><A href="ch08.htm#Review Questions">Review
+      Questions</A></P>
+      <P><A href="ch08.htm#Review Exercises">Review
+      Exercises</A></P></SMALL><A name=chapters></A>
+      <P>Chapters<BR><FONT size=1>
+      <P><A href="errata.htm">ERRATA</A></P>
+      <P><A href="index.htm">Welcome!</A></P>
+      <P><A href="ch00.htm">Introduction</A></P>
+      <P>Part I: Basic Perl</P>
+      <P><A href="ch01.htm">01-Getting Your Feet
+      Wet</A></P>
+      <P><A href="ch02.htm">02-Numeric and String
+      Literals</A></P>
+      <P><A href="ch03.htm">03-Variables</A></P>
+      <P><A href="ch04.htm">04-Operators</A></P>
+      <P><A href="ch05.htm">05-Functions</A></P>
+      <P><A href="ch06.htm">06-Statements</A></P>
+      <P><A href="ch07.htm">07-Control
+      Statements</A></P>
+      <P><A href="ch08.htm">08-References</A></P>
+      <P>Part II: Intermediate Perl</P>
+      <P><A href="ch09.htm">09-Using Files</A></P>
+      <P><A href="ch10.htm">10-Regular
+      Expressions</A></P>
+      <P><A href="ch11.htm">11-Creating
+      Reports</A></P>
+      <P>Part III: Advanced Perl</P>
+      <P><A href="ch12.htm">12-Using Special
+      Variables</A></P>
+      <P><A href="ch13.htm">13-Handling Errors and
+      Signals</A></P>
+      <P><A href="ch14.htm">14-What Are
+      Objects?</A></P>
+      <P><A href="ch15.htm">15-Perl Modules</A></P>
+      <P><A href="ch16.htm">16-Debugging
+      Perl</A></P>
+      <P><A href="ch17.htm">17-Command line
+      Options</A></P>
+      <P>Part IV: Perl and the Internet</P>
+      <P><A href="ch18.htm">18-Using Internet
+      Protocols</A></P>
+      <P><A href="ftplib.htm">ftplib.pl</A></P>
+      <P><A href="ch19.htm">19-What is CGI?</A></P>
+      <P><A href="ch20.htm">20-Form
+      Processing</A></P>
+      <P><A href="ch21.htm">21-Using Perl with Web
+      Servers</A></P>
+      <P><A href="ch22.htm">22-Internet
+      Resources</A></P>
+      <P>Appendixes</P>
+      <P><A href="xp0a.htm">A-Review
+      Questions</A></P>
+      <P><A href="xp0b.htm">B-Glossary</A></P>
+      <P><A href="xp0c.htm">C-Function List</A></P>
+      <P><A href="xp0d.htm">D-The Windows
+      Registry</A></P>
+      <P><A href="xp0e.htm">E-What's On the
+      CD?</A></P></FONT></TD>
+    <TD width=5>&nbsp;</TD>
+    <TD width=5 bgColor=black>&nbsp;</TD>
+    <TD width=5>&nbsp;</TD></TR></TBODY></TABLE>
+<H1>08 - References</H1>
+<P>A <I>reference</I> is a scalar value that points to a memory location that
+holds some type of data. Everything in your Perl program is stored inside your
+computer's memory. Therefore, all of your variables and functions are located at
+some memory location. References are used to hold the memory addresses. When a
+reference is <I>dereferenced</I>, you retrieve the information referred to by
+the reference.
+<H2><A name="Reference Types">Reference Types</A></H2><A
+name="Josh Purinton"></A>There are six types of references. A reference can
+point to a scalar, an array, a hash, a function, a glob or another reference.
+Table 8.1 shows how the different types are valued with the assignment operator
+and how to dereference them using curly braces.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>Note:</B> I briefly mentioned hashes in Chapter 3,
+      "<A href="ch03.htm">Variables</A>." Just to
+      refresh your memory, hashes are another name for associative arrays. Since
+      "hash" is shorter than "associative array," I'll be using both terms in
+      this chapter.</TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 8.1 - The Six Types of References</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Reference Assignment </TH>
+    <TH align=left>How to Dereference</TH></TR>
+  <TR>
+    <TD vAlign=top>$refScalar = \$scalar; </TD>
+    <TD vAlign=top>${$refScalar} is a scalar value.</TD></TR>
+  <TR>
+    <TD vAlign=top>$refArray = \@array; </TD>
+    <TD vAlign=top>@{$refArray} is an array value.</TD></TR>
+  <TR>
+    <TD vAlign=top>$refHash = \%hash; </TD>
+    <TD vAlign=top>%{$refHash} is a hash value.</TD></TR>
+  <TR>
+    <TD vAlign=top>$refFunction = \&amp;function; </TD>
+    <TD vAlign=top>&amp;{$refFunction} is a function location.</TD></TR>
+  <TR>
+    <TD vAlign=top>$refGlob = \*FILE;</TD>
+    <TD vAlign=top>$refGlob is a reference to a file handle and seems to be
+      automatically dereferenced by Perl.</TD></TR>
+  <TR>
+    <TD vAlign=top>$refRef = \$refScalar; </TD>
+    <TD vAlign=top>${${$refRef}} is a scalar value.</TD></TR></TBODY></TABLE>
+<P>Essentially all you need to do in order to create a reference is to add the
+backslash to the front of a value or variable.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Errata
+  Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>The printed version of this book did not mention
+      Glob references. They can be used to pass file handles to subroutines.
+      However, it seems like Glob references are not needed since Perl will let
+      you pass file handles directly (as well as indirectly) to subroutines. For
+      example: <B><PRE>open(FILE, '&lt;test.dat');
+$refGlob = \*FILE;
+readLineFromFile($refGlob);   # this line and the next seem to work in the same way.
+readLineFromFile(FILE);
+
+sub readLineFromFile {
+    my($temp) = shift;
+    $line = &lt;$temp&gt;;
+}</PRE></B>If you try this example - create a test.dat file first - you
+      will see that the two calls to readLineFromFile() work correctly.
+  </TD></TR></TBODY></TABLE>
+<P>
+<H3><A name="Example: Passing Parameters to Functions">Example: Passing
+Parameters to Functions</A></H3>Back in Chapter 5, "<A
+href="ch05.htm">Functions</A>," we talked about
+passing parameters to functions. At the time, we were not able to pass more than
+one array to a function. This was because functions only see one array (the
+<TT>@_</TT> array) when looking for parameters. References can be used to
+overcome this limitation.
+<P>Let's start off by passing two arrays into a function to show that the
+function only sees one array.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Call firstSub() with two arrays as parameters.
+      <P>Define the firstSub() function.
+      <P>Create local variables and assign elements from the parameter array to
+      them.
+      <P>Print the local arrays.</TT></P></TD></TR></TBODY></TABLE>
+<P><B><PRE>firstSub( (1..5), ("A".."E"));
+
+sub firstSub {
+    my(@firstArray, @secondArray) = @_;
+
+    print("The first array is  @firstArray.\n");
+    print("The second array is @secondArray.\n");
+}</PRE></B>This program displays:
+<P><B><PRE>The first array is  1 2 3 4 5 A B C D E.
+The second array is .</PRE></B>Inside the <TT>firstSub()</TT> function, the
+<TT>@firstArray</TT> variable was assigned the entire parameter array, leaving
+nothing for the <TT>@secondArray</TT> variable. By passing references to the
+<TT>@arrayOne</TT> and <TT>@arrayTwo</TT>, we can preserve the arrays for use
+inside the function. Very few changes are needed to enable the above example to
+use references. Take a look.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Call firstSub() using the backslash operator to pass a reference to
+      each array.
+      <P>Define the firstSub() function.
+      <P>Create two local scalar variables to hold the array references.
+      <P>Print the local variables, dereferencing them to look like arrays. This
+      is done using the @{} notation.</TT></P></TD></TR></TBODY></TABLE>
+<P><B><PRE>firstSub( \(1..5), \("A".."E") );                         # One
+
+sub firstSub {
+    my($ref_firstArray, $ref_secondArray) = @_;           # Two
+
+    print("The first array is  @{$ref_firstArray}.\n");   # Three
+    print("The second array is @{$ref_secondArray}.\n");  # Three
+}</PRE></B>This program displays:
+<P><B><PRE>The first array is  1 2 3 4 5.
+The second array is A B C D E.</PRE></B>Three things were done to make this
+example use references:
+<P>
+<OL>
+  <LI>In the line marked "One," backslashes were added to indicate that a
+  reference to the array should be passed.
+  <P></P>
+  <LI>In the line marked "Two," the references were taken from the parameter
+  array and assigned to scalar variables.
+  <P></P>
+  <LI>In the lines marked "Three," the scalar values were dereferenced.
+  Dereferencing means that Perl will use the reference as if it were a normal
+  data type - In this case, an array variable.</LI></OL>
+<H3><A name="Example: The ref() Function">Example: The <I>ref()</I>
+Function</A></H3>Using references to pass arrays into a function worked well and
+it was easy, wasn't it? However, what happens if you pass a scalar reference to
+the <TT>firstSub()</TT> function instead of an array reference?
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Call firstSub() and pass a reference to a scalar and a reference to an
+      array.
+      <P>Define the firstSub() function.
+      <P>Create two local scalar variables to hold the array references.
+      <P>Print the local variables, dereferencing them to look like
+      arrays.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 8.1-08LST01.PL - Passing a Scalar Reference When the Function
+      Expects an Array Reference Causes Problems</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>firstSub( \10, \("A".."E") );
+
+sub firstSub {
+    my($ref_firstArray, $ref_secondArray) = @_;
+
+    print("The first array is  @{$ref_firstArray}.\n");
+    print("The second array is @{$ref_secondArray}.\n");
+}</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>This program displays:
+<P><B><PRE>Not an ARRAY reference at 08lst01.pl line 9.</PRE></B>Perl provides the
+<TT>ref()</TT> function so that you can check the reference type before
+dereferencing a reference. The next example shows how to trap the mistake of
+passing a scalar reference instead of an array reference.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Call <TT>firstSub()</TT> and pass a reference to each variable.
+      <P>Define the <TT>firstSub()</TT> function.
+      <P>Create two local scalar variables to hold the array references.
+      <P>Print the local variables if each variable is a reference to an array.
+      Otherwise, print nothing.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 8.2-08LST02.PL - How to Test for an Array Reference Passed as a
+      Parameter</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>firstSub( \10, \("A".."E") );
+
+sub firstSub {
+    my($ref_firstArray, $ref_secondArray) = @_;
+
+    print("The first array is  @{$ref_firstArray}.\n")
+        if (ref($ref_firstArray) eq "ARRAY");             # One
+
+    print("The second array is @{$ref_secondArray}.\n")
+        if (ref($ref_secondArray) eq "ARRAY");            # Two
+}</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>This program displays:
+<P><B><PRE>The second array is A B C D E.</PRE></B>Only the second parameter is
+printed because the first parameter - the scalar reference - failed the test on
+the line marked "One." The statement modifiers on the lines marked "One" and
+"Two" ensure that we are dereferencing an array reference. This prevents the
+error message that appeared earlier. Of course, in your own programs you might
+want to set an error flag or print a warning.
+<P>Table 8.2 shows the different values that the <TT>ref()</TT> function can
+return.
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 8.2 - Using the <TT>ref()</TT> Function</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Function Call </TH>
+    <TH align=left>Return Value</TH></TR>
+  <TR>
+    <TD vAlign=top>ref( 10 ); </TD>
+    <TD vAlign=top>undefined</TD></TR>
+  <TR>
+    <TD vAlign=top>ref( \10 ); </TD>
+    <TD vAlign=top>SCALAR</TD></TR>
+  <TR>
+    <TD vAlign=top>ref( \(1, 2) ); </TD>
+    <TD vAlign=top>SCALAR
+      <TABLE cellSpacing=0 cellPadding=0 border=0>
+        <TBODY>
+        <TR>
+          <TD bgColor=black><FONT color=lightcyan size=4><B>Errata
+            Note</B></FONT></TD></TR>
+        <TR>
+          <TD bgColor=lightcyan>The printed version of this book indicated
+            that <TT>ref( \(1, 2) );</TT> would return <TT>ARRAY</TT> which is
+            erroneous. Instead, <TT>SCALAR</TT> is returned because the array is
+            being evaluated in a scalar context. Therefore, <TT>$c = \(1,
+            3);</TT> results in $c being a reference to a scalar that has a
+            value of 3. However, <TT>$c = \(1..3);</TT> and <TT>$c = [1..3]</TT>
+            does result in $c being a reference to an array with three elements
+            (1, 2, and 3).</TD></TR></TBODY></TABLE></TD></TR>
+  <TR>
+    <TD vAlign=top>ref( \{1 =&gt; "Joe"} ); </TD>
+    <TD vAlign=top>HASH</TD></TR>
+  <TR>
+    <TD vAlign=top>ref( \&amp;firstSub ); </TD>
+    <TD vAlign=top>CODE</TD></TR>
+  <TR>
+    <TD vAlign=top>ref( \\10 ); </TD>
+    <TD vAlign=top>REF</TD></TR></TBODY></TABLE>
+<P>Listing 8.3 shows another example of the <TT>ref()</TT> function in action.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Initialize scalar, array, and hash variables.
+      <P>Pass the variables to the <TT>printRef()</TT> function. These are
+      non-references so the undefined value should be returned.
+      <P>Pass variable references to the <TT>printRef()</TT> function. This is
+      accomplished by prefixing the variable names with a backslash.
+      <P>Pass a function reference and a reference to a reference to the
+      <TT>printRef()</TT> function.
+      <P>Define the <TT>printRef()</TT> function.
+      <P>Iterate over the parameter array.
+      <P>Assign the reference type to <TT>$refType</TT>.
+      <P>If the current parameter is a reference then print its reference type
+      otherwise print that it's a non-reference.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 8.3-08LST03.PL - Using the <TT>ref()</TT> Function to Determine
+      the Reference Type of a Parameter</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>$scalar = 10;
+@array  = (1, 2);
+%hash   = ( "1" =&gt; "Davy Jones" );
+
+# I added extra spaces around the parameter list
+# so that the backslashes are easier to see.
+printRef( $scalar, @array, %hash );
+printRef( \$scalar, \@array, \%hash );
+printRef( \&amp;printRef, \\$scalar );
+
+# print the reference type of every parameter.
+sub printRef {
+    foreach (@_) {
+        $refType = ref($_);
+        if (defined($refType) &amp;&amp; $refType ne '') {
+             print "$refType ";
+        }
+        else {
+             print "Non-reference ";
+        }
+    }
+    print("\n");
+}</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>This program displays:
+<P><B><PRE>Non-reference Non-reference Non-reference Non-reference Non-reference
+SCALAR ARRAY HASH
+CODE REF</PRE></B>By using the <TT>ref()</TT> function you can protect program
+code that dereferences variables from producing errors when the wrong type of
+reference is used. Notice that five 'Non-references' strings are displayed. Why?
+Because both @array and %hash are 'flattened' when they are moved into the
+<TT>@_</TT> array.
+<H3><A name="Example: Creating a Data Record">Example: Creating a Data
+Record</A></H3>Perl's associative arrays (hashes) are extremely useful when it
+comes to storing information in a way that facilitates easy retrieval. For
+example, you could store customer information like this:
+<P><B><PRE>%record = ( "Name"    =&gt; "Jane Hathaway",
+            "Address" =&gt; "123 Anylane Rd.",
+            "Town"    =&gt; "AnyTown",
+            "State"   =&gt; "AnyState",
+            "Zip"     =&gt; "12345-1234"
+);</PRE></B>The <TT>%record</TT> associative array can also be considered a
+<I>data record</I> with five <I>members</I>. Each member is a single item of
+information. The data record is a group of members that relate to a single
+topic. In this case, that topic is a customer address. And a <I>database</I> is
+one or more data records.
+<P>Each member is accessed in the record by using its name as the key. For
+example, you can access the state member by saying <TT>$record{"State"}</TT>. In
+a similar manner all of the members can be accessed.
+<P>Of course, a database with only one record is not very useful. By using
+references, you can build a multiple record array. Listing 8.4 shows two records
+and how to initialize a database array.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Declare a data record called <TT>%recordOne</TT> as an associative
+      array.
+      <P>Declare a data record called <TT>%recordTwo</TT> as an associative
+      array.
+      <P>Declare an array called <TT>@database</TT> with references to the
+      associative arrays as elements.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 8.4-08LST04.PL - A Database with Two
+  Records</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>%recordOne = ( "Name"    =&gt; "Jane Hathaway",
+               "Address" =&gt; "123 Anylane Rd.",
+               "Town"    =&gt; "AnyTown",
+               "State"   =&gt; "AnyState",
+               "Zip"     =&gt; "12345-1234"
+);
+
+%recordTwo = ( "Name"    =&gt; "Kevin Hughes",
+               "Address" =&gt; "123 Allways Dr.",
+               "Town"    =&gt; "AnyTown",
+               "State"   =&gt; "AnyState",
+               "Zip"     =&gt; "12345-1234"
+);
+
+@database = ( \%recordOne, \%recordTwo );</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>You can print the address member of the first record like this:
+<P><B><PRE>print( %{$database[0]}-&gt;{"Address"} . "\n");</PRE></B>which displays:
+<P><B><PRE>123 Anylane Rd.</PRE></B>Let's dissect the dereferencing expression in this
+print statement. Remember to work left to right and always evaluate brackets and
+parentheses first. Ignoring the <TT>print()</TT> function and the newline, you
+can evaluate this line of code in the following way.
+<P>
+<UL>
+  <LI>The inner most bracket is <TT>[0]</TT> which means that we'll be looking
+  at the first element of an array.
+  <P></P>
+  <LI>The square bracket operators have a left to right associativity so we look
+  left for the name of the array. The name of the array is <TT>database</TT>.
+  <P></P>
+  <LI>Next come the curly brackets which tell Perl to dereference. Curly
+  brackets also have a left to right associativity so we look left to see the
+  reference type. In this case we see a <TT>%</TT> which means an associative
+  array.
+  <P></P>
+  <LI>The <TT>-&gt;</TT> is the infix dereference operator. It tells Perl that
+  the thing being dereferenced on the left (the <TT>database</TT> reference in
+  this case) is connected to something on the right.
+  <P><LU>The 'thing' on the right is the key value or "Address." Notice that it
+  is inside curly braces exactly as if a regular hash key were being
+  used.</P></LI></UL>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>Using the <TT>%{$database[0]}-&gt;{"Address"}</TT>
+      notation is pretty cumbersome. Although it lets you can see exactly what
+      is happening in terms of referencing and dereferencing. You can also let
+      Perl handle the details by using the following notation:
+      <TT>$database[0]-&gt;{"Address"}</TT>.</TD></TR></TBODY></TABLE>
+<P>The variable declaration in the above example uses three variables to define
+the data's structure. We can condense the declaration down to one variable as
+shown in Listing 8.5.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Declare an array called <TT>@database</TT> with two associative arrays
+      as elements. Because the associative arrays are not being assigned
+      directly to a variable, they are considered anonymous.
+      <P>Print the value associated with the "Name" key for the first element of
+      the <TT>@database</TT> array.
+      <P>Print the value associated with the "Name" key for the second element
+      of the <TT>@database</TT> array.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 8.5-08LST05.PL - Declaring the Database Structure in One
+      Shot</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>@database = (
+    { "Name"    =&gt; "Jane Hathaway",
+      "Address" =&gt; "123 Anylane Rd.",
+      "Town"    =&gt; "AnyTown",
+      "State"   =&gt; "AnyState",
+      "Zip"     =&gt; "12345-1234"
+    },
+    { "Name"    =&gt; "Kevin Hughes",
+      "Address" =&gt; "123 Allways Dr.",
+      "Town"    =&gt; "AnyTown",
+      "State"   =&gt; "AnyState",
+      "Zip"     =&gt; "12345-1234"
+    }
+);
+
+print(%{$database[0]}-&gt;{"Name"} . "\n");
+print(%{$database[1]}-&gt;{"Name"} . "\n");</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>This program displays:
+<P><B><PRE>Jane Hathaway
+Kevin Hughes</PRE></B>Let's analyze the dereferencing code in the first print
+line.
+<P>
+<UL>
+  <LI>The inner-most bracket is <TT>[0]</TT> which means that we'll be looking
+  at the first element of an array.
+  <P></P>
+  <LI>The square bracket operators have a left to right associativity so we look
+  left for the name of the array. The name of the array is <TT>database</TT>.
+  <P></P>
+  <LI>Next comes the curly brackets which tell Perl to dereference. Curly
+  brackets also have a left to right associativity so we look left to see the
+  reference type. In this case we see a <TT>%</TT> which means an associative
+  array.
+  <P></P>
+  <LI>The -&gt; is the infix dereference operator. It tells Perl that the thing
+  being dereferenced on the left (the <TT>database</TT> reference in this case)
+  is connected to something on the right.
+  <P></P>
+  <LI>The 'thing' on the right is the key value or "Name". Notice that it is
+  inside curly braces exactly as if a regular hash key were being used.</LI></UL>
+<P>Even though the structure declarations in the last two examples look
+different, they are equivalent. You can confirm this because the structures are
+dereferenced the same way. What's happening here? Perl is creating <I>anonymous
+</I>associative array references that become elements of the <TT>@database</TT>
+array.
+<P>In the previous example, each hash had a name - <TT>%recordOne</TT> and
+<TT>%recordTwo</TT>. In the current example, there is no variable name directly
+associated with the hashes. If you use an anonymous variable in your programs,
+Perl will automatically provide a reference to it.
+<P>We can explore the concepts of data records a bit further using this basic
+example. So far, we've used hash references as elements of an array. When one
+data type is stored inside of another data type, this is called <I>nesting
+</I>data types. You can nest data types as often and as deeply as you'd like.
+<P>At this stage of the example, <TT>%{$database[0]}-&gt;{"Name"}</TT> was used
+to dereference the "Name" member of the first record. This type of dereferencing
+uses an array subscript to tell Perl which record to look at. However, you could
+use an associative array to hold the records. With an associative array, you
+could look at the records using a customer number or other id value. Listing 8.6
+shows how this can be done.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Declare a hash called %<TT>database</TT> with two keys, MRD-100 and
+      MRD-250. Each key has a reference to an anonymous hash as its value.
+      <P>Find the reference to the hash associated with the key "MRD-100." Then
+      print the value associated with the key "Name" inside the first hash.
+      <P>Find the reference to the hash associated with the key "MRD-250." Then
+      print the value associated with the key "Name" inside the first
+      hash.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 8.6-08LST06.PL - Using an Associative Array to Hold the
+      Records</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>%database = (
+    "MRD-100" =&gt; { "Name"    =&gt; "Jane Hathaway",
+                   "Address" =&gt; "123 Anylane Rd.",
+                   "Town"    =&gt; "AnyTown",
+                   "State"   =&gt; "AnyState",
+                   "Zip"     =&gt; "12345-1234"
+                 },
+    "MRD-250" =&gt; { "Name"    =&gt; "Kevin Hughes",
+                   "Address" =&gt; "123 Allways Dr.",
+                   "Town"    =&gt; "AnyTown",
+                   "State"   =&gt; "AnyState",
+                   "Zip"     =&gt; "12345-1234"
+                 }
+);
+
+print(%{$database{"MRD-100"}}-&gt;{"Name"} . "\n");
+print(%{$database{"MRD-250"}}-&gt;{"Name"} . "\n");</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>This program displays:
+<P><B><PRE>Jane Hathaway
+Kevin Hughes</PRE></B>You should be able to follow the same steps that we used
+previously to decipher the print statement in this listing. The key is that the
+associative array index is surrounded by the curly brackets instead of the
+square brackets used previously.
+<P>There is one more twist that I'd like to show you using this data structure.
+Let's see how to dynamically add information. First, we'll look at adding an
+entire data record and then we'll look at adding new members to an existing data
+record. Listing 8.7 shows you can use a standard hash assignment to dynamically
+create a data record.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Assign a reference to a hash to the "MRD-300" key in the
+      <TT>%database<B> </TT></B>associative array.
+      <P>Assign the reference to the hash associated with the key "MRD-300" to
+      the <TT>$refCustomer</TT> variable.
+      <P>Print the value associated with the key "Name" inside hash referenced
+      by <TT>$refCustomer</TT>.
+      <P>Print the value associated with the key "Address" inside hash
+      referenced by <TT>$refCustomer</TT>.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 8.7-08LST07.PL - Creating a Record Using Hash
+      Assignment</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>$database{"MRD-300"} = {
+    "Name"    =&gt; "Nathan Hale",
+    "Address" =&gt; "999 Centennial Ave.",
+    "Town"    =&gt; "AnyTown",
+    "State"   =&gt; "AnyState",
+    "Zip"     =&gt; "12345-1234"
+};
+
+$refCustomer = $database{"MRD-300"};
+print(%{$refCustomer}-&gt;{"Name"} . "\n");
+print(%{$refCustomer}-&gt;{"Address"} . "\n");</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>This program displays:
+<P><B><PRE>Nathan Hale
+999 Centennial Ave.</PRE></B>Notice that by using a temporary variable
+(<TT>$refCustomer</TT>) the program code is more readable. The alternative would
+be this:
+<P><B><PRE>print(%{$database{"MRD-300"}}-&gt;{"Name"} . "\n");</PRE></B>Most
+programmers would agree that using the temporary variable aids in the
+understanding of the program.
+<P>Our last data structure example shows how to add members to an existing
+customer record. Listing 8.8 shows how to add two phone number members to
+customer record MRD-300.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Assign a reference to an anonymous function to $codeRef. This function
+      will print the elements of the %database hash. Since each value in the
+      %database hash is a reference to another hash, the function has an inner
+      loop to dereference the sub-hash.
+      <P>Assign a reference to a hash to the "MRD-300" key in the %database
+      associative array.
+      <P>Call the anonymous routine by dereferencing $codeRef to print the
+      contents of %database. This is done by surrounding the code reference
+      variable with curly braces and prefixing it with a &amp; to indicate that
+      it should be dereferenced as a function.
+      <P>Assign the reference to the hash associated with the key "MRD-300" to
+      the $refCustomer variable.
+      <P>Add "Home Phone" as a key to the hash associated with the "MRD-300"
+      key.
+      <P>Add "Business Phone" as a key to the hash associated with the "MRD-300"
+      key.
+      <P>Call the anonymous routine by dereferencing $codeRef to print the
+      contents of %database.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=5 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 8.8-08LST08.PL - How to Dynamically Add Members to a Data
+      Structure</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>$codeRef = sub {
+    while (($key, $value) = each(%database)) {
+        print("$key = {\n");
+        while (($innerKey, $innerValue) = each(%{$value})) {
+            print("\t$innerKey =&gt; $innerValue\n");
+        }
+        print("};\n\n");
+    }
+};
+
+$database{"MRD-300"} = {
+    "Name"    =&gt; "Nathan Hale",
+    "Address" =&gt; "999 Centennial Ave.",
+    "Town"    =&gt; "AnyTown",
+    "State"   =&gt; "AnyState",
+    "Zip"     =&gt; "12345-1234"
+};
+
+# print database before dynamic changes.
+</P></PRE>&amp; {$codeRef};<PRE>
+$refCustomer = $database{"MRD-300"};
+%{$refCustomer}-&gt;{"Home Phone"}     = "(111) 511-1322";
+%{$refCustomer}-&gt;{"Business Phone"} = "(111) 513-4556";
+
+# print database after dynamic changes.
+</PRE>&amp; {$codeRef};</B></TT></TD></TR></TBODY></TABLE>
+<P>This program displays:
+<P><B><PRE>MRD-300 = {
+        Town =&gt; AnyTown
+        State =&gt; AnyState
+        Name =&gt; Nathan Hale
+        Zip =&gt; 12345-1234
+        Address =&gt; 999 Centennial Ave.
+};
+
+MRD-300 = {
+        Town =&gt; AnyTown
+        State =&gt; AnyState
+        Name =&gt; Nathan Hale
+        Home Phone =&gt; (111) 511-1322
+        Zip =&gt; 12345-1234
+        Business Phone =&gt; (111) 513-4556
+        Address =&gt; 999 Centennial Ave.
+};</PRE></B>This example does two new things. The first thing is that it uses an
+anonymous function referenced by <TT>$codeRef</TT>. This is done for
+illustration purposes. There is no reason to use an anonymous function. There
+are actually good reasons for you not to do so in normal programs. I think that
+anonymous functions make programs much harder to understand.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>When helper functions are small and easily
+      understood, I like to place them at the beginning of code files. This
+      helps me to quickly refresh my memory when coming back to view program
+      code after time spent doing other things.</TD></TR></TBODY></TABLE>
+<P>The second thing is that a regular hash assignment statement was use to add
+values. You can use any of the array functions with these nested data
+structures.
+<H3><A
+name="Example: Interpolating Functions inside Double-Quoted Strings">Example:
+Interpolating Functions inside Double-Quoted Strings</A></H3>You can use
+references to force Perl to interpolate the return value of a function call
+inside double-quoted strings. This helps to reduce the number of temporary
+variables needed by your program.
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Call the <TT>makeLine()</TT> function from inside a double-quoted
+      string.
+      <P>Define the <TT>makeLine()</TT> function.
+      <P>Return the dash character repeated a specified number of times. The
+      first element in the parameter array is the number of times to repeat the
+      dash.</TT></P></TD></TR></TBODY></TABLE>
+<P><B><PRE>print("Here are  5 dashes ${\makeLine(5)}.\n");
+print("Here are 10 dashes ${\makeLine(10)}.\n");
+
+sub makeLine {
+    return("-" x $_[0]);
+}</PRE></B>This program displays:
+<P><B><PRE>Here are  5 dashes -----.
+Here are 10 dashes ----------.</PRE></B>The trick in this example is that the
+backslash turns the scalar return value into a reference and then the dollar
+sign and curly braces turn the reference back into a scalar value that the
+<TT>print()</TT> function can interpret correctly. If the backslash character is
+not used to create the reference to the scalar return value then the
+<TT>${}</TT> dereferencing operation does not have a reference to dereference
+and you will get an "initialized value" error.
+<H2><A name=Summary>Summary</A></H2>In this chapter you learned about
+references. References are scalar variables used to hold the memory locations.
+When references are dereferenced, the actual value is returned. For example, if
+the value of the reference is assigned like this: <TT>$refScalar = \10</TT>.
+Then, dereferencing <TT>$refScalar</TT> would be equal to 10 and would look like
+this <TT>${$refScalar}</TT>. You can always create a reference to a value or
+variable by preceding it with a backslash. Dereferencing is accomplished by
+surrounding the reference variable in curly braces and preceding the left curly
+brace with a character denoting what type of reference it is. For example, use
+<TT>@</TT> for arrays and <TT>&amp;</TT> for functions.
+<P>There are five types of references that you can use in Perl. You can have a
+reference to scalars, arrays, hashes, functions, and other references. If you
+need to determine what type of reference is passed to a function, use the
+<TT>ref()</TT> function.
+<P>The <TT>ref()</TT> function returns a string that indicates which type of
+reference was passed to it. If the parameter was not a reference, the undefined
+value is returned. You discovered that it is always a good idea to check
+reference types to prevent errors caused by passing the wrong type of reference.
+An example was given that caused a error by passing a scalar reference when the
+function expected an array reference.
+<P>NOTE: It seems that the return value for ref() might be platform dependent.
+When using ref on a non-reference, Windows 95 returns an undefined null value.
+Whereas on Linux, ref on a non-reference returned defined null. And this
+behavior may be simply a bug on one of the platforms. The upshot of this note is
+that you should test the return value of ref before depending on it.</P>
+<P>A lot of time was spent discussing data records and how to access information
+stored in them. You learned how to step through dissecting a dereferencing
+expression; how to dynamically add new data records to an associative array; and
+how to add new data members to an existing record.
+<P>The last thing covered in this chapter was how to interpolate function calls
+inside double-quoted strings. You'll use this technique - at times - to avoid
+using temporary variables when printing or concatenating the output of functions
+to other strings.
+<P>Chapter 9, "<A href="ch09.htm">Using Files</A>,"
+introduces you to opening, reading, and writing files. You find out how to store
+the data records you've constructed in this chapter to a file for long-term
+storage.
+<H2><A name="Review Questions">Review Questions</A></H2>
+<OL>
+  <LI>What is a reference?
+  <P></P>
+  <LI>How many types of references are there?
+  <P></P>
+  <LI>What does the <TT>ref()</TT> function return if passed a non-reference as
+  a parameter?
+  <P></P>
+  <LI>What notation is used to dereference a reference value?
+  <P></P>
+  <LI>What is an anonymous array?
+  <P></P>
+  <LI>What is a nested data structure?
+  <P></P>
+  <LI>What will the following line of code display?
+  <P><B><PRE>print("${\ref(\(1..5))}");</PRE></B>
+  <LI>Using the <TT>%database</TT> array in Listing 8.6, what will the following
+  line of code display?
+  <P><B><PRE>print(%{$database{"MRD-100"}}-&gt;{"Zip"} . "\n");</PRE></B></LI></OL>
+<H2><A name="Review Exercises">Review Exercises</A></H2>
+<OL>
+  <LI>Write a program that will print the dereferenced value of <TT>$ref</TT> in
+  the following line of code.
+  <P><B><PRE>$ref = \\\45;</PRE></B>
+  <LI>Write a function that removes the first element from each array passed to
+  it. The return value of the function should be the number of elements removed
+  from all arrays.
+  <P></P>
+  <LI>Add error checking to the function written in exercise 4 so that the
+  <TT>undef</TT> value is returned if one of the parameters is not an array.
+  <P></P>
+  <LI>Write a program based on Listing 8.7 that adds a data member indicating
+  which weekdays a salesman may call the customer with an id of MRD-300. Use the
+  following as an example:
+  <P><B><PRE>"Best days to call" =&gt; ["Monday", "Thursday" ]</PRE></B></LI></OL>
+<HR>
+<SMALL><A href="ch08.htm#top">Top of Page</A> | <A
+href="ch08.htm#sections">Sections</A> | <A
+href="ch08.htm#chapters">Chapters</A> | <A
+href="copyright.htm">Copyright</A> </SMALL>
+<HR>
+
+<P></P></BODY></HTML>

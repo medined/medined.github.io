@@ -1,0 +1,637 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0037)ch17.htm -->
+<HTML><HEAD><TITLE>Perl 5 by Example: Command-line Options</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META 
+content="Perl, Perl Manual, Introduction to Perl, Perl Tutorial, Programming, Electronic Book, ebook" 
+name=keywords>
+<META 
+content="Perl 5 by Example teaches you how to use the Perl programming language by showing examples that demonstrate the concepts being discussed. The examples are designed to give you a chance to experiment - which clarifies the material." 
+name=description>
+<META content="MSHTML 6.00.2723.2500" name=GENERATOR></HEAD>
+<BODY bgColor=silver background=images/back2.jpg><A name=top></A>
+<TABLE cellSpacing=0 cellPadding=0>
+  <TBODY>
+  <TR>
+    <TD><IMG height=71 alt=Title src="images/title.jpg" width=443 
+    border=0></TD></TR></TBODY></TABLE>
+<TABLE cellSpacing=0 cellPadding=0 width=140 align=left border=0>
+  <TBODY>
+  <TR>
+    <TD vAlign=top width=100 background=images/leftbar.jpg height=373>
+      <P><SMALL>
+      <P><A href="ch16.htm"><SMALL>Previous 
+      Chapter</SMALL></A><BR><A 
+      href="ch18.htm"><SMALL>Next 
+      Chapter</SMALL></A><BR></P></SMALL></TD></TR>
+  <TR>
+    <TD>
+      <P>Links<BR><SMALL><A 
+      href="ch17.htm#sections">Sections</A><BR><A 
+      href="ch17.htm#chapters">Chapters</A><BR><A 
+      href="copyright.htm">Copyright</A><BR></SMALL></P><A 
+      name=sections></A>
+      <P>Sections</P><SMALL>
+      <P><A 
+      href="ch17.htm#How Are the Options Specified">How 
+      Are the Options Specified?</A></P>
+      <P><A 
+      href="ch17.htm#What Are the Options">What Are 
+      the Options?</A></P>
+      <P><A href="ch17.htm#Summary">Summary</A></P>
+      <P><A href="ch17.htm#Review Questions">Review 
+      Questions</A></P>
+      <P><A href="ch17.htm#Review Exercises">Review 
+      Exercises</A></P></SMALL><A name=chapters></A>
+      <P>Chapters<BR><FONT size=1>
+      <P><A href="errata.htm">ERRATA</A></P>
+      <P><A href="index.htm">Welcome!</A></P>
+      <P><A href="ch00.htm">Introduction</A></P>
+      <P>Part I: Basic Perl</P>
+      <P><A href="ch01.htm">01-Getting Your Feet 
+      Wet</A></P>
+      <P><A href="ch02.htm">02-Numeric and String 
+      Literals</A></P>
+      <P><A href="ch03.htm">03-Variables</A></P>
+      <P><A href="ch04.htm">04-Operators</A></P>
+      <P><A href="ch05.htm">05-Functions</A></P>
+      <P><A href="ch06.htm">06-Statements</A></P>
+      <P><A href="ch07.htm">07-Control 
+      Statements</A></P>
+      <P><A href="ch08.htm">08-References</A></P>
+      <P>Part II: Intermediate Perl</P>
+      <P><A href="ch09.htm">09-Using Files</A></P>
+      <P><A href="ch10.htm">10-Regular 
+      Expressions</A></P>
+      <P><A href="ch11.htm">11-Creating 
+      Reports</A></P>
+      <P>Part III: Advanced Perl</P>
+      <P><A href="ch12.htm">12-Using Special 
+      Variables</A></P>
+      <P><A href="ch13.htm">13-Handling Errors and 
+      Signals</A></P>
+      <P><A href="ch14.htm">14-What Are 
+      Objects?</A></P>
+      <P><A href="ch15.htm">15-Perl Modules</A></P>
+      <P><A href="ch16.htm">16-Debugging 
+      Perl</A></P>
+      <P><A href="ch17.htm">17-Command line 
+      Options</A></P>
+      <P>Part IV: Perl and the Internet</P>
+      <P><A href="ch18.htm">18-Using Internet 
+      Protocols</A></P>
+      <P><A href="ftplib.htm">ftplib.pl</A></P>
+      <P><A href="ch19.htm">19-What is CGI?</A></P>
+      <P><A href="ch20.htm">20-Form 
+      Processing</A></P>
+      <P><A href="ch21.htm">21-Using Perl with Web 
+      Servers</A></P>
+      <P><A href="ch22.htm">22-Internet 
+      Resources</A></P>
+      <P>Appendixes</P>
+      <P><A href="xp0a.htm">A-Review 
+      Questions</A></P>
+      <P><A href="xp0b.htm">B-Glossary</A></P>
+      <P><A href="xp0c.htm">C-Function List</A></P>
+      <P><A href="xp0d.htm">D-The Windows 
+      Registry</A></P>
+      <P><A href="xp0e.htm">E-What's On the 
+      CD?</A></P></FONT></TD>
+    <TD width=5>&nbsp;</TD>
+    <TD width=5 bgColor=black>&nbsp;</TD>
+    <TD width=5>&nbsp;</TD></TR></TBODY></TABLE>
+<H1>17 - Command-line Options</H1>
+<P>Perl has a wide range of command-line options or switches that you can use. 
+The options are also called <I>switches</I> because they can turn on or turn off 
+different behaviors. A thorough knowledge of the command line switches will 
+enable you to create short one-time programs to perform odd little tasks. For 
+example, the <TT>-e</TT> option lets you specify a line of code directly on the 
+command-line instead of creating a script file. You use the <TT>-l</TT> option 
+to change the line endings in a text file. 
+<H2><A name="How Are the Options Specified">How Are the Options 
+Specified?</A></H2>The most frequent way to specify a command-line options is on 
+the command line. All of Perl's options are specified using a dash and then a 
+single character followed by arguments, if needed. For example, 
+<P><B><PRE> perl -I/usr/~john/include script.pl</PRE></B>You can combine options with 
+no arguments with the following switch. The following two command lines are 
+equivalent. 
+<P><B><PRE>perl -cI/usr/~john/include script.pl
+perl -c -I/usr/~john/include script.pl</PRE></B>You can also specify 
+command-line options inside your script file using the #! line. Just place them 
+following the directory and/or executable name. If you are working on a UNIX 
+system, you are probably familiar with using the #! notation to tell the system 
+where to find the Perl executable. The various UNIX systems and Windows can 
+interpret the #! line in different ways. Therefore, Perl starts parsing the #! 
+switches immediately after the first instance of "perl" on the line. For 
+example, if you started your script with this line: 
+<P><B><PRE>#!/bin/perl -w</PRE></B>Then Perl will run with the <TT>-w</TT> option in 
+effect. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=tomato size=4><B>Caution</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=tomato>Some UNIX systems will only read the first 32 
+      characters of the #! line. So try to have your options either end before 
+      the 32<SUP>nd</SUP> position or start after the 32<SUP>nd</SUP> position. 
+      Placing the options after the 32<SUP>nd</SUP> position will help to make 
+      your scripts more portable because you will be bypassing one of the 
+      inconsistencies of UNIX.<BR></TD></TR></TBODY></TABLE>
+<H2><A name="What Are the Options">What Are the Options?</A></H2>Table 17.1 
+provides a short description of each command-line option used with Perl. After 
+the table, examples of several options will be shown. 
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 17.1-Perl's Command Line Options</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Option </TH>
+    <TH align=left>Description</TH></TR>
+  <TR>
+    <TD vAlign=top><TT>-0</TT> </TD>
+    <TD vAlign=top>Lets you specify the record separator (<TT>$/</TT>) as an 
+      octal number. For example, - 0055 will cause records to end on a dash. If 
+      no number is specified, records will end on null characters. The special 
+      value of 00 will place Perl into paragraph mode. And 0777 will force Perl 
+      to read the whole file in one shot because 0777 is not a legal character 
+      value. See "Example: Using the <TT>-0</TT> option" for more 
+  information.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-a</TT> </TD>
+    <TD vAlign=top>This option must be used in conjunction with either the 
+      <TT>-n</TT> or <TT>-p</TT> option. Using the <TT>-a</TT> option will 
+      automatically feed input lines to the <TT>split</TT> function. The results 
+      of the split are placed into the <TT>@F</TT> variable. See "<A 
+      href="ch17.htm#Example: Using the -n and -p Options">Example: 
+      Using the -n and -p Options</A>" for more information.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-c</TT> </TD>
+    <TD vAlign=top>This option lets you check the syntax of your script 
+      without fully executing it. The <TT>BEGIN</TT> blocks, and <TT>use 
+      </TT>statements are still executed because they are needed by the 
+      compilation process.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-d</TT> </TD>
+    <TD vAlign=top>This option lets you start the Perl debugger. See Chapter 
+      16, "<A href="ch16.htm">Debugging Perl</A>," 
+      for more information.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-D</TT> </TD>
+    <TD vAlign=top>This option lets you turn on different behaviors related to 
+      the debugging process. The following table shows you the sub-options that 
+      can be used. Please note, however, that not all releases of Perl can use 
+      this feature. I know that the hip port of Perl for Win32 can't. If your 
+      version of Perl does not have this option, you will see the message 
+      <TT>Recompile perl with -DDEBUGGING to use -D switch</TT> when you try it. 
+      If you want to watch your script as it executes, use -D14. Following is a 
+      list of the other values that you can use. You can add the numbers 
+      together to specify more than one behavior (such as 8+4+2 = 14) or you can 
+      use the letters. 
+      <P>
+      <TABLE cellPadding=10 border=0>
+        <TBODY>
+        <TR>
+          <TD>1</TD>
+          <TD>p</TD>
+          <TD>Tokenizing and Parsing</TD></TR>
+        <TR>
+          <TD>2</TD>
+          <TD>s</TD>
+          <TD>Stack Snapshots</TD></TR>
+        <TR>
+          <TD>4</TD>
+          <TD>l</TD>
+          <TD>Label Stack Processing</TD></TR>
+        <TR>
+          <TD>8</TD>
+          <TD>t</TD>
+          <TD>Trace Execution</TD></TR>
+        <TR>
+          <TD>16</TD>
+          <TD>o</TD>
+          <TD>Operator Node Construction</TD></TR>
+        <TR>
+          <TD>32</TD>
+          <TD>c</TD>
+          <TD>String/Numeric Conversions</TD></TR>
+        <TR>
+          <TD>64</TD>
+          <TD>P</TD>
+          <TD>Print Preprocessor Command for -P</TD></TR>
+        <TR>
+          <TD>128</TD>
+          <TD>m</TD>
+          <TD>Memory Allocation</TD></TR>
+        <TR>
+          <TD>256</TD>
+          <TD>f</TD>
+          <TD>Format Processing</TD></TR>
+        <TR>
+          <TD>512</TD>
+          <TD>r</TD>
+          <TD>Regular Expression Parsing</TD></TR>
+        <TR>
+          <TD>1024</TD>
+          <TD>x</TD>
+          <TD>Syntax Tree Dump</TD></TR>
+        <TR>
+          <TD>2048</TD>
+          <TD>u</TD>
+          <TD>Tainting Checks</TD></TR>
+        <TR>
+          <TD>4096</TD>
+          <TD>L</TD>
+          <TD>Memory Leaks (not supported anymore)</TD></TR>
+        <TR>
+          <TD>8192</TD>
+          <TD>H</TD>
+          <TD>Hash Dump -- usurps values()</TD></TR>
+        <TR>
+          <TD>16384</TD>
+          <TD>X</TD>
+          <TD>Scratchpad Allocation</TD></TR>
+        <TR>
+          <TD>32768</TD>
+          <TD>D</TD>
+          <TD>Cleaning Up</TD></TR></TBODY></TABLE></P></TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-e</TT> </TD>
+    <TD vAlign=top>This option lets you specify a single line of code on the 
+      command line. This line of code will be executed in lieu of a script file. 
+      You can use multiple <TT>-e</TT> options to create a multiple line program 
+      - although given the probability of a typing mistake, I'd create a script 
+      file instead. Semi-colons must be used to end Perl statements just like a 
+      normal script.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-F</TT> </TD>
+    <TD vAlign=top>This option modifies the behavior of the <TT>-a</TT> 
+      option. It lets you change the regular expression that is used to split 
+      the input lines. For example, <TT>-F /:+/</TT> will split the input line 
+      whenever one or more colons are found. The slashes are optional; they 
+      simply delimit the pattern if they are there. I use them for their 
+      aesthetic value.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-i</TT> </TD>
+    <TD vAlign=top>This option lets you edit files in-place. It is used in 
+      conjunction with the <TT>-n</TT> or <TT>-p</TT> option. See "Example: 
+      Using the <TT>-i</TT> option" for more information.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-I</TT> </TD>
+    <TD vAlign=top>This option is used in conjunction with the <TT>-P</TT> 
+      option. It tells the C preprocessor where to look for include files. The 
+      default search directories include <TT>/usr/include</TT> and 
+      <TT>/usr/lib/Perl</TT>.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-l</TT> </TD>
+    <TD vAlign=top>This option turns on line-ending processing. It can be used 
+      to set the output line terminator variable (<TT>$/</TT>) by specifying an 
+      octal value. See "Example: Using the <TT>-0 </TT>option" for an example of 
+      using octal numbers. If no octal number is specified, the output line 
+      terminator is set equal to the input line terminator (such as <TT>$\ = 
+      $/;</TT>).</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-n</TT> </TD>
+    <TD vAlign=top>This option places a loop around your script. It will 
+      automatically read a line from the diamond operator and then execute the 
+      script. It is most often used with the <TT>-e </TT>option. See "Examples: 
+      Using the <TT>-n</TT> and <TT>-p</TT> Options" for more information.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-p</TT> </TD>
+    <TD vAlign=top>This option places a loop around your script. It will 
+      automatically read a line from the diamond operator, execute the script, 
+      and then print <TT>$_</TT>. It is most often used with the <TT>-e</TT> 
+      option. See "Examples: Using the <TT>-n </TT>and <TT>-p</TT> Options" for 
+      more information.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-P</TT> </TD>
+    <TD vAlign=top>This option will invoke the C preprocessor before compiling 
+      your script. This might be useful if you have some C programming 
+      experience and would like to use the #include and #define facility. The C 
+      preprocessor can also be used for conditional compilation. Use the 
+      <TT>-I</TT> option to tell Perl where to find include files.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-s</TT> </TD>
+    <TD vAlign=top>This option lets you define custom switches for your 
+      script. See "Examples: Using the <TT>-s</TT> option" for more 
+    information.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-S</TT> </TD>
+    <TD vAlign=top>This option makes Perl search for the script file using the 
+      PATH environment variable. It's mostly used with UNIX systems that don't 
+      support the #! line. The docs/perlrun.htm documentation file that comes 
+      with your Perl distribution has more information about this option.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-T</TT> </TD>
+    <TD vAlign=top>This UNIX-based option turns on taint checking. Normally, 
+      these checks are only done when running <TT>setuid</TT> or 
+      <TT>setgid</TT>. The docs/perlsec.htm documentation file that comes with 
+      your Perl distribution has more information about this option.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-u</TT> </TD>
+    <TD vAlign=top>This UNIX-based option will cause Perl to dump core after 
+      compiling your script. See the Perl documentation that came with your Perl 
+      distribution for more information.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-U</TT> </TD>
+    <TD vAlign=top>This UNIX-based option will let Perl do unsafe operations. 
+      Its use is beyond the scope of this book.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-v</TT> </TD>
+    <TD vAlign=top>This option will display the version and patchlevel of your 
+      Perl executable.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-w</TT> </TD>
+    <TD vAlign=top>This option prints warnings about unsafe programming 
+      practices. See Chapter 16, "<A 
+      href="ch16.htm">Debugging Perl</A>," for more 
+      information.</TD></TR>
+  <TR>
+    <TD vAlign=top><TT>-x</TT> </TD>
+    <TD vAlign=top>This option will let you extract a Perl script from the 
+      middle of a file. This feature comes in handy when someone has sent you a 
+      script via e-mail. Perl will scan the input file looking for a #! line 
+      that contains the word "perl". When it is found, it will execute the 
+      script until the __<TT>END</TT>__ token is found. If a directory name is 
+      specified after the <TT>-x</TT> option, Perl will switch to that directory 
+      before executing the script.</TD></TR></TBODY></TABLE>
+<P>As you can see, Perl has quite a few command-line options. Most of them are 
+designed so that you can do useful things without needing to create a text file 
+to hold the script. If you are a system administrator then these options will 
+make you more productive. You'll be able to manipulate files and data quickly 
+and accurately. If you're looking to create applications or more complicated 
+programs, you won't need these options - except for <TT>-w</TT> and <TT>-d</TT>. 
+
+<P>The rest of the chapter is devoted to demonstrating the <TT>-0</TT>, 
+<TT>-n</TT>, <TT>-p</TT>, <TT>-i</TT>, and <TT>-s</TT> options. 
+<H3><A name="Example: Using the -0 Option">Example: Using the <TT>-0</TT> 
+Option</A></H3>The -0 option will let you change the record separator. This is 
+useful if your records are separated by something other than a newline. Let's 
+use the example of input records separated by a dash instead of a newline. 
+First, you need to find out the octal value of the dash character. The easy way 
+to do this is covert from the decimal value which will be displayed if you run 
+the following command line. 
+<P><B><PRE>perl -e "print ord('-');"</PRE></B>This program will display <TT>45</TT>. 
+Converting 4510 into octal results in 558. 
+<P>Next, you'll need an input file to practice with. Listing 17.1 shows a sample 
+input file. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 17.1-17LST01.DAT - Test Input File for the -0 
+      Option</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>Veterinarian-Orthopedist-Dentist-
+</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>Listing 17.2 holds a program that reads the above data file using the diamond 
+operators. The program will use the dash character as an end-of-line indicator. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=blanchedalmond 
+      size=4><B>Pseudocode</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=blanchedalmond><TT>
+      <P>Set the record separator to be a dash using the #! switch setting 
+      method. 
+      <P>Open a file for input. 
+      <P>Read all of the records into the <TT>@lines</TT> array. One element in 
+      <TT>@lines</TT> will be one record. 
+      <P>Close the file. 
+      <P>Iterate over the <TT>@lines</TT> array and print each 
+    element.</TT></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 17.2-17LST02.PL - Using the -0 Option to Change the Record 
+      Separator</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>#!perl -0055
+
+open(FILE, "&lt;17LST01.DAT");
+@lines = &lt;FILE&gt;;
+close(FILE);
+
+foreach (@lines) {
+    print("$_\n");
+}</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>Instead of using the command-line option, you could 
+      also say <TT>$/ = "-";</TT>. Using the command-line is a better option if 
+      the line ending changes from input file to input 
+file.<BR></TD></TR></TBODY></TABLE>
+<P>This program will display: 
+<P><B><PRE>Veterinarian-
+Orthopedist-
+Dentist-</PRE></B>Notice that the end-of-line indicator is left as part of the 
+record. This behavior also happens when the newline is used as the end-of-line 
+indicator. You can use <TT>chop()</TT> or <TT>chomp()</TT> to remove the dash, 
+if needed. 
+<H3><A name="Example: Using the -n and -p Options">Example: Using the 
+<TT>-n</TT> and <TT>-p</TT> Options</A></H3>The <TT>-n</TT> and <TT>-p</TT> 
+options wrap your script inside loops. Before looking at specific examples, 
+let's see what the loops look like and how they are changed by the <TT>-a</TT> 
+and <TT>-F</TT> options. 
+<P>The <TT>-n</TT> option causes Perl to execute your script inside the 
+following loop: 
+<P><B><PRE>while (&lt;&gt;) {
+    # your script
+}</PRE></B>The <TT>-p</TT> option uses the same loop, but adds a 
+<TT>continue</TT> block so that <TT>$_</TT> will be printed every time through 
+the loop. If both <TT>-n</TT> and <TT>-p</TT> are specified on the command line, 
+the <TT>-p</TT> option will take precedence. The loop looks like this: 
+<P><B><PRE>while (&lt;&gt;) {
+    # your script
+} continue {
+    print;
+}</PRE></B>The <TT>-a</TT> option adds a <TT>split()</TT> function call to the 
+beginning of each iteration of the loop. So that the loop looks like this: 
+<P><B><PRE>while (&lt;&gt;) {
+    @F = split(/ /);
+    # your script
+}</PRE></B>The <TT>-F</TT> option lets you split on something besides the space 
+character. If you used <TT>-F/|+/</TT> on the command line, the loop would look 
+like this: 
+<P><B><PRE>while (&lt;&gt;) {
+    @F = split(/|+/);
+    # your script
+}</PRE></B>You can use <TT>BEGIN</TT> and <TT>END</TT> blocks if you need to 
+specify some initialization or cleanup code. The initialization section might be 
+used to create objects or to open log files. The cleanup section can be used to 
+display statistics or close files. For example, 
+<P><B><PRE>BEGIN {
+    # initialization section
+    $count = 0;
+}
+
+while (&lt;&gt;) {
+    # your script
+}
+
+END {
+    # cleanup section
+    print("The count was $count.\n");
+}</PRE></B>
+<P>Next, you'll see some examples of these options in action. Let's start with a 
+command-line that simply displays each line of the input file - like the "type" 
+command in DOS and UNIX. </P>
+<P>The following examples use a data file called data.dat with the following 
+lines: <PRE>  David Veterinarian
+  John Orthopedist
+  Jeff Dentist
+  </PRE>
+<P></P>
+<P><B><PRE>perl -p -e "1;" data.dat</PRE></B>This command line is equivalent to: 
+<P><B><PRE>while (&lt;&gt;) {
+    1;
+} continue {
+    print;
+}</PRE></B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>The <TT>1;</TT> statement was used to give Perl 
+      something to process. Otherwise, Perl would not have had any statements to 
+      execute.<BR></TD></TR></TBODY></TABLE>
+<P>And will display: 
+<P><B><PRE>David Veterinarian
+John Orthopedist
+Jeff Dentist</PRE></B>How about just printing the first word of each line? You 
+could use this command line: 
+<P><B><PRE>perl -p -e "s/\s*(\w+).*/$1/;" test.dat</PRE></B>which is equivalent to: 
+<P><B><PRE>while (&lt;&gt;) {
+    s/\s*(\w+).*/$1/;
+} continue {
+    print;
+}</PRE></B>And will display: 
+<P><B><PRE>David
+John
+Jeff</PRE></B>If you have data files that store information in columns, you can 
+pull out the second column of information like this: 
+<P><B><PRE>perl -p -e "s/\s*.+\s(.+)\s*/$1\n/;" test.dat</PRE></B>which will display: 
+<P><B><PRE>Veterinarian
+Orthopedist
+Dentist</PRE></B>You can use the <TT>-a</TT> option to get access to information 
+stored in columns. For example, you could also display the second column like 
+this: 
+<P><B><PRE>perl -p -a -e "$_ = \"$F[1]\n\";" test.dat</PRE></B>which is equivalent to 
+<P><B><PRE> while (&lt;&gt;) {
+    @F = split(/ /);
+    $_ = "$F[1]\n";
+} continue {
+    print;
+}</PRE></B>
+<P>Notice you need to escape the double-quotes in the above command-line. If you 
+don't do this you get an error message. </P>
+<H3><A name="Example: Using the -i Option">Example: Using the <TT>-i</TT> 
+Option</A></H3>The <TT>-i</TT> option lets you modify files in-place. This means 
+that Perl will automatically rename the input file and open the output file 
+using the original name. You can force Perl to create a backup file by 
+specifying a file extension for the backup file immediately after the 
+<TT>-i</TT>. For example, <TT>-i.bak</TT>. If no extension is specified, no 
+backup file will be kept. 
+<P>One of the more popular uses for the <TT>-i</TT> option is to change 
+sequences of characters. This kind of change normally requires 10 or more lines 
+of code. However, using command line options you can do it like this: 
+<P><B><PRE>perl -p -i.bak -e "s/harry/tom/g;" test.dat</PRE></B>This command line will 
+change all occurrences of "harry" to "tom" in the test.dat file. 
+<H3><A name="Examples: Using the -s Option">Examples: Using the <TT>-s</TT> 
+Option</A></H3>The <TT>-s</TT> option lets you create your own custom switches. 
+Custom switches are placed after the script name but before any filename 
+arguments. Any custom switches are removed from the <TT>@ARGV</TT> array. Then a 
+scalar variable named after the switch is created and initialized to 1. For 
+example, let's say that you want to use a switch called -useTR in a script like 
+the one in Listing 17.3. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=#fffaa0 size=4><B>
+      <P>Listing 17.3-17LST03.PL - Checking for the useTR 
+    Switch</B></FONT></P></TD></TR>
+  <TR>
+    <TD bgColor=#fffaa0><B><PRE><BR>
+<P>if ($useTR) {
+    # do TR processing.
+    print "useTR=$useTR\n";
+}</B></P></PRE></TT></TD></TR></TBODY></TABLE>
+<P>You might execute this program using this following command line: 
+<P><B><PRE>perl -s -w 17lst03.pl -useTR</PRE></B>and it would display: 
+<P><B><PRE>useTR=1</PRE></B>
+<H2><A name=Summary>Summary</A></H2>This chapter covered the different 
+command-line options that you can use with Perl. The options can also be 
+referred to as switches because they turn different behaviors on and off. 
+<P>The switches can be specified on the command line or using the #! line inside 
+your script. If you use the #! line, try to place the options after the 
+32<SUP>nd</SUP> position to avoid inconsistent handling by different versions of 
+UNIX. 
+<P>The <TT>-n</TT> option is used to place your script inside of an input loop. 
+The <TT>-p</TT> option uses the same loop, but also prints the <TT>$_</TT> 
+variable after each pass through the loop. The <TT>-a</TT> and <TT>-F</TT> 
+options are used when you want the input lines to be split into the <TT>@F</TT> 
+array. 
+<P>Another very useful option is <TT>-i</TT>, which lets you edit files 
+in-place. This option is good when you are doing a lot of text file 
+manipulation. 
+<P>The next chapter, "<A href="ch18.htm">Using 
+Internet Protocols</A>," introduces you to some of the different standards used 
+on the Internet. These standards let you perform activities like read mail, send 
+mail, and transfer files. 
+<P>Review Questions 
+<P>
+<OL>
+  <LI>What is a command line option? 
+  <P></P>
+  <LI>What are the two places that the switches can be specified? 
+  <P></P>
+  <LI>What switch should always be used? 
+  <P></P>
+  <LI>Which switch lets you read records that end with the ~ character instead 
+  of the newline? 
+  <P></P>
+  <LI>What two options can be used with the <TT>-n</TT> option? 
+  <P></P>
+  <LI>How can you execute a script that someone sent you via E-mail? 
+  <P></P>
+  <LI>What happens if you specify both the <TT>-v</TT> and the <TT>-c</TT> 
+  options?</LI></OL>
+<P>Review Exercises 
+<P>
+<OL>
+  <LI>Use the <TT>-v</TT> option to see the patchlevel of your version of Perl. 
+  <P></P>
+  <LI>Use the chomp or chop function to remove the dash from the end of the 
+  records printed by the program listing 17.2. 
+  <P></P>
+  <LI>Write a program that uses the <TT>-p</TT> option to display the third 
+  column. 
+  <P></P>
+  <LI>Modify the program written in exercise 3 to use a BEGIN block to ask the 
+  user which column to display? 
+  <P></P>
+  <LI>Create a sample E-mail message that contains a Perl script. Use the 
+  <TT>-x</TT> option to execute it. 
+  <P></P>
+  <LI>Modify the E-mail message written for exercise 5 to display any text that 
+  appears after the __END__ token. Hint: Use the DATA file handle.</LI></OL>
+<HR>
+<SMALL><A href="ch17.htm#top">Top of Page</A> | <A 
+href="ch17.htm#sections">Sections</A> | <A 
+href="ch17.htm#chapters">Chapters</A> | <A 
+href="copyright.htm">Copyright</A> </SMALL>
+<HR>
+
+<P></P></BODY></HTML>

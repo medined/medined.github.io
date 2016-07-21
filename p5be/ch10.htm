@@ -1,0 +1,1873 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0037)ch10.htm -->
+<HTML><HEAD><TITLE>Perl 5 by Example: Regular Expressions</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META 
+content="Perl, Perl Manual, Introduction to Perl, Perl Tutorial, Programming, Electronic Book, ebook" 
+name=keywords>
+<META 
+content="Perl 5 by Example teaches you how to use the Perl programming language by showing examples that demonstrate the concepts being discussed. The examples are designed to give you a chance to experiment - which clarifies the material." 
+name=description>
+<META content="MSHTML 6.00.2723.2500" name=GENERATOR></HEAD>
+<BODY bgColor=silver background=images/back2.jpg><A name=top></A>
+<TABLE cellSpacing=0 cellPadding=0>
+  <TBODY>
+  <TR>
+    <TD><IMG height=71 alt=Title src="images/title.jpg" width=443 
+    border=0></TD></TR></TBODY></TABLE>
+<TABLE cellSpacing=0 cellPadding=0 width=140 align=left border=0>
+  <TBODY>
+  <TR>
+    <TD vAlign=top width=100 background=images/leftbar.jpg height=373>
+      <P><SMALL>
+      <P><A href="ch09.htm"><SMALL>Previous 
+      Chapter</SMALL></A><BR><A 
+      href="ch11.htm"><SMALL>Next 
+      Chapter</SMALL></A><BR></P></SMALL></TD></TR>
+  <TR>
+    <TD>
+      <P>Links<BR><SMALL><A 
+      href="ch10.htm#sections">Sections</A><BR><A 
+      href="ch10.htm#chapters">Chapters</A><BR><A 
+      href="copyright.htm">Copyright</A><BR></SMALL></P><A 
+      name=sections></A>
+      <P>Sections</P><SMALL>
+      <P><A 
+      href="ch10.htm#Pattern Delimiters">Pattern 
+      Delimiters</A></P>
+      <P><A 
+      href="ch10.htm#The Matching Operator (m//)">The 
+      Matching Operator (m//)</A></P>
+      <P><A 
+      href="ch10.htm#The Substitution Operator (s///)">The 
+      Substitution Operator (s///)</A></P>
+      <P><A 
+      href="ch10.htm#The Translation Operator (tr///)">The 
+      Translation Operator (tr///)</A></P>
+      <P><A 
+      href="ch10.htm#The Binding Operators (=~ and !~)">The 
+      Binding Operators (=~ and !~)</A></P>
+      <P><A 
+      href="ch10.htm#How to Create Patterns">How to 
+      Create Patterns</A></P>
+      <P><A 
+      href="ch10.htm#Pattern Examples">Pattern 
+      Examples</A></P>
+      <P><A href="ch10.htm#Summary">Summary</A></P>
+      <P><A href="ch10.htm#Review Questions">Review 
+      Questions</A></P>
+      <P><A href="ch10.htm#Review Exercises">Review 
+      Exercises</A></P></SMALL><A name=chapters></A>
+      <P>Chapters<BR><FONT size=1>
+      <P><A href="errata.htm">ERRATA</A></P>
+      <P><A href="index.htm">Welcome!</A></P>
+      <P><A href="ch00.htm">Introduction</A></P>
+      <P>Part I: Basic Perl</P>
+      <P><A href="ch01.htm">01-Getting Your Feet 
+      Wet</A></P>
+      <P><A href="ch02.htm">02-Numeric and String 
+      Literals</A></P>
+      <P><A href="ch03.htm">03-Variables</A></P>
+      <P><A href="ch04.htm">04-Operators</A></P>
+      <P><A href="ch05.htm">05-Functions</A></P>
+      <P><A href="ch06.htm">06-Statements</A></P>
+      <P><A href="ch07.htm">07-Control 
+      Statements</A></P>
+      <P><A href="ch08.htm">08-References</A></P>
+      <P>Part II: Intermediate Perl</P>
+      <P><A href="ch09.htm">09-Using Files</A></P>
+      <P><A href="ch10.htm">10-Regular 
+      Expressions</A></P>
+      <P><A href="ch11.htm">11-Creating 
+      Reports</A></P>
+      <P>Part III: Advanced Perl</P>
+      <P><A href="ch12.htm">12-Using Special 
+      Variables</A></P>
+      <P><A href="ch13.htm">13-Handling Errors and 
+      Signals</A></P>
+      <P><A href="ch14.htm">14-What Are 
+      Objects?</A></P>
+      <P><A href="ch15.htm">15-Perl Modules</A></P>
+      <P><A href="ch16.htm">16-Debugging 
+      Perl</A></P>
+      <P><A href="ch17.htm">17-Command line 
+      Options</A></P>
+      <P>Part IV: Perl and the Internet</P>
+      <P><A href="ch18.htm">18-Using Internet 
+      Protocols</A></P>
+      <P><A href="ftplib.htm">ftplib.pl</A></P>
+      <P><A href="ch19.htm">19-What is CGI?</A></P>
+      <P><A href="ch20.htm">20-Form 
+      Processing</A></P>
+      <P><A href="ch21.htm">21-Using Perl with Web 
+      Servers</A></P>
+      <P><A href="ch22.htm">22-Internet 
+      Resources</A></P>
+      <P>Appendixes</P>
+      <P><A href="xp0a.htm">A-Review 
+      Questions</A></P>
+      <P><A href="xp0b.htm">B-Glossary</A></P>
+      <P><A href="xp0c.htm">C-Function List</A></P>
+      <P><A href="xp0d.htm">D-The Windows 
+      Registry</A></P>
+      <P><A href="xp0e.htm">E-What's On the 
+      CD?</A></P></FONT></TD>
+    <TD width=5>&nbsp;</TD>
+    <TD width=5 bgColor=black>&nbsp;</TD>
+    <TD width=5>&nbsp;</TD></TR></TBODY></TABLE>
+<H1>10 - Regular Expressions</H1>
+<P>You can use a <I>regular expression</I> to find patterns in strings: for 
+example, to look for a specific name in a phone list or all of the names that 
+start with the letter <I>a</I>. Pattern matching is one of Perl's most powerful 
+and probably least understood features. But after you read this chapter, you'll 
+be able to handle regular expressions almost as well as a Perl guru. With a 
+little practice, you'll be able to do some incredibly handy things. 
+<P>There are three main uses for regular expressions in Perl: matching, 
+substitution, and translation. The matching operation uses the <TT>m//</TT> 
+operator, which evaluates to a true or false value. The substitution operation 
+substitutes one expression for another; it uses the <TT>s///</TT> operator. The 
+translation operation translates one set of characters to another and uses the 
+<TT>tr///</TT> operator. These operators are summarized in Table 10.1. 
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 10.1 - Perl's Regular Expression Operators</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Operator </TH>
+    <TH align=left>Description</TH></TR>
+  <TR>
+    <TD vAlign=top>m/PATTERN/ </TD>
+    <TD vAlign=top>This operator returns true if PATTERN is found in 
+      <TT>$_</TT>.</TD></TR>
+  <TR>
+    <TD vAlign=top>s/PATTERN/REPLACEMENT/ </TD>
+    <TD vAlign=top>This operator replaces the sub- string matched by PATTERN 
+      with REPLACEMENT.</TD></TR>
+  <TR>
+    <TD vAlign=top>tr/CHARACTERS/REPLACEMENTS/ </TD>
+    <TD vAlign=top>This operator replaces characters specified by CHARACTERS 
+      with the characters in REPLACEMENTS.</TD></TR></TBODY></TABLE>
+<P>All three regular expression operators work with <TT>$_</TT> as the string to 
+search. You can use the binding operators (see the section "<A 
+href="ch10.htm#The Binding Operators (=~ and !~)">The 
+Binding Operators (=~ and !~)</A>" later in this section) to search a variable 
+other than <TT>$_</TT>. 
+<P>Both the matching (<TT>m//</TT>) and the substitution (<TT>s///</TT>) 
+operators perform variable interpolation on the <TT>PATTERN</TT> and 
+<TT>REPLACEMENT</TT> strings. This comes in handy if you need to read the 
+pattern from the keyboard or a file. 
+<P>If the match pattern evaluates to the empty string, the last valid pattern is 
+used. So, if you see a statement like <TT>print if //;</TT> in a Perl program, 
+look for the previous regular expression operator to see what the pattern really 
+is. The substitution operator also uses this interpretation of the empty 
+pattern. 
+<P>In this chapter, you learn about pattern delimiters and then about each type 
+of regular expression operator. After that, you learn how to create patterns in 
+the section"<A 
+href="ch10.htm#How to Create Patterns">How to 
+Create Patterns</A>" .. Then, the "<A 
+href="ch10.htm#Pattern Examples">Pattern 
+Examples</A>" section shows you some situations and how regular expressions can 
+be used to resolve the situations. 
+<H2><A name="Pattern Delimiters">Pattern Delimiters</A></H2>Every regular 
+expression operator allows the use of alternative <I>pattern delimiters</I>. A 
+<I>delimiter </I>marks the beginning and end of a given pattern. In the 
+following statement, 
+<P><B><PRE>m//;</PRE></B>you see two of the standard delimiters - the slashes 
+(<TT>//</TT>). However, you can use any character as the delimiter. This feature 
+is useful if you want to use the slash character inside your pattern. For 
+instance, to match a file you would normally use: 
+<P><B><PRE>m/\/root\/home\/random.dat/</PRE></B>This match statement is hard to read 
+because all of the slashes seem to run together (some programmers say they look 
+like teepees). If you use an alternate delimiter, if might look like this: 
+<P><B><PRE>m!/root/home/random.dat!</PRE></B>or 
+<P><B><PRE>m{/root/home/random.dat}</PRE></B>You can see that these examples are a 
+little clearer. The last example also shows that if a left bracket is used as 
+the starting delimiter, then the ending delimiter must be the right bracket. 
+<P><A name="Garen Deve"></A>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Errata 
+  Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>The printed version of this book shows the above 
+      examples as <TT>m!\/root\/home\/random.dat!</TT> and as 
+      <TT>m{\/root\/home\/random.dat}</TT>. While I was writing the book it did 
+      not occur to be that the / character was not a metacharacter and only 
+      needed to be escaped because of the delimiters. Obviously, if the / 
+      character is the delimiter, it needs to be escaped in order to use it 
+      inside the pattern. However, if an alternative delimiter is used, it no 
+      longer needs to be escaped. - this fact was pointed out to me by Garen 
+      Deve.</TD></TR></TBODY></TABLE>
+<P>Both the match and substitution operators let you use variable interpolation. 
+You can take advantage of this to use a single-quoted string that does not 
+require the slash to be escaped. For instance: 
+<P><B><PRE>$file = '/root/home/random.dat';
+m/$file/; </PRE></B>You might find that this technique yields clearer code than 
+simply changing the delimiters. 
+<P>If you choose the single quote as your delimiter character, then no variable 
+interpolation is performed on the pattern. However, you still need to use the 
+backslash character to escape any of the meta-characters discussed in the "<A 
+href="ch10.htm#How to Create Patterns">How to 
+Create Patterns</A>" section later in this chapter. 
+<P><B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>I tend to avoid delimiters that might be confused 
+      with characters in the pattern. For example, using the plus sign as a 
+      delimiter (<TT>m+abc+</TT>) does not help program readability. A casual 
+      reader might think that you intend to add two expressions instead of 
+      matching them.</TD></TR></TBODY></TABLE></B>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=tomato size=4><B>Caution</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=tomato>The <TT>?</TT> has a special meaning when used as a 
+      match pattern delimiter. It works like the <TT>/</TT> delimiter except 
+      that it matches only once between calls to the <TT>reset()</TT> function. 
+      This feature may be removed in future versions of Perl, so avoid using 
+    it.</TD></TR></TBODY></TABLE>
+<P>The next few sections look at the matching, substitution, and translation 
+operators in more detail. 
+<H2><A name="The Matching Operator (m//)">The Matching Operator 
+(<I>m//</I>)</A></H2>The matching operator (<TT>m//</TT>) is used to find 
+patterns in strings. One of its more common uses is to look for a specific 
+string inside a data file. For instance, you might look for all customers whose 
+last name is "Johnson" or you might need a list of all names starting with the 
+letter <I>s</I>. 
+<P>The matching operator only searches the <TT>$_</TT> variable. This makes the 
+match statement shorter because you don't need to specify where to search. Here 
+is a quick example: 
+<P><B><PRE>$_ = "AAA bbb AAA";
+print "Found bbb\n" if  m/bbb/;</PRE></B>The print statement is executed only if 
+the <TT>bbb</TT> character sequence is found in the <TT>$_</TT> variable. In 
+this particular case, <TT>bbb</TT> will be found, so the program will display 
+the following: 
+<P><B><PRE>Found bbb</PRE></B>The matching operator allows you to use variable 
+interpolation in order to create the pattern. For example: 
+<P><B><PRE>$needToFind = "bbb";
+$_ = "AAA bbb AAA";
+print "Found bbb\n" if  m/$needToFind/;</PRE></B>Using the matching operator is 
+so commonplace that Perl allows you to leave off the <TT>m</TT> from the 
+matching operator as long as slashes are used as delimiters: 
+<P><B><PRE>$_ = "AAA bbb AAA";
+print "Found bbb\n" if  /bbb/;</PRE></B>Using the matching operator to find a 
+string inside a file is very easy because the defaults are designed to 
+facilitate this activity. For example: 
+<P><B><PRE>$target = "M";
+
+open(INPUT, "&lt;findstr.dat");
+
+while (&lt;INPUT&gt;) {
+     if (/$target/) {
+         print "Found $target on line $.";
+     }
+}
+close(INPUT);</PRE></B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>The <TT>$.</TT> special variable keeps track of the 
+      record number. Every time the diamond operators read a line, this variable 
+      is incremented.</TD></TR></TBODY></TABLE>
+<P>This example reads every line in an input searching for the letter 
+<TT>M</TT>. When an <TT>M</TT> is found, the print statement is executed. The 
+print statement prints the letter that is found and the line number it was found 
+on. 
+<H3><A name="The Matching Options">The Matching Options</A></H3>The matching 
+operator has several options that enhance its utility. The most useful option is 
+probably the capability to ignore case and to create an array of all matches in 
+a string. Table 10.2 shows the options you can use with the matching operator. 
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 10.2 - Options for the Matching Operator</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Option </TH>
+    <TH align=left>Description</TH></TR>
+  <TR>
+    <TD vAlign=top>g </TD>
+    <TD vAlign=top>This option finds all occurrences of the pattern in the 
+      string. A list of matches is returned or you can iterate over the matches 
+      using a loop statement.</TD></TR>
+  <TR>
+    <TD vAlign=top>i </TD>
+    <TD vAlign=top>This option ignores the case of characters in the 
+  string.</TD></TR>
+  <TR>
+    <TD vAlign=top>m </TD>
+    <TD vAlign=top>This option treats the string as multiple lines. Perl does 
+      some optimization by assuming that <TT>$_</TT> contains a single line of 
+      input. If you know that it contains multiple newline characters, use this 
+      option to turn off the optimization.</TD></TR>
+  <TR>
+    <TD vAlign=top>o </TD>
+    <TD vAlign=top>This option compiles the pattern only once. You can achieve 
+      some small performance gains with this option. It should be used with 
+      variable interpolation only when the value of the variable will not change 
+      during the lifetime of the program.</TD></TR>
+  <TR>
+    <TD vAlign=top>s </TD>
+    <TD vAlign=top>This option treats the string as a single line.</TD></TR>
+  <TR>
+    <TD vAlign=top>x </TD>
+    <TD vAlign=top>This option lets you use extended regular expressions. 
+      Basically, this means that Perl will ignore whitespace that's not escaped 
+      with a backslash or within a character class. I highly recommend this 
+      option so you can use spaces to make your regular expressions more 
+      readable. See the section "Example: Extension Syntax" later in this 
+      chapter for more information.</TD></TR></TBODY></TABLE>
+<P>All options are specified after the last pattern delimiter. For instance, if 
+you want the match to ignore the case of the characters in the string, you can 
+do this: 
+<P><B><PRE>$_ = "AAA BBB AAA";
+print "Found bbb\n" if  m/bbb/i;</PRE></B>This program finds a match even though 
+the pattern uses lowercase and the string uses uppercase because the <TT>/i</TT> 
+option was used, telling Perl to ignore the case. 
+<P>The result from a global pattern match can be assigned to an array variable 
+or used inside a loop. This feature comes in handy after you learn about 
+meta-characters in the section called "<A 
+href="ch10.htm#How to Create Patterns">How to 
+Create Patterns</A>" later in this chapter. 
+<H2><A name="The Substitution Operator (s///)">The Substitution Operator 
+(<I>s///</I>)</A></H2>The substitution operator (<TT>s///</TT>) is used to 
+change strings. It requires two operands, like this: 
+<P><B><PRE>s/a/z/;</PRE></B>This statement changes the first <TT>a</TT> in <TT>$_</TT> 
+into a <TT>z</TT>. Not too complicated, huh? Things won't get complicated until 
+we start talking about regular expressions in earnest in the section "<A 
+href="ch10.htm#How to Create Patterns">How to 
+Create Patterns</A>" later in the chapter. 
+<P>You can use variable interpolation with the substitution operator just as you 
+can with the matching operator. For instance: 
+<P><B><PRE>$needToReplace   = "bbb";
+$replacementText = "1234567890";
+$_ = "AAA bbb AAA";
+$result = s/$needToReplace/$replacementText/;</PRE></B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>You can use variable interpolation in the 
+      replacement pattern as shown here, but none of the meta-characters 
+      described later in the chapter can be used in the replacement 
+  pattern.</TD></TR></TBODY></TABLE>
+<P>This program changes the <TT>$_</TT> variable to hold <TT>"AAA 1234567890 
+AAA"</TT> instead of its original value, and the <TT>$result</TT> variable will 
+be equal to 1 - the number of substitutions made. 
+<P>Frequently, the substitution operator is used to remove substrings. For 
+instance, if you want to remove the <TT>"bbb"</TT> sequence of characters from 
+the <TT>$_</TT> variable, you could do this: 
+<P><B><PRE>s/bbb//;</PRE></B>By replacing the matched string with nothing, you have 
+effectively deleted it. 
+<P>If brackets of any type are used as delimiters for the search pattern, you 
+need to use a second set of brackets to enclose the replacement pattern. For 
+instance: 
+<P><B><PRE>$_ = "AAA bbb AAA";
+$result = s{bbb}{1234567890};</PRE></B>
+<H3><A name="The Substitution Options">The Substitution Options</A></H3>Like the 
+matching operator, the substitution operator has several options. One 
+interesting option is the capability to evaluate the replacement pattern as an 
+expression instead of a string. You could use this capability to find all 
+numbers in a file and multiply them by a given percentage, for instance. Or you 
+could repeat matched strings by using the string repetition operator. Table 10.3 
+shows all of the options you can use with the substitution operator. 
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 10.3 - Options for the Substitution Operator</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Option </TH>
+    <TH align=left>Description</TH></TR>
+  <TR>
+    <TD vAlign=top>e </TD>
+    <TD vAlign=top>This option forces Perl to evaluate the replacement pattern 
+      as an expression.</TD></TR>
+  <TR>
+    <TD vAlign=top>g </TD>
+    <TD vAlign=top>This option replaces all occurrences of the pattern in the 
+      string.</TD></TR>
+  <TR>
+    <TD vAlign=top>i </TD>
+    <TD vAlign=top>This option ignores the case of characters in the 
+  string.</TD></TR>
+  <TR>
+    <TD vAlign=top>m </TD>
+    <TD vAlign=top>This option treats the string as multiple lines. Perl does 
+      some optimization by assuming that <TT>$_</TT> contains a single line of 
+      input. If you know that it contains multiple newline characters, use this 
+      option to turn off the optimization.</TD></TR>
+  <TR>
+    <TD vAlign=top>o </TD>
+    <TD vAlign=top>This option compiles the pattern only once. You can achieve 
+      some small performance gains with this option. It should be used with 
+      variable interpolation only when the value of the variable will not change 
+      during the lifetime of the program.</TD></TR>
+  <TR>
+    <TD vAlign=top>s </TD>
+    <TD vAlign=top>This option treats the string as a single line.</TD></TR>
+  <TR>
+    <TD vAlign=top>x </TD>
+    <TD vAlign=top>This option lets you use extended regular expressions. 
+      Basically, this means that Perl ignores whitespace that is not escaped 
+      with a backslash or within a character class. I highly recommend this 
+      option so you can use spaces to make your regular expressions more 
+      readable. See the section "<A 
+      href="ch10.htm#Example: Extension Syntax">Example: 
+      Extension Syntax</A>" later in this chapter for more 
+  information.</TD></TR></TBODY></TABLE>
+<P>The <TT>/e</TT> option changes the interpretation of the pattern delimiters. 
+If used, variable interpolation is active even if single quotes are used. In 
+addition, if back quotes are used as delimiters, the replacement pattern is 
+executed as a DOS or UNIX command. The output of the command is then used as the 
+replacement text. 
+<H2><A name="The Translation Operator (tr///)">The Translation Operator 
+(<I>tr///</I>)</A></H2>The translation operator (<TT>tr///</TT>) is used to 
+change individual characters in the <TT>$_</TT> variable. It requires two 
+operands, like this: 
+<P><B><PRE>tr/a/z/;</PRE></B>This statement translates all occurrences of <TT>a</TT> 
+into <TT>z</TT>. If you specify more than one character in the match character 
+list, you can translate multiple characters at a time. For instance: 
+<P><B><PRE>tr/ab/z/;</PRE></B>translates all <TT>a</TT> and all <TT>b</TT> characters 
+into the <TT>z</TT> character. If the replacement list of characters is shorter 
+than the target list of characters, the last character in the replacement list 
+is repeated as often as needed. However, if more than one replacement character 
+is given for a matched character, only the first is used. For instance: 
+<P><B><PRE>tr/WWW/ABC/;</PRE></B>results in all <TT>W</TT> characters being converted 
+to an <TT>A</TT> character. The rest of the replacement list is ignored. 
+<P>Unlike the matching and substitution operators, the translation operator 
+doesn't perform variable interpolation. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>The <TT>tr</TT> operator gets its name from the UNIX 
+      tr utility. If you are familiar with the tr utility, then you already know 
+      how to use the <TT>tr</TT> operator.Z 
+      <P>The UNIX sed utility uses a <I>y</I> to indicate translations. To make 
+      learning Perl easier for sed users, y is supported as a synonym for 
+    tr.</P></TD></TR></TBODY></TABLE>
+<H3><A name="The Translation Options">The Translation Options</A></H3>The 
+translation operator has options different from the matching and substitution 
+operators. You can delete matched characters, replace repeated characters with a 
+single character, and translate only characters that don't match the character 
+list. Table 10.4 shows the translation options. 
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 10.4 - Options for the Translation Operator</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Option </TH>
+    <TH align=left>Description</TH></TR>
+  <TR>
+    <TD vAlign=top>c </TD>
+    <TD vAlign=top>This option complements the match character list. In other 
+      words, the translation is done for every character that does not match the 
+      character list.</TD></TR>
+  <TR>
+    <TD vAlign=top>d </TD>
+    <TD vAlign=top>This option deletes any character in the match list that 
+      does not have a corresponding character in the replacement list.</TD></TR>
+  <TR>
+    <TD vAlign=top>s </TD>
+    <TD vAlign=top>This option reduces repeated instances of matched 
+      characters to a single instance of that character.</TD></TR></TBODY></TABLE>
+<P>Normally, if the match list is longer than the replacement list, the last 
+character in the replacement list is used as the replacement for the extra 
+characters. However, when the <TT>d</TT> option is used, the matched characters 
+are simply deleted. 
+<P>If the replacement list is empty, then no translation is done. The operator 
+will still return the number of characters that matched, though. This is useful 
+when you need to know how often a given letter appears in a string. This feature 
+also can compress repeated characters using the <TT>s</TT> option. 
+<P><B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>UNIX programmers may be familiar with using the tr 
+      utility to convert lowercase characters to uppercase characters, or vice 
+      versa. Perl now has the <TT>lc()</TT> and <TT>uc()</TT> functions that can 
+      do this much quicker.</TD></TR></TBODY></TABLE></B>
+<H2><A name="The Binding Operators (=~ and !~)">The Binding Operators (<I>=~</I> 
+and <I>!~</I>)</A></H2>The search, modify, and translation operations work on 
+the <TT>$_</TT> variable by default. What if the string to be searched is in 
+some other variable? That's where the binding operators come into play. They let 
+you bind the regular expression operators to a variable other than <TT>$_</TT>. 
+There are two forms of the binding operator: the regular <TT>=~</TT> and its 
+complement <TT>!~</TT>. The following small program shows the syntax of the 
+<TT>=~</TT> operator: 
+<P><B><PRE>$scalar       = "The root has many leaves";
+$match        = $scalar =~ m/root/;
+$substitution = $scalar =~ s/root/tree/;
+$translate    = $scalar =~ tr/h/H/;
+
+print("\$match        = $match\n");
+print("\$substitution = $substitution\n");
+print("\$translate    = $translate\n");
+print("\$scalar       = $scalar\n");</PRE></B>This program displays the 
+following: 
+<P><B><PRE>$match        = 1
+$substitution = 1
+$translate    = 2
+$scalar       = THe tree Has many leaves</PRE></B>This example uses all three of 
+the regular expression operators with the regular binding operator. Each of the 
+regular expression operators was bound to the <TT>$scalar</TT> variable instead 
+of <TT>$_</TT>. This example also shows the return values of the regular 
+expression operators. If you don't need the return values, you could do this: 
+<P><B><PRE>$scalar = "The root has many leaves";
+print("String has root.\n") if $scalar =~ m/root/;
+$scalar =~ s/root/tree/;
+$scalar =~ tr/h/H/;
+print("\$scalar = $scalar\n");</PRE></B>This program displays the following: 
+<P><B><PRE>String has root.
+$scalar = THe tree Has many leaves</PRE></B>The left operand of the binding 
+operator is the string to be searched, modified, or transformed; the right 
+operand is the regular expression operator to be evaluated. 
+<P>The complementary binding operator is valid only when used with the matching 
+regular expression operator. If you use it with the substitution or translation 
+operator, you get the following message if you're using the <TT>-w</TT> 
+command-line option to run Perl: 
+<P><B><PRE>Useless use of not in void context at test.pl line 4.</PRE></B>You can see 
+that the <TT>!~</TT> is the opposite of <TT>=~</TT> by replacing the <TT>=~</TT> 
+in the previous example: 
+<P><B><PRE>$scalar = "The root has many leaves";
+print("String has root.\n") if $scalar !~ m/root/;
+$scalar =~ s/root/tree/;
+$scalar =~ tr/h/H/;
+print("\$scalar = $scalar\n");</PRE></B>This program displays the following: 
+<P><B><PRE>$scalar = THe tree Has many leaves</PRE></B>The first print line does not 
+get executed because the complementary binding operator returns false. 
+<H2><A name="How to Create Patterns">How to Create Patterns</A></H2>So far in 
+this chapter, you've read about the different operators used with regular 
+expressions, and you've seen how to match simple sequences of characters. Now 
+we'll look at the wide array of meta-characters that are used to harness the 
+full power of regular expressions. <I>Meta-characters</I> are characters that 
+have an additional meaning above and beyond their literal meaning. For example, 
+the period character can have two meanings in a pattern. First, it can be used 
+to match a period character in the searched string - this is its <I>literal 
+meaning</I>. And second, it can be used to match <I>any</I> character in the 
+searched string except for the newline character - this is its 
+<I>meta-meaning</I>. 
+<P>When creating patterns, the meta-meaning will always be the default. If you 
+really intend to match the literal character, you need to prefix the 
+meta-character with a backslash. You might recall that the backslash is used to 
+create an escape sequence. 
+<P>Patterns can have many different components. These components all combine to 
+provide you with the power to match any type of string. The following list of 
+components will give you a good idea of the variety of ways that patterns can be 
+created. The section "<A 
+href="ch10.htm#Pattern Examples">Pattern 
+Examples</A>" later in this chapter shows many examples of these rules in 
+action. 
+<P>
+<UL>
+  <LI><B>Variable Interpolation:</B> Any variable is interpolated, and the 
+  essentially new pattern is then evaluated as a regular expression. Remember 
+  that only one level of interpolation is done. This means that if the value of 
+  the variable includes, for example, <TT>$scalar</TT> as a string value, then 
+  <TT>$scalar</TT> will not be interpolated. In addition, back-quotes do not 
+  interpolate within double-quotes, and single-quotes do not stop interpolation 
+  of variables when used within double-quotes. 
+  <P></P>
+  <LI><B>Self-Matching Characters:</B> Any character will match itself unless it 
+  is a meta-character or one of <TT>$</TT>, <TT>@</TT>, <TT>%</TT>, 
+  <TT>&amp;</TT>. The meta-characters are listed in Table 10.5, and the other 
+  characters are used to begin variable names and function calls. You can use 
+  the backslash character to force Perl to match the literal meaning of any 
+  character. For example, <TT>m/a/;</TT> will return true if the letter 
+  <TT>a</TT> is in the <TT>$_</TT> variable. And <TT>m/\$/;</TT> will return 
+  true if the character <TT>$</TT> is in the <TT>$_</TT> variable. 
+  <P>
+  <TABLE cellPadding=10 border=1>
+    <CAPTION>Table 10.5 - Regular Expression Meta-Characters, Meta-Brackets, and 
+    Meta-Sequences</CAPTION>
+    <TBODY>
+    <TR>
+      <TH align=left>Meta-Character </TH>
+      <TH align=left>Description</TH></TR>
+    <TR>
+      <TD vAlign=top>^ </TD>
+      <TD vAlign=top>This meta-character - the caret - will match the 
+        beginning of a string or if the <TT>/m</TT> option is used, matches the 
+        beginning of a line. It is one of two pattern anchors - the other anchor 
+        is the <TT>$</TT>.</TD></TR>
+    <TR>
+      <TD vAlign=top>. </TD>
+      <TD vAlign=top>This meta-character will match any character except for 
+        the newline unless the <TT>/s</TT> option is specified. If the 
+        <TT>/s</TT> option is specified, then the newline will also be 
+      matched.</TD></TR>
+    <TR>
+      <TD vAlign=top>$ </TD>
+      <TD vAlign=top>This meta-character will match the end of a string or if 
+        the <TT>/m</TT> option is used, matches the end of a line. It is one of 
+        two pattern anchors - the other anchor is the <TT>^</TT>.</TD></TR>
+    <TR>
+      <TD vAlign=top>| </TD>
+      <TD vAlign=top>This meta-character - called alternation - lets you 
+        specify two values that can cause the match to succeed. For instance, 
+        <TT>m/a|b/</TT> means that the <TT>$_</TT> variable must contain the 
+        <TT>"a"</TT> or <TT>"b"</TT> character for the match to succeed.</TD></TR>
+    <TR>
+      <TD vAlign=top>* </TD>
+      <TD vAlign=top>This meta-character indicates that the "thing" 
+        immediately to the left should be matched 0 or more times in order to be 
+        evaluated as true.</TD></TR>
+    <TR>
+      <TD vAlign=top>+ </TD>
+      <TD vAlign=top>This meta-character indicates that the "thing" 
+        immediately to the left should be matched 1 or more times in order to be 
+        evaluated as true.</TD></TR>
+    <TR>
+      <TD vAlign=top>? </TD>
+      <TD vAlign=top>This meta-character indicates that the "thing" 
+        immediately to the left should be matched 0 or 1 times in order to be 
+        evaluated as true. When used in conjunction with the <TT>+</TT>, 
+        <TT>_</TT>, <TT>?</TT>, or {<TT>n</TT>, <TT>m</TT>} meta- characters and 
+        brackets, it means that the regular expression should be non-greedy and 
+        match the smallest possible string.</TD></TR></TBODY></TABLE>
+  <P>
+  <TABLE cellPadding=10 border=1>
+    <TBODY>
+    <TR>
+      <TH align=left>Meta-Brackets </TH>
+      <TH align=left>Description</TH></TR>
+    <TR>
+      <TD vAlign=top>() </TD>
+      <TD vAlign=top>The parentheses let you affect the order of pattern 
+        evaluation and act as a form of pattern memory. See the section "Pattern 
+        Memory" later in this chapter for more information.</TD></TR>
+    <TR>
+      <TD vAlign=top>(?...) </TD>
+      <TD vAlign=top>If a question mark immediately follows the left 
+        parentheses, it indicates that an extended mode component is being 
+        specified. See the section "<A 
+        href="ch10.htm#Example: Extension Syntax">Example: 
+        Extension Syntax</A>" later in this chapter for more information.</TD></TR>
+    <TR>
+      <TD vAlign=top>{n, m} </TD>
+      <TD vAlign=top>The curly braces let specify how many times the "thing" 
+        immediately to the left should be matched. <TT>{n}</TT> means that it 
+        should be matched exactly n times. <TT>{n,}</TT> means it must be 
+        matched at least n times. <TT>{n, m}</TT> means that it must be matched 
+        at least n times and not more than m times.</TD></TR>
+    <TR>
+      <TD vAlign=top>[] </TD>
+      <TD vAlign=top>The square brackets let you create a character class. For 
+        instance, <TT>m/[abc]/</TT> will evaluate to true if any of 
+        <TT>"a"</TT>, <TT>"b"</TT>, or <TT>"c"</TT> is contained in <TT>$_</TT>. 
+        The square brackets are a more readable alternative to the alternation 
+        meta-character.</TD></TR></TBODY></TABLE>
+  <P>
+  <TABLE cellPadding=10 border=1>
+    <TBODY>
+    <TR>
+      <TH align=left>Meta-Sequences </TH>
+      <TH align=left>Description</TH></TR>
+    <TR>
+      <TD vAlign=top>\</TD>
+      <TD>This meta-character "escapes" the following character. This means 
+        that any special meaning normally attached to that character is ignored. 
+        For instance, if you need to include a dollar sign in a pattern, you 
+        must use <TT>\$</TT> to avoid Perl's variable interpolation. Use 
+        <TT>\\</TT> to specify the backslash character in your pattern.</TD></TR>
+    <TR>
+      <TD vAlign=top>\nnn</TD>
+      <TD>Any Octal byte. Use zero padding for values from \000 to \077 
+        inclusively. For larger values simply use the three-digit number (like 
+        \100 or \323).</TD></TR>
+    <TR>
+      <TD vAlign=top>\a</TD>
+      <TD>Alarm.</TD></TR>
+    <TR>
+      <TD vAlign=top>\A</TD>
+      <TD>This meta-sequence represents the beginning of the string. Its 
+        meaning is not affected by the <TT>/m</TT> option.</TD></TR>
+    <TR>
+      <TD vAlign=top>\b</TD>
+      <TD>This meta-sequence represents the backspace character inside a 
+        character class; otherwise, it represents a <I>word boundary</I>. A word 
+        boundary is the spot between word (<TT>\w</TT>) and 
+        non-word(<TT>\W</TT>) characters. Perl thinks that the <TT>\W</TT> 
+        meta-sequence matches the imaginary characters off the ends of the 
+        string.</TD></TR>
+    <TR>
+      <TD vAlign=top>\B</TD>
+      <TD>Match a non-word boundary.</TD></TR>
+    <TR>
+      <TD vAlign=top>\cn</TD>
+      <TD>Any control character.</TD></TR>
+    <TR>
+      <TD vAlign=top>\d</TD>
+      <TD>Match a single digit character.</TD></TR>
+    <TR>
+      <TD vAlign=top>\D</TD>
+      <TD>Match a single non-digit character.</TD></TR>
+    <TR>
+      <TD vAlign=top>\e</TD>
+      <TD>Escape.</TD></TR>
+    <TR>
+      <TD vAlign=top>\E</TD>
+      <TD>Terminate the \L or \U sequence.</TD></TR>
+    <TR>
+      <TD vAlign=top>\f</TD>
+      <TD>Form Feed.</TD></TR>
+    <TR>
+      <TD vAlign=top>\G</TD>
+      <TD>Match only where the previous <TT>m//g</TT> left off.</TD></TR>
+    <TR>
+      <TD vAlign=top>\l</TD>
+      <TD>Change the next character to lowercase.</TD></TR>
+    <TR>
+      <TD vAlign=top>\L</TD>
+      <TD>Change the following characters to lowercase until a <TT>\E</TT> 
+        sequence is encountered.</TD></TR>
+    <TR>
+      <TD vAlign=top>\n</TD>
+      <TD>Newline.</TD></TR>
+    <TR>
+      <TD vAlign=top>\Q</TD>
+      <TD>Quote Regular Expression meta-characters literally until the 
+        <TT>\E</TT> sequence is encountered.</TD></TR>
+    <TR>
+      <TD vAlign=top>\r</TD>
+      <TD>Carriage Return.</TD></TR>
+    <TR>
+      <TD vAlign=top>\s</TD>
+      <TD>Match a single whitespace character.</TD></TR>
+    <TR>
+      <TD vAlign=top>\S</TD>
+      <TD>Match a single non-whitespace character.</TD></TR>
+    <TR>
+      <TD vAlign=top>\t</TD>
+      <TD>Tab.</TD></TR>
+    <TR>
+      <TD vAlign=top>\u</TD>
+      <TD>Change the next character to uppercase.</TD></TR>
+    <TR>
+      <TD vAlign=top>\U</TD>
+      <TD>Change the following characters to uppercase until a <TT>\E</TT> 
+        sequence is encountered.</TD></TR>
+    <TR>
+      <TD vAlign=top>\v</TD>
+      <TD>Vertical Tab.</TD></TR>
+    <TR>
+      <TD vAlign=top>\w</TD>
+      <TD>Match a single word character. Word characters are the alphanumeric 
+        and underscore characters.</TD></TR>
+    <TR>
+      <TD vAlign=top>\W</TD>
+      <TD>Match a single non-word character.</TD></TR>
+    <TR>
+      <TD vAlign=top>\xnn</TD>
+      <TD>Any Hexadecimal byte.</TD></TR>
+    <TR>
+      <TD vAlign=top>\Z</TD>
+      <TD>This meta-sequence represents the end of the string. Its meaning is 
+        not affected by the /m option.</TD></TR>
+    <TR>
+      <TD vAlign=top>\$</TD>
+      <TD>Dollar Sign.</TD></TR>
+    <TR>
+      <TD vAlign=top>\@</TD>
+      <TD>Ampersand.</TD></TR>
+    <TR>
+      <TD vAlign=top>\%</TD>
+      <TD>Percent Sign. 
+        <TABLE cellSpacing=0 cellPadding=0 border=0>
+          <TBODY>
+          <TR>
+            <TD bgColor=black><FONT color=lightcyan size=4><B>Errata 
+              Note</B></FONT></TD></TR>
+          <TR>
+            <TD bgColor=lightcyan>The \% is not a valid escape sequence for 
+              Perl. It was included erroneously. Please ignore this entry. If 
+              you need to use the % character in double-quoted strings, go ahead 
+              and use it. Later in the book, you'll read about the printf() 
+              function. If you want to actually use the % character in the 
+              printf() format string, use the %% sequence. - Randal Schwartz was 
+              kind enough to identify this 
+    error.</TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+  <P></P>
+  <LI><B>Character Sequences:</B> A sequence of characters will match the 
+  identical sequence in the searched string. The characters need to be in the 
+  same order in both the pattern and the searched string for the match to be 
+  true. For example, <TT>m/abc/;</TT> will match <TT>"abc"</TT> but not 
+  <TT>"cab"</TT> or <TT>"bca"</TT>. If any character in the sequence is a 
+  meta-character, you need to use the backslash to match its literal value. 
+  <P></P>
+  <LI><B>Alternation:</B> The <I>alternation </I>meta-character (<TT>|</TT>) 
+  will let you match more than one possible string. For example, 
+  <TT>m/a|b/;</TT> will match if either the <TT>"a"</TT> character or the 
+  <TT>"b"</TT> character is in the searched string. You can use sequences of 
+  more than one character with alternation. For example, <TT>m/dog|cat/;</TT> 
+  will match if either of the strings <TT>"dog"</TT> or <TT>"cat"</TT> is in the 
+  searched string. 
+  <P>
+  <TABLE cellSpacing=0 cellPadding=0 border=0>
+    <TBODY>
+    <TR>
+      <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+    <TR>
+      <TD bgColor=lightpink>Some programmers like to enclose the alternation 
+        sequence inside parentheses to help indicate where the sequence begins 
+        and ends. 
+        <P><PRE>m/(dog|cat)/;</PRE>However, this will affect something called 
+        <I>pattern memory</I>, which you'll be learning about in the section "<A 
+        href="ch10.htm#Example: Pattern Memory">Example: 
+        Pattern Memory</A>" later in the chapter.</TD></TR></TBODY></TABLE>
+  <P></P>
+  <LI><B>Character Classes:</B> The square brackets are used to create character 
+  classes. A <I>character class</I> is used to match a specific type of 
+  character. For example, you can match any decimal digit using 
+  <TT>m/[0123456789]/</TT>. This will match a single character in the range of 
+  zero to nine. You can find more information about character classes in the 
+  section called "<A 
+  href="ch10.htm#Example: Character Classes">Example: 
+  Character Classes</A>" later in this chapter. 
+  <TABLE cellSpacing=0 cellPadding=0 border=0>
+    <TBODY>
+    <TR>
+      <TD bgColor=black><FONT color=lightcyan size=4><B>Errata 
+      Note</B></FONT></TD></TR>
+    <TR>
+      <TD bgColor=lightcyan>The printed version of this book says: 
+        <TT>m/0123456789/;</TT>. The square brackets were missing and the 
+        semi-colon is extraneous since this is an example of an expression, not 
+        a statement. Randal Schwartz was kind enough to point out this 
+      problem.</TD></TR></TBODY></TABLE>
+  <P></P>
+  <LI><B>Symbolic Character Classes:</B> There are several character classes 
+  that are used so frequently that they have a symbolic representation. The 
+  period meta-character stands for a special character class that matches all 
+  characters except for the newline. The rest are <TT>\d</TT>, <TT>\D</TT>, 
+  <TT>\s</TT>, <TT>\S</TT>, <TT>\w</TT>, and <TT>\W</TT>. These are mentioned in 
+  Table 10.5 earlier and are discussed in the section "<A 
+  href="ch10.htm#Example: Character Classes">Example: 
+  Character Classes</A>" later in this chapter. 
+  <P></P>
+  <LI><B>Anchors:</B> The caret (<TT>^</TT>) and the dollar sign meta-characters 
+  are used to anchor a pattern to the beginning and the end of the searched 
+  string. The caret is always the first character in the pattern when used as an 
+  anchor. For example, <TT>m/^one/;</TT> will only match if the searched string 
+  starts with sequence of characters, <TT>one</TT>. The dollar sign is always 
+  the last character in the pattern when used as an anchor. For example, 
+  <TT>m/(last|end)$/;</TT> will match only if the searched string ends with 
+  either the character sequence <TT>last</TT> or the character sequence 
+  <TT>end</TT>. The <TT>\A</TT> and <TT>\Z</TT> meta-sequences are also used as 
+  pattern anchors for the beginning and end of strings. 
+  <TABLE cellSpacing=0 cellPadding=0 border=0>
+    <TBODY>
+    <TR>
+      <TD bgColor=black><FONT color=lightcyan size=4><B>Errata 
+      Note</B></FONT></TD></TR>
+    <TR>
+      <TD bgColor=lightcyan>The printed version of this book states "The caret 
+        is always the first character in the pattern when used as an anchor". 
+        However, this is not strictly true when the alternation meta-character 
+        is used. For example, /Jack$|^John/ will match when "Jack" is at the end 
+        of a string or when "John" is at the beginning of a string. Randal 
+        Schwartz was kind enough to mention that this concept needs 
+        clarification.</TD></TR></TBODY></TABLE>
+  <P></P>
+  <LI><B>Quantifiers:</B> There are several meta-characters that are devoted to 
+  controlling how many characters are matched. For example, <TT>m/a{5}/;</TT> 
+  means that five <TT>a</TT> characters must be found before a true result can 
+  be returned. The <TT>*</TT>, <TT>+</TT>, and <TT>?</TT> meta-characters and 
+  the curly braces are all used as quantifiers. See the section "<A 
+  href="ch10.htm#Example: Quantifiers">Example: 
+  Quantifiers</A>" later in this chapter for more information. 
+  <P></P>
+  <LI><B>Pattern Memory:</B> Parentheses are used to store matched values into 
+  buffers for later recall. I like to think of this as a form of pattern memory. 
+  Some programmers call them back-references. After you use 
+  <TT>m/(fish|fowl)/;</TT> to match a string and a match is found, the variable 
+  <TT>$1</TT> will hold either <TT>fish</TT> or <TT>fowl</TT> depending on which 
+  sequence was matched. See the section "<A 
+  href="ch10.htm#Example: Pattern Memory">Example: 
+  Pattern Memory</A>" later in this chapter for more information. 
+  <P></P>
+  <LI><B>Word Boundaries:</B> The <TT>\b</TT> meta-sequence will match the spot 
+  between a space and the first character of a word or between the last 
+  character of a word and the space. The <TT>\b</TT> will match at the beginning 
+  or end of a string if there are no leading or trailing spaces. For example, 
+  <TT>m/\bfoo/;</TT> will match <TT>foo</TT> even without spaces surrounding the 
+  word. It will also match $<TT>foo</TT> because the dollar sign is not 
+  considered a word character. The statement <TT>m/foo\b/;</TT> will match 
+  <TT>foo</TT> but not <TT>foobar</TT>, and the statement <TT>m/\bwiz/;</TT> 
+  will match <TT>wizard</TT> but not <TT>geewiz</TT>. See the section "<A 
+  href="ch10.htm#Example: Character Classes">Example: 
+  Character Classes</A>" later in this chapter for more information about word 
+  boundaries. 
+  <P>The <TT>\B</TT> meta-sequence will match everywhere except at a word 
+  boundary. 
+  <P></P>
+  <LI><B>Quoting Meta-Characters:</B> You can match meta-character literally by 
+  enclosing them in a <TT>\Q..\E</TT> sequence. This will let you avoid using 
+  the backslash character to escape all meta-characters, and your code will be 
+  easier to read. 
+  <P></P>
+  <LI><B>Extended Syntax:</B> The (?...) sequence lets you use an extended 
+  version of the regular expression syntax. The different options are discussed 
+  in the section "<A 
+  href="ch10.htm#Example: Extension Syntax">Example: 
+  Extension Syntax</A>" later in this chapter. 
+  <P></P>
+  <LI><B>Combinations:</B> Any of the preceding components can be combined with 
+  any other to create simple or complex pattern.</LI></UL>
+<P>The power of patterns is that you don't always know in advance the value of 
+the string that you will be searching. If you need to match the first word in a 
+string that was read in from a file, you probably have no idea how long it might 
+be; therefore, you need to build a pattern. You might start with the <TT>\w</TT> 
+symbolic character class, which will match any single alphanumeric or underscore 
+character. So, assuming that the string is in the <TT>$_</TT> variable, you can 
+match a one-character word like this: 
+<P><B><PRE>m/\w/;</PRE></B>If you need to match both a one-character word and a 
+two-character word, you can do this: 
+<P><B><PRE>m/\w|\w\w/;</PRE></B>This pattern says to match a single word character or 
+two consecutive word characters. You could continue to add alternation 
+components to match the different lengths of words that you might expect to see, 
+but there is a better way. 
+<P>You can use the <TT>+</TT> quantifier to say that the match should succeed 
+only if the component is matched one or more times. It is used this way: 
+<P><B><PRE>m/\w+/;</PRE></B>If the value of <TT>$_</TT> was <TT>"AAA BBB"</TT>, then 
+<TT>m/\w+/;</TT> would match the <TT>"AAA"</TT> in the string. If <TT>$_</TT> 
+was blank, full of whitespace, or full of other non-word characters, an 
+undefined value would be returned. 
+<P>The preceding pattern will let you determine if <TT>$_</TT> contains a word 
+but does not let you know what the word is. In order to accomplish that, you 
+need to enclose the matching components inside parentheses. For example: 
+<P><B><PRE>m/(\w+)/;</PRE></B>By doing this, you force Perl to store the matched 
+string into the <TT>$1</TT> variable. The <TT>$1</TT> variable can be considered 
+as pattern memory. 
+<P>This introduction to pattern components describes most of the details you 
+need to know in order to create your own patterns or regular expressions. 
+However, some of the components deserve a bit more study. The next few sections 
+look at character classes, quantifiers, pattern memory, pattern precedence, and 
+the extension syntax. Then the rest of the chapter is devoted to showing 
+specific examples of when to use the different components. 
+<H3><A name="Example: Character Classes">Example: Character Classes</A></H3>A 
+character class defines a type of character. The character class [0123456789] 
+defines the class of decimal digits, and [0-9a-f] defines the class of 
+hexadecimal digits. Notice that you can use a dash to define a range of 
+consecutive characters. Character classes let you match any of a range of 
+characters; you don't know in advance which character will be matched. This 
+capability to match non-specific characters is what meta-characters are all 
+about. 
+<P>You can use variable interpolation inside the character class, but you must 
+be careful when doing so. For example, 
+<P><B><PRE>$_ = "AAABBBCCC";
+$charList = "ADE";
+print "matched" if m/[$charList]/;</PRE></B>will display 
+<P><B><PRE>matched</PRE></B>This is because the variable interpolation results in a 
+character class of [ADE]. If you use the variable as one-half of a character 
+range, you need to ensure that you don't mix numbers and digits. For example, 
+<P><B><PRE>$_ = "AAABBBCCC";
+$charList = "ADE";
+print "matched" if m/[$charList-9]/;</PRE></B>will result in the following error 
+message when executed: 
+<P><B><PRE>/[ADE-9]/: invalid [] range in regexp at test.pl line 4.</PRE></B>At times, 
+it's necessary to match on any character except for a given character list. This 
+is done by complementing the character class with the caret. For example, 
+<P><B><PRE>$_ = "AAABBBCCC";
+print "matched" if m/[^ABC]/;</PRE></B>will display nothing. This match returns 
+true only if a character besides <TT>A</TT>, <TT>B</TT>, or <TT>C</TT> is in the 
+searched string. If you complement a list with just the letter <TT>A</TT>, 
+<P><B><PRE>$_ = "AAABBBCCC";
+print "matched" if m/[^A]/;</PRE></B>then the string <TT>"matched"</TT> will be 
+displayed because <TT>B</TT> and <TT>C</TT> are part of the string - in other 
+words, a character besides the letter <TT>A</TT>. 
+<P>Perl has shortcuts for some character classes that are frequently used. Here 
+is a list of what I call symbolic character classes: 
+<P>
+<UL>
+  <LI><B><TT>\w</TT></B> - This symbol match any alphanumeric character or the 
+  underscore character. It is equivalent to the character class 
+  <TT>[a-zA-Z0-9_]</TT>. 
+  <P></P>
+  <LI><B><TT>\W</TT></B> - This symbol matches every character that the 
+  <TT>\w</TT> symbol does not. In other words, it is the complement of 
+  <TT>\w</TT>. It is equivalent to <TT>[^a-zA-Z0-9_]</TT>. 
+  <P></P>
+  <LI><B><TT>\s</TT></B> - This symbol matches any space, tab, or newline 
+  character. It is equivalent to <TT>[\t \n]</TT>. 
+  <P></P>
+  <LI><B><TT>\S</TT></B> - This symbol matches any non-whitespace character. It 
+  is equivalent to <TT>[^\t \n]</TT>. 
+  <P></P>
+  <LI><B><TT>\d</TT></B> - This symbol match any digit. It is equivalent to 
+  <TT>[0-9]</TT>. 
+  <P></P>
+  <LI><B><TT>\D</TT></B> - This symbol matches any non-digit character. It is 
+  equivalent to <TT>[^0-9]</TT>.</LI></UL>
+<P>You can use these symbols inside other character classes but not as endpoints 
+of a range. For example, you can do the following: 
+<P><B><PRE>$_ = "\tAAA";
+print "matched" if m/[\d\s]/;</PRE></B>which will display 
+<P><B><PRE>matched</PRE></B>because the value of <TT>$_</TT> includes the tab 
+character. 
+<P><B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>Meta-characters that appear inside the square 
+      brackets that define a character class are used in their literal sense. 
+      They lose their meta-meaning. This may be a little confusing at first. In 
+      fact, I have a tendency to forget this when evaluating 
+  patterns.</TD></TR></TBODY></TABLE></B>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>I think that most of the confusion regarding regular 
+      expressions lies in the fact that each character of a pattern might have 
+      several possible meanings. The caret could be an anchor, it could be a 
+      caret, or it could be used to complement a character class. Therefore, it 
+      is vital that you decide which context any given pattern character or 
+      symbol is in before assigning a meaning to it.</TD></TR></TBODY></TABLE>
+<H3><A name="Example: Quantifiers">Example: Quantifiers</A></H3>Perl provides 
+several different quantifiers that let you specify how many times a given 
+component must be present before the match is true. They are used when you don't 
+know in advance how many characters need to be matched. Table 10.6 lists the 
+different quantifiers that can be used. 
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 10.6 - The Six Types of Quantifiers</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Quantifier </TH>
+    <TH align=left>Description</TH></TR>
+  <TR>
+    <TD vAlign=top>* </TD>
+    <TD vAlign=top>The component must be present zero or more times.</TD></TR>
+  <TR>
+    <TD vAlign=top>+ </TD>
+    <TD vAlign=top>The component must be present one or more times.</TD></TR>
+  <TR>
+    <TD vAlign=top>? </TD>
+    <TD vAlign=top>The component must be present zero or one times.</TD></TR>
+  <TR>
+    <TD vAlign=top>{n} </TD>
+    <TD vAlign=top>The component must be present n times.</TD></TR>
+  <TR>
+    <TD vAlign=top>{n,} </TD>
+    <TD vAlign=top>The component must be present at least n times.</TD></TR>
+  <TR>
+    <TD vAlign=top>{n,m} </TD>
+    <TD vAlign=top>The component must be present at least n times and no more 
+      than m times.</TD></TR></TBODY></TABLE>
+<P>If you need to match a word whose length is unknown, you need to use the 
+<TT>+</TT> quantifier. You can't use an <TT>*</TT> because a zero length word 
+makes no sense. So, the match statement might look like this: 
+<P><B><PRE>m/^\w+/;</PRE></B>This pattern will match <TT>"QQQ"</TT> and 
+<TT>"AAAAA"</TT> but not <TT>""</TT> or <TT>" BBB "</TT>. In order to account 
+for the leading whitespace, which may or not be at the beginning of a string, 
+you need to use the asterisk (<TT>*</TT>) quantifier in conjunction with the 
+<TT>\s</TT> symbolic character class in the following way: 
+<P><B><PRE>m/\s*\w+/;</PRE></B><B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>Be careful when using the <TT>*</TT> quantifier 
+      because it can match an empty string, which might not be your intention. 
+      The pattern <TT>/b*/</TT> will match any string - even one without any 
+      <TT>b</TT> characters.</TD></TR></TBODY></TABLE></B>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Errata 
+  Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>The printed version of this book has the first match 
+      statement as <B><PRE>m/\w+/;</PRE></B>, notice that pattern anchor was left 
+  out.</TD></TR></TBODY></TABLE>
+<P>At times, you may need to match an exact number of components. The following 
+match statement will be true only if five words are present in the <TT>$_</TT> 
+variable: 
+<P><B><PRE>$_ = "AA AB AC AD AE";
+m/^(\w+\W+){5}$/;</PRE></B>In this example, we are matching at least one word 
+character followed by zero or more non-word characters. Notice that Perl 
+considers the end of a string as a non-word character. The <TT>{5}</TT> 
+quantifier is used to ensure that that combination of components is present five 
+times. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightcyan size=4><B>Errata 
+  Note</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightcyan>The printed version of the book used the pattern 
+      <TT>m/(\w+\s*){5}/;</TT> in order to match the five words. This is 
+      incorrect since the pattern <TT>\w+\s*</TT> matches a single character 
+      (remember that * matches <I>zero</I> or more instances of a character). 
+      Therefore <TT>m/(\w+\s*){5}/;</TT> matches "AAAA" as well as "A A A A 
+    A".</TD></TR></TBODY></TABLE>
+<P>The <TT>*</TT> and <TT>+</TT> quantifiers are greedy. They match as many 
+characters as possible. This may not always be the behavior that you need. You 
+can create non-greedy components by following the quantifier with a <TT>?</TT>. 
+<P>Use the following file specification in order to look at the <TT>*</TT> and 
+<TT>+</TT> quantifiers more closely: 
+<P><B><PRE>$_ = '/user/Jackie/temp/names.dat';</PRE></B>The regular expression 
+<TT>.*</TT> will match the entire file specification. This can be seen in the 
+following small program: 
+<P><B><PRE>$_ = '/user/Jackie/temp/names.dat';
+m/.*/;
+print $&amp;;</PRE></B>This program displays 
+<P><B><PRE>/user/Jackie/temp/names.dat</PRE></B>You can see that the <TT>*</TT> 
+quantifier is greedy. It matched the whole string. If you add the <TT>?</TT> 
+modifier to make the <TT>.*</TT> component non-greedy, what do you think the 
+program would display? 
+<P><B><PRE>$_ = '/user/Jackie/temp/names.dat';
+m/.*?/;
+print $&amp;;</PRE></B>This program displays nothing because the least amount of 
+characters that the <TT>*</TT> matches is zero. If we change the <TT>*</TT> to a 
+<TT>+</TT>, then the program will display 
+<P><B><PRE>/</PRE></B>Next, let's look at the concept of pattern memory, which lets 
+you keep bits of matched string around after the match is complete. 
+<H3><A name="Example: Pattern Memory">Example: Pattern Memory</A></H3>Matching 
+arbitrary numbers of characters is fine, but without the capability to find out 
+what was matched, patterns would be not very useful. Perl lets you enclose 
+pattern components inside parentheses in order to store the string that matched 
+the components into pattern memory. You might also hear <I>pattern memory 
+</I>referred to as <I>pattern buffers</I>. This memory persists after the match 
+statement is finished executing so that you can assign the matched values to 
+other variables. 
+<P>You saw a simple example of this earlier right after the component 
+descriptions. That example looked for the first word in a string and stored it 
+into the first buffer, <TT>$1</TT>. The following small program 
+<P><B><PRE>$_ =  "AAA BBB CCC";
+m/(\w+)/;
+print("$1\n");</PRE></B>will display 
+<P><B><PRE>AAA</PRE></B>
+<P>You can use as many buffers as you need. Each time you add a set of 
+parentheses, another buffer is used. The pattern matched by the first set is 
+placed into $1. The pattern matched by the second set is placed into $2. And so 
+on.</P>
+<P>If you want to find all the words in the string, you need to use the 
+<TT>/g</TT> match option. In order to find all the words, you can use a loop 
+statement that loops until the match operator returns false.</P>
+<P><B><PRE>$_ =  "AAA BBB CCC";
+
+while (m/(\w+)/g) {
+    print("$1\n");
+}</PRE></B>The program will display 
+<P><B><PRE>AAA
+BBB
+CCC</PRE></B>If looping through the matches is not the right approach for your 
+needs, perhaps you need to create an array consisting of the matches. 
+<P><B><PRE>$_ =  "AAA BBB CCC";
+@matches = m/(\w+)/g;
+print("@matches\n");</PRE></B>The program will display 
+<P><B><PRE>AAA BBB CCC</PRE></B>Perl also has a few special variables to help you know 
+what matched and what did not. These variables will occasionally save you from 
+having to add parentheses to find information. 
+<P>
+<UL>
+  <LI><B><TT>$+</TT></B> - This variable is assigned the value that the last 
+  bracket match matched. 
+  <P></P>
+  <LI><B><TT>$&amp;</TT></B> - This variable is assigned the value of the entire 
+  matched string. If the match is not successful, then <TT>$&amp;</TT> retains 
+  its value from the last successful match. 
+  <P></P>
+  <LI><B><TT>$`</TT></B> - This variable is assigned everything in the searched 
+  string that is before the matched string. 
+  <P></P>
+  <LI><B><TT>$'</TT></B> - This variable is assigned everything in the search 
+  string that is after the matched string.</LI></UL>
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>If you need to save the value of the matched strings 
+      stored in the pattern memory, make sure to assign them to other variables. 
+      Pattern memory is local to the enclosing block and lasts only until 
+      another match is done.</TD></TR></TBODY></TABLE>
+<H3><A name="Example: Pattern Precedence">Example: Pattern 
+Precedence</A></H3>Pattern components have an order of precedence just as 
+operators do. If you see the following pattern: 
+<P><B><PRE>m/a|b+/</PRE></B>it's hard to tell if the pattern should be 
+<P><B><PRE> m/(a|b)+/  # match any sequence of  "a" and "b" characters
+             # in any order.</PRE></B>or 
+<P><B><PRE>m/a|(b+)/   # match either the "a" character or the "b" character
+            # repeated one or more times.</PRE></B>The order of precedence shown 
+in Table 10.7 is designed to solve problems like this. By looking at the table, 
+you can see that quantifiers have a higher precedence than alternation. 
+Therefore, the second interpretation is correct. 
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 10.7 - The Pattern Component Order of Precedence</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Precedence Level </TH>
+    <TH align=left>Component</TH></TR>
+  <TR>
+    <TD vAlign=top>1 </TD>
+    <TD vAlign=top>Parentheses</TD></TR>
+  <TR>
+    <TD vAlign=top>2 </TD>
+    <TD vAlign=top>Quantifiers</TD></TR>
+  <TR>
+    <TD vAlign=top>3 </TD>
+    <TD vAlign=top>Sequences and Anchors</TD></TR>
+  <TR>
+    <TD vAlign=top>4 </TD>
+    <TD vAlign=top>Alternation</TD></TR></TBODY></TABLE>
+<P><B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>You can use parentheses to affect the order that 
+      components are evaluated because they have the highest precedence. 
+      However, unless you use the extended syntax, you will be affecting the 
+      pattern memory.</TD></TR></TBODY></TABLE></B>
+<H3><A name="Example: Extension Syntax">Example: Extension Syntax</A></H3>The 
+regular expression extensions are a way to significantly add to the power of 
+patterns without adding a lot of meta-characters to the proliferation that 
+already exists. By using the basic (?...) notation, the regular expression 
+capabilities can be greatly extended. 
+<P>At this time, Perl recognizes five extensions. These vary widely in 
+functionality - from adding comments to setting options. Table 10.8 lists the 
+extensions and gives a short description of each. 
+<P>
+<TABLE cellPadding=10 border=1>
+  <CAPTION>Table 10.8 - Five Extension Components</CAPTION>
+  <TBODY>
+  <TR>
+    <TH align=left>Extension </TH>
+    <TH align=left>Description</TH></TR>
+  <TR>
+    <TD vAlign=top>(?# TEXT) </TD>
+    <TD vAlign=top>This extension lets you add comments to your regular 
+      expression. The TEXT value is ignored.</TD></TR>
+  <TR>
+    <TD vAlign=top>(?:...) </TD>
+    <TD vAlign=top>This extension lets you add parentheses to your regular 
+      expression without causing a pattern memory position to be used.</TD></TR>
+  <TR>
+    <TD vAlign=top>(?=...) </TD>
+    <TD vAlign=top>This extension lets you match values without including them 
+      in the <TT>$&amp;</TT> variable.</TD></TR>
+  <TR>
+    <TD vAlign=top>(?!...) </TD>
+    <TD vAlign=top>This extension lets you specify what should not follow your 
+      pattern. For instance, <TT>/blue(?!bird)/</TT> means that 
+      <TT>"bluebox"</TT> and <TT>"bluesy"</TT> will be matched but not 
+      <TT>"bluebird"</TT>.</TD></TR>
+  <TR>
+    <TD vAlign=top>(?sxi) </TD>
+    <TD vAlign=top>This extension lets you specify an embedded option in the 
+      pattern rather than adding it after the last delimiter. This is useful if 
+      you are storing patterns in variables and using variable interpolation to 
+      do the matching.</TD></TR></TBODY></TABLE>
+<P>By far the most useful feature of extended mode, in my opinion, is the 
+ability to add comments directly inside your patterns. For example, would you 
+rather a see a pattern that looks like this: 
+<P><B><PRE># Match a string with two words. $1 will be the
+# first word. $2 will be the second word.
+m/^\s*(\w+)\W+(\w+)\s*$/;</PRE></B>or one that looks like this: 
+<P><B><PRE>m/
+    (?# This pattern will match any string with two)
+    (?# and only two words in it. The matched words)
+    (?# will be available in $1 and $2 if the match)
+    (?# is successful.)
+
+    ^      (?# Anchor this match to the beginning)
+           (?# of the string)
+
+    \s*    (?# skip over any whitespace characters)
+           (?# use the * because there may be none)
+
+    (\w+)  (?# Match the first word, we know it's)
+           (?# the first word because of the anchor)
+           (?# above. Place the matched word into)
+           (?# pattern memory.)
+
+    \W+    (?# Match at least one non-word)
+           (?# character, there may be more than one)
+
+    (\w+)  (?# Match another word, put into pattern)
+           (?# memory also.)
+
+    \s*    (?# skip over any whitespace characters)
+           (?# use the * because there may be none)
+
+    $      (?# Anchor this match to the end of the)
+           (?# string. Because both ^ and $ anchors)
+           (?# are present, the entire string will)
+           (?# need to match the pattern. A)
+           (?# sub-string that fits the pattern will)
+           (?# not match.)
+/x;</PRE></B>Of course, the commented pattern is much longer, but they take the 
+same amount of time to execute. In addition, it will be much easier to maintain 
+the commented pattern because each component is explained. When you know what 
+each component is doing in relation to the rest of the pattern, it becomes easy 
+to modify its behavior when the need arises. 
+<P>Extensions also let you change the order of evaluation without affecting 
+pattern memory. For example, 
+<P><B><PRE>m/(?:a|b)+/;</PRE></B>matches the <TT>a</TT> or <TT>b</TT> characters 
+repeated one or more times in any order. The pattern memory will not be 
+affected. 
+<P>At times, you might like to include a pattern component in your pattern 
+without including it in the <TT>$&amp;</TT> variable that holds the matched 
+string. The technical term for this is a <I>zero-width positive look-ahead 
+assertion</I>. You can use this to ensure that the string following the matched 
+component is correct without affecting the matched value. For example, if you 
+have some data that looks like this: 
+<P><B><PRE>David    Veterinarian 56
+Jackie  Orthopedist 34
+Karen Veterinarian 28</PRE></B>and you want to find all veterinarians and store 
+the value of the first column, you can use a look-ahead assertion. This will do 
+both tasks in one step. For example: 
+<P><B><PRE>while (&lt;&gt;) {
+    push(@array, $&amp;) if m/^\w+(?=\s+Vet)/;
+}
+
+print("@array\n");</PRE></B>This program will display: 
+<P><B><PRE>David Karen</PRE></B>Let's look at the pattern with comments added using 
+the extended mode. In this case, it doesn't make sense to add comments directly 
+to the pattern because the pattern is part of the <TT>if</TT> statement 
+modifier. Adding comments in that location would make the comments hard to 
+format. So let's use a different tactic. 
+<P><B><PRE>$pattern = '^\w+     (?# Match the first word in the string)
+
+            (?=\s+   (?# Use a look-ahead assertion to match)
+                     (?# one or more whitespace characters)
+
+               Vet)  (?# In addition to the whitespace, make)
+                     (?# sure that the next column starts)
+                     (?# with the character sequence "Vet")
+           ';
+
+while (&lt;&gt;) {
+    push(@array, $&amp;) if m/$pattern/x;
+}
+
+print("@array\n");</PRE></B>Here we used a variable to hold the pattern and then 
+used variable interpolation in the pattern with the match operator. You might 
+want to pick a more descriptive variable name than <TT>$pattern</TT>, however. 
+<P>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>Although the Perl documentation does not mention it, 
+      I believe you have only one look-ahead assertion per pattern, and it must 
+      be the last pattern component.</TD></TR></TBODY></TABLE>
+<P>The last extension that we'll discuss is the <I>zero-width negative 
+assertion</I>. This type of component is used to specify values that shouldn't 
+follow the matched string. For example, using the same data as in the previous 
+example, you can look for everyone who is not a veterinarian. Your first 
+inclination might be to simply replace the <TT>(?=...)</TT> with the 
+<TT>(?!...)</TT> in the previous example. 
+<P><B><PRE> while (&lt;&gt;) {
+    push(@array, $&amp;) if m/^\w+(?!\s+Vet)/;
+}
+
+print("@array\n");</PRE></B>Unfortunately, this program displays 
+<P><B><PRE>Davi Jackie Kare</PRE></B>which is not what you need. The problem is that 
+Perl is looking at the last character of the word to see if it matches the 
+<TT>Vet</TT> character sequence. In order to correctly match the first word, you 
+need to explicitly tell Perl that the first word ends at a word boundary, like 
+this: 
+<P><B><PRE>while (&lt;&gt;) {
+    push(@array, $&amp;) if m/^\w+\b(?!\s+Vet)/;
+}
+
+print("@array\n");</PRE></B>This program displays 
+<P><B><PRE>Jackie</PRE></B>which is correct. 
+<P><B>
+<TABLE cellSpacing=0 cellPadding=0 border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=black><FONT color=lightpink size=4><B>Tip</B></FONT></TD></TR>
+  <TR>
+    <TD bgColor=lightpink>There are many ways of matching any value. If the 
+      first method you try doesn't work, try breaking the value into smaller 
+      components and match each boundary. If all else fails, you can always ask 
+      for help on the <TT>comp.lang.perl.misc</TT> 
+newsgroup.</TD></TR></TBODY></TABLE></B>
+<H2><A name="Pattern Examples">Pattern Examples</A></H2>In order to demonstrate 
+many different patterns, I will depart from the standard example format in this 
+section. Instead, I will explain a matching situation in italicized text and 
+then a possible resolution will immediately follow. After the resolution, I'll 
+add some comments to explain how the match is done. In all of these examples, 
+the string to search will be in the <TT>$_</TT> variable. 
+<H3><A name="Example: Using the Match Operator">Example: Using the Match 
+Operator</A></H3>
+<UL>
+  <LI>If you need to find repeated characters in a string like the AA in "ABC AA 
+  ABC", then do this: 
+  <P><B><PRE>m/(.)\1/;</PRE></B>This pattern uses pattern memory to store a single 
+  character. Then a back-reference (<TT>\1</TT>) is used to repeat the first 
+  character. The back-reference is used to reference the pattern memory while 
+  still inside the pattern. Anywhere else in the program, use the <TT>$1</TT> 
+  variable. After this statement, <TT>$1</TT> will hold the repeated character. 
+  This pattern will match two of any non-newline character. 
+  <P></P>
+  <LI>If you need to find the first word in a string, then do this: 
+  <P><B><PRE>m/^\s*(\w+)/;</PRE></B>After this statement, <TT>$1</TT> will hold the 
+  first word in the string. Any whitespace at the beginning of the string will 
+  be skipped by the <TT>\s*</TT> meta-character sequence. Then the <TT>\w+</TT> 
+  meta-character sequence will match the next word. Note that the <TT>*</TT> - 
+  which matches zero or more - is used to match the whitespace because there may 
+  not be any. The <TT>+</TT> - which matches one or more - is used for the word. 
+
+  <P></P>
+  <LI>If you need to find the last word in a string, then do this: 
+  <P><B><PRE>m/
+    (\w+)      (?# Match a word, store its value into pattern memory)
+
+    [.!?]?     (?# Some strings might hold a sentence. If so, this)
+               (?# component will match zero or one punctuation)
+               (?# characters)
+
+    \s*        (?# Match trailing whitespace using the * because there)
+               (?# might not be any)
+
+    $          (?# Anchor the match to the end of the string)
+/x;</PRE></B>After this statement, <TT>$1</TT> will hold the last word in the 
+  string. You need to expand the character class, <TT>[.!?]</TT>, by adding more 
+  punctuation. 
+  <P></P>
+  <LI>If you need to know that there are only two words in a string, you can do 
+  this: 
+  <P><B><PRE>m/^(\w+)\W+(\w+)$/x;</PRE></B>After this statement, <TT>$1</TT> will hold 
+  the first word and <TT>$2</TT> will hold the second word, assuming that the 
+  pattern matches. The pattern starts with a caret and ends with a dollar sign, 
+  which means that the entire string must match the pattern. The <TT>\w+</TT> 
+  meta-character sequence matches one word. The <TT>\W+</TT> meta-character 
+  sequence matches the whitespace between words. You can test for additional 
+  words by adding one <TT>\W+(\w+)</TT> meta-character sequence for each 
+  additional word to match. 
+  <P></P>
+  <LI>If you need to know that there are only two words in a string while 
+  ignoring leading or trailing spaces, you can do this: 
+  <P><B><PRE>m/^\s*(\w+)\W+(\w+)\s*$/;</PRE></B>After this statement, <TT>$1</TT> will 
+  hold the first word and <TT>$2</TT> will hold the second word, assuming that 
+  the pattern matches. The <TT>\s*</TT> meta-character sequence will match any 
+  leading or trailing whitespace. 
+  <P></P>
+  <LI>If you need to assign the first two words in a string to <TT>$one</TT> and 
+  <TT>$two</TT> and the rest of the string to <TT>$rest</TT>, you can do this: 
+  <P><B><PRE>$_ = "This is the way to San Jose.";
+
+$word   = '\w+';    # match a whole word.
+
+$space  = '\W+';    # match at least one character of whitespace
+
+$string = '.*';     # match any number of anything except
+                    # for the newline character.
+
+($one, $two, $rest) = (m/^($word) $space ($word) $space ($string)/x);</PRE></B>After 
+  this statement, <TT>$one</TT> will hold the first word, <TT>$two</TT> will 
+  hold the second word, and <TT>$rest</TT> will hold everything else in the 
+  <TT>$_</TT> variable. This example uses variable interpolation to, hopefully, 
+  make the match pattern easier to read. This technique also emphasizes which 
+  meta-sequence is used to match words and whitespace. It lets the reader focus 
+  on the whole of the pattern rather than the individual pattern components by 
+  adding a level of abstraction. 
+  <P></P>
+  <LI>If you need to see if <TT>$_</TT> contains a legal Perl variable name, you 
+  can do this: 
+  <P><B><PRE>$result = m/
+            ^          (?# Anchor the pattern to the start of the string)
+
+            [\$\@\%]   (?# Use a character class to match the first)
+                       (?# character of a variable name)
+
+            [a-z]      (?# Use a character class to ensure that the)
+                       (?# character of the name is a letter)
+
+            \w*        (?# Use a character class to ensure that the)
+                       (?# rest of the variable name is either an)
+                       (?# alphanumeric or an underscore character)
+
+            $          (?# Anchor the pattern to the end of the)
+                       (?# string. This means that for the pattern to)
+                       (?# match, the variable name must be the only)
+                       (?# value in $_.)
+
+          /ix;         # Use the /i option so that the search is
+                       # case-insensitive and use the /x option to
+                       # allow extensions.</PRE></B>After this statement, 
+  <TT>$result</TT> will be true if <TT>$_</TT> contains a legal variable name 
+  and false if it does not. 
+  <P></P>
+  <LI>If you need to see if <TT>$_</TT> contains a legal integer literal, you 
+  can do this: 
+  <P><B><PRE>$result = m/
+            (?# First check for just numbers in $_)
+
+            ^         (?# Anchor to the start of the string)
+            \d+       (?# Match one or more digits)
+            $         (?# Anchor to the end of the string)
+
+            |         (?# or)
+
+           (?# Now check for hexadecimal numbers)
+
+            ^         (?# Anchor to the start of the string)
+            0x        (?# The "0x" sequence starts a hexadecimal number)
+            [\da-f]+  (?# Match one or more hexadecimal characters)
+            $         (?# Anchor to the end of the string)
+          /ix;
+</PRE></B>After this statement, <TT>$result</TT> will be true if <TT>$_</TT> 
+  contains an integer literal and false if it does not. 
+  <P></P>
+  <LI>If you need to match all legal integers in <TT>$_</TT>, you can do this: 
+  <P><B><PRE>@results = m/\d+$|^0[x][\da-f]+/gi;</PRE></B>After this statement, 
+  <TT>@result</TT> will contain a list of all integer literals in <TT>$_</TT>. 
+  <TT>@result</TT> will contain an empty list if no literals were found. 
+  <P></P>
+  <LI>If you need to match the end of the first word in a string, you can do 
+  this: 
+  <P><B><PRE>m/\w\W/;</PRE></B>After this statement is executed, <TT>$&amp;</TT> will 
+  hold the last character of the first word and the next character that follows 
+  it. If you want only the last character, use pattern memory, 
+  <TT>m/(\w)\W/;</TT>. Then <TT>$1</TT> will be equal to the last character of 
+  the first word. If you use the global option, <TT>@array = m/\w\W/g;</TT>, 
+  then you can create an array that holds the last character of each word in the 
+  string. 
+  <P></P>
+  <LI>If you need to match the start of the second word in a string, you can do 
+  this: 
+  <P><B><PRE>m/\W\w/;</PRE></B>After this statement, <TT>$&amp;</TT> will hold the 
+  first character of the second word and the whitespace character that 
+  immediately precedes it. While this pattern is the opposite of the pattern 
+  that matches the end of words, it will not match the beginning of the first 
+  word! This is because of the <TT>\W</TT> meta-character. Simply adding a 
+  <TT>*</TT> meta-character to the pattern after the <TT>\W</TT> does not help, 
+  because then it would match on zero non-word characters and therefore match 
+  every word character in the string. 
+  <P></P>
+  <LI>If you need to match the file name in a file specification, you can do 
+  this: 
+  <P><B><PRE>$_ = '/user/Jackie/temp/names.dat';
+m!^.*/(.*)!;</PRE></B>After this match statement, <TT>$1</TT> will equal 
+  <TT>names.dat</TT>. The match is anchored to the beginning of the string, and 
+  the <TT>.*</TT> component matches everything up to the last slash because 
+  regular expressions are greedy. Then the next <TT>(.*)</TT> matches the file 
+  name and stores it into pattern memory. You can store the file path into 
+  pattern memory by placing parentheses around the first <TT>.*</TT> component. 
+  <P></P>
+  <LI>If you need to match two prefixes and one root word, like "rockfish" and 
+  "monkfish," you can do this: 
+  <P><B><PRE>m/(?:rock|monk)fish/x;</PRE></B>The alternative meta-character is used to 
+  say that either <TT>rock</TT> or <TT>monk</TT> followed by <TT>fish</TT> needs 
+  to be found. If you need to know which alternative was found, then use regular 
+  parentheses in the pattern. After the match, <TT>$1</TT> will be equal to 
+  either <TT>rock</TT> or <TT>monk</TT>. 
+  <P></P>
+  <LI>If you want to search a file for a string and print some of the 
+  surrounding lines, you can do this: 
+  <P><B><PRE># read the whole file into memory.
+open(FILE, "&lt;fndstr.dat");
+@array = &lt;FILE&gt;;
+close(FILE);
+
+# specify which string to find.
+$stringToFind = "A";
+
+# iterate over the array looking for the
+# string. The $#array notation is used to
+# determine the number of elements in the
+# array.
+for ($index = 0; $index &lt;= $#array; $index++) {
+    last if $array[$index] =~ /$stringToFind/;
+}
+
+# Use $index to print two lines before
+# and two lines after the line that contains
+# the match.
+foreach (@array[$index-2..$index+2]) {
+    print("$index: $_");
+    $index++;
+}</PRE></B>There are many ways to perform this type of search, and this is 
+  just one of them. This technique is only good for relatively small files 
+  because the entire file is read into memory at once. In addition, the program 
+  assumes that the input file always contains the string that you are looking 
+  for.</LI></UL>
+<H3><A name="Example: Using the Substitution Operator">Example: Using the 
+Substitution Operator</A></H3>
+<UL>
+  <LI>If you need to remove whitespace from the beginning of a string, you can 
+  do this: 
+  <P><B><PRE>s/^\s+//;</PRE></B>This pattern uses the <TT>\s</TT> predefined character 
+  class to match any whitespace character. The plus sign means to match one or 
+  more whitespace characters, and the caret means match only at the beginning of 
+  the string. 
+  <P></P>
+  <LI>If you need to remove whitespace from the end of a string, you can do 
+  this: 
+  <P><B><PRE>s/\s+$//;</PRE></B>This pattern uses the <TT>\s</TT> predefined character 
+  class to match any whitespace character. The plus sign means to match one or 
+  more whitespace characters, and the dollar sign means match only at the end of 
+  the string. 
+  <P></P>
+  <LI>If you need to add a prefix to a string, you can do this: 
+  <P><B><PRE>$prefix = "A";
+s/^(.*)/$prefix$1/;</PRE></B>When the substitution is done, the value in the 
+  <TT>$prefix</TT> variable will be added to the beginning of the <TT>$_</TT> 
+  variable. This is done by using variable interpolation and pattern memory. Of 
+  course, you might also consider using the string concatenation operator; for 
+  instance, <TT>$_ = "A" . $_;</TT>, which is probably faster. 
+  <P></P>
+  <LI>If you need to add a suffix to a string, you can do this: 
+  <P><B><PRE>$suffix = "Z";
+s/^(.*)/$1$suffix/;</PRE></B>When the substitution is done, the value in the 
+  <TT>$suffix</TT> variable will be added to the end of the <TT>$_</TT> 
+  variable. This is done by using variable interpolation and pattern memory. Of 
+  course, you might also consider using the string concatenation operator; for 
+  instance, <TT>$_ .= "Z";</TT>, which is probably faster. 
+  <P></P>
+  <LI>If you need to reverse the first two words in a string, you can do this: 
+  <P><B><PRE>s/^\s*(\w+)\W+(\w+)/$2 $1/;</PRE></B>This substitution statement uses the 
+  pattern memory variables <TT>$1</TT> and <TT>$2</TT> to reverse the first two 
+  words in a string. You can use a similar technique to manipulate columns of 
+  information, the last two words, or even to change the order of more than two 
+  matches. 
+  <P></P>
+  <LI>If you need to duplicate each character in a string, you can do this: 
+  <P><B><PRE>s/\w/$&amp; x 2/eg;</PRE></B>When the substitution is done, each 
+  character in <TT>$_</TT> will be repeated. If the original string was 
+  <TT>"123abc"</TT>, the new string would be <TT>"112233aabbcc"</TT>. The 
+  <TT>e</TT> option is used to force evaluation of the replacement string. The 
+  <TT>$&amp;</TT> special variable is used in the replacement pattern to 
+  reference the matched string, which is then repeated by the string repetition 
+  operator. 
+  <P></P>
+  <LI>If you need to capitalize all the words in a sentence, you can do this: 
+  <P><B><PRE>s/(\w+)/\u$1/g;</PRE></B>When the substitution is done, each character in 
+  <TT>$_</TT> will have its first letter capitalized. The <TT>/g</TT> option 
+  means that each word - the <TT>\w+</TT> meta-sequence - will be matched and 
+  placed in <TT>$1</TT>. Then it will be replaced by <TT>\u$1</TT>. The 
+  <TT>\u</TT> will capitalize whatever follows it; in this case, it's the 
+  matched word. 
+  <P></P>
+  <LI>If you need to insert a string between two repeated characters, you can do 
+  this: 
+  <P><B><PRE>$_      = "!!!!";
+$char   = "!";
+$insert = "AAA";
+
+s{
+    ($char)             # look for the specified character.
+
+    (?=$char)           # look for it again, but don't include
+                        # it the matched string, so the next
+}                       # search will also find it.
+{
+    $char . $insert     # concatenate the specified character
+                        # with the string to insert.
+
+}xeg;                   # use extended mode, evaluate the
+                        # replacement pattern, and match all
+                        # possible strings.
+
+print("$_\n");</PRE></B>This example uses the extended mode to add comments 
+  directly inside the regular expression. This makes it easy to relate the 
+  comment directly to a specific pattern element. The match pattern does not 
+  directly reflect the originally stated goal of inserting a string between two 
+  repeated characters. Instead, the example was quietly restated. The new goal 
+  is to substitute all instances of <TT>$char</TT> with <TT>$char</TT> . 
+  <TT>$insert</TT>, if $char is followed by <TT>$char</TT>. As you can see, the 
+  end result is the same. Remember that sometimes you need to think outside the 
+  box. 
+  <P></P>
+  <LI>If you need to do a second level of variable interpolation in the 
+  replacement pattern, you can do this: 
+  <P><B><PRE>s/(\$\w+)/$1/eeg;</PRE></B>This is a simple example of secondary variable 
+  interpolation. If <TT>$firstVar = "AAA"</TT> and <TT>$_ = '$firstVar'</TT>, 
+  then <TT>$_</TT> would be equal to <TT>"AAA"</TT> after the substitution was 
+  made. The key is that the replacement pattern is evaluated twice. This 
+  technique is very powerful. It can be used to develop error messages used with 
+  variable interpolation. 
+  <P><B><PRE> $errMsg = "File too large";
+$fileName = "DATA.OUT";
+$_ = 'Error: $errMsg for the file named $fileName';
+s/(\$\w+)/$1/eeg;
+print;</PRE></B>When this program is run, it will display 
+  <P><B><PRE>Error: File too large for the file named DATA.OUT</PRE></B>The values of 
+  the <TT>$errMsg</TT> and <TT>$fileName</TT> variables were interpolated into 
+  the replacement pattern as needed.</LI></UL>
+<H3><A name="Example: Using the Translation Operator">Example: Using the 
+Translation Operator</A></H3>
+<UL>
+  <LI>If you need to count the number of times a given letter appears in a 
+  string, you can do this: 
+  <P><B><PRE>$cnt = tr/Aa//;</PRE></B>After this statement executes, <TT>$cnt</TT> 
+  will hold the number of times the letter <TT>a</TT> appears in <TT>$_</TT>. 
+  The <TT>tr</TT> operator does not have an option to ignore the case of the 
+  string, so both upper- and lowercase need to be specified. 
+  <P></P>
+  <LI>If you need to turn the high bit off for every character in $_, you can do 
+  this: 
+  <P><B><PRE>tr [\200-\377] [\000-\177];</PRE></B>This statement uses the square 
+  brackets to delimit the character lists. Notice that spaces can be used 
+  between the pairs of brackets to enhance readability of the lists. The octal 
+  values are used to specify the character ranges. The translation operator is 
+  more efficient - in this instance - than using logical operators and a loop 
+  statement. This is because the translation can be done by creating a simple 
+  lookup table.</LI></UL>
+<H3><A name="Example: Using the Split() Function">Example: Using the 
+<I>Split()</I> Function</A></H3>
+<UL>
+  <LI>If you need to split a string into words, you can do this: 
+  <P><B><PRE>s/^\s+//;
+@array = split;</PRE></B>After this statement executes, <TT>@array</TT> will 
+  be an array of words. Before splitting the string, you need to remove any 
+  beginning whitespace. If this is not done, <TT>split</TT> will create an array 
+  element with the whitespace as the first element in the array, and this is 
+  probably not what you want. 
+  <P></P>
+  <LI>If you need to split a string contained in <TT>$line</TT> instead of 
+  <TT>$_</TT> into words, you can do this: 
+  <P><B><PRE>$line =~ s/^\s+//;
+@array = split(/\W/, $line);</PRE></B>After this statement executes, 
+  <TT>@array</TT> will be an array of words. 
+  <P></P>
+  <LI>If you need to split a string into characters, you can do this: 
+  <P><B><PRE>@array = split(//);</PRE></B>After this statement executes, 
+  <TT>@array</TT> will be an array of characters. <TT>split</TT> recognizes the 
+  empty pattern as a request to make every character into a separate array 
+  element. 
+  <P></P>
+  <LI>If you need to split a string into fields based on a delimiter sequence of 
+  characters, you can do this: 
+  <P><B><PRE>@array = split(/:/);</PRE></B><TT>@array</TT> will be an array of strings 
+  consisting of the values between the delimiters. If there are repeated 
+  delimiters - <TT>::</TT> in this example - then an empty array element will be 
+  created. Use <TT>/:+/</TT> as the delimiter to match in order to eliminate the 
+  empty array elements.</LI></UL>
+<H2><A name=Summary>Summary</A></H2>This chapter introduced you to regular 
+expressions or patterns, regular expression operators, and the binding 
+operators. There are three regular expression operators - <TT>m//</TT>, 
+<TT>s///</TT>, and <TT>tr///</TT> - which are used to match, substitute, and 
+translate and use the <TT>$_</TT> variable as the default operand. The binding 
+operators, <TT>=~</TT> and <TT>!~</TT>, are used to bind the regular expression 
+operators to a variable other than <TT>$_</TT>. 
+<P>While the slash character is the default pattern delimiter, you can use any 
+character in its place. This feature is useful if the pattern contains the slash 
+character. If you use an opening bracket or parenthesis as the beginning 
+delimiter, use the closing bracket or parenthesis as the ending delimiter. Using 
+the single-quote as the delimiter will turn off variable interpolation for the 
+pattern. 
+<P>The matching operator has six options: <TT>/g</TT>, <TT>/i</TT>, <TT>/m</TT>, 
+<TT>/o</TT>, <TT>/s</TT>, and <TT>/x</TT>. These options were described in Table 
+10.2. I've found that the <TT>/x</TT> option is very helpful for creating 
+maintainable, commented programs. The <TT>/g</TT> option, used to find all 
+matches in a string, is also very useful. And, of course, the capability to 
+create case-insensitive patterns using the <TT>/i</TT> option is crucial in many 
+cases. 
+<P>The substitution operator has the same options as the matching operator and 
+one more - the <TT>/e</TT> option. The <TT>/e</TT> option lets you evaluate the 
+replacement pattern and use the new value as the replacement string. If you use 
+back-quotes as delimiters, the replacement pattern will be executed as a DOS or 
+UNIX command, and the resulting output will become the replacement string. 
+<P>The translation operator has three options: <TT>/c</TT>, <TT>/d</TT>, and 
+<TT>/s</TT>. These options are used to complement the match character list, 
+delete characters not in the match character list, and eliminate repeated 
+characters in a string. If no replacement list is specified, the number of 
+matched characters will be returned. This is handy if you need to know how many 
+times a given character appears in a string. 
+<P>The binding operators are used to force the matching, substitution, and 
+translation operators to search a variable other than <TT>$_</TT>. The 
+<TT>=~</TT> operator can be used with all three of the regular expression 
+operators, while the <TT>!~</TT> operator can be used only with the matching 
+operator. 
+<P>Quite a bit of space was devoted to creating patterns, and the topic deserves 
+even more space. This is easily one of the more involved features of the Perl 
+language. One key concept is that a character can have multiple meanings. For 
+example, the plus sign can mean a plus sign in one instance (its literal 
+meaning), and in another it means match something one or more times (its 
+meta-meaning). 
+<P>You learned about regular expression components and that they can be combined 
+in an infinite number of ways. Table 10.5 listed most of the meta-meanings for 
+different characters. You read about character classes, alternation, 
+quantifiers, anchors, pattern memory, word boundaries, and extended components. 
+<P>The last section of the chapter was devoted to presenting numerous examples 
+of how to use regular expressions to accomplish specific goals. Each situation 
+was described, and a pattern that matched that situation was shown. Some 
+commentary was given for each example. 
+<P>In the next chapter, you'll read about how to present information by using 
+formats. Formats are used to help relieve some of the programming burden from 
+the task of creating reports. 
+<H2><A name="Review Questions">Review Questions</A></H2>
+<OL>
+  <LI>Can you use variable interpolation with the translation operator? 
+  <P></P>
+  <LI>What happens if the pattern is empty? 
+  <P></P>
+  <LI>What variable does the substitution operator use as its default? 
+  <P></P>
+  <LI>Will the following line of code work? 
+  <P><B><PRE> m{.*];</PRE></B>
+  <LI>What is the <TT>/g</TT> option of the substitution operator used for? 
+  <P></P>
+  <LI>What does the <TT>\d</TT> meta-character sequence mean? 
+  <P></P>
+  <LI>What is the meaning of the dollar sign in the following pattern? 
+  <P><B><PRE>/AA[.&lt;]$]ER/</PRE></B>
+  <LI>What is a word boundary? 
+  <P></P>
+  <LI>What will be displayed by the following program? 
+  <P><B><PRE>$_ = 'AB AB AC';
+print m/c$/i;</PRE></B></LI></OL>
+<H2><A name="Review Exercises">Review Exercises</A></H2>
+<OL>
+  <LI>Write a pattern that matches either <TT>"top"</TT> or <TT>"topgun"</TT>. 
+  <P></P>
+  <LI>Write a program that accepts input from STDIN and changes all instances of 
+  the letter <TT>a</TT> into the letter <TT>b</TT>. 
+  <P></P>
+  <LI>Write a pattern that stores the first character to follow a tab into 
+  pattern memory. 
+  <P></P>
+  <LI>Write a pattern that matches the letter <TT><I>g</TT></I> between 3 and 7 
+  times. 
+  <P></P>
+  <LI>Write a program that finds repeated words in an input file and prints the 
+  repeated word and the line number on which it was found. 
+  <P></P>
+  <LI>Create a character class for octal numbers. 
+  <P></P>
+  <LI>Write a program that uses the translation operator to remove repeated 
+  instances of the tab character and then replaces the tab character with a 
+  space character. 
+  <P></P>
+  <LI>Write a pattern that matches either <TT>"top"</TT> or <TT>"topgun"</TT> 
+  using a zero-width positive look-ahead assertion.</LI></OL>
+<HR>
+<SMALL><A href="ch10.htm#top">Top of Page</A> | <A 
+href="ch10.htm#sections">Sections</A> | <A 
+href="ch10.htm#chapters">Chapters</A> | <A 
+href="copyright.htm">Copyright</A> </SMALL>
+<HR>
+
+<P></P></BODY></HTML>
