@@ -4,7 +4,27 @@ title: How I Got Hashicorp Vault to Run on Raspberry PI
 categories: hashicorp raspberry-pi picocluster vault
 ---
 
-Vault running in development mode.
+## Notes for Research
+
+* https://www.katacoda.com/courses/docker-production/vault-secrets
+* https://github.com/csawyerYumaed/vault-docker
+* https://github.com/aerofs/gockerize
+* https://github.com/CenturyLinkLabs/golang-builder
+* https://gist.github.com/voxxit/dd6f95398c1bdc9f1038
+* https://github.com/calavera/docker-volume-keywhiz
+* https://github.com/defunctzombie/docket
+* https://github.com/ehazlett/docker-volume-libsecret
+* https://github.com/AngryBytes/docker-surgery
+* https://www.vaultproject.io/intro/getting-started/apis.html
+
+## References
+
+* http://elasticcompute.io/2016/01/21/runtime-secrets-with-docker-containers/
+
+
+## Content
+
+These steps result in Hashicorp Vault running in development mode. Do NOT use in production without proper research.
 
 
 All of these steps are done on a Raspberry PI. 
