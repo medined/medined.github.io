@@ -1,6 +1,6 @@
 ---
 layout: post
-title: From BASH, how to write to a file inside a Docker Volume`
+title: From BASH, how to write to a file inside a Docker Volume
 categories: docker
 ---
 
