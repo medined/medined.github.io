@@ -103,12 +103,22 @@ docker service create \
   --publish 4200:4200 \
   --publish 4300:4300 \
   --update-parallelism 1 \
+  hypriot/rpi-crate:0.54.1
+
+  
+docker service create \
+  --mode global \
+  --name crate \
+  --update-delay 10s \
+  --publish 4200:4200 \
+  --publish 4300:4300 \
+  --update-parallelism 1 \
   hypriot/rpi-crate:0.54.1 \
     -Des.cluster.name=crate-cluster \
     -Des.node.name=crate1 \
     -Des.transport.publish_port=4300 \
-    -Des.network.publish_host="$HOST" \
+    -Des.network.publish_host="pi1" \
     -Des.multicast.enabled=false \
-    -Des.discovery.zen.ping.unicast.hosts="$HOSTS" \
-    -Des.discovery.zen.minimum_master_nodes=2
+    -Des.discovery.zen.ping.unicast.hosts="pi2:4300,pi3:4300" \
+    -Des.discovery.zen.minimum_master_nodes=1
 
