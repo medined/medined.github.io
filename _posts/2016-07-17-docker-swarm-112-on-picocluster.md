@@ -15,7 +15,7 @@ First off, I wanted to have my cluster using eth0 to connect to my laptop and th
 
 Use `lsblk` to umount any directories on the SD cards you'll be using.
 
-Now flash the SD cards using the flash tool from hypriot. Notice that *no* network information is provided.
+Now flash (https://github.com/hypriot/flash) the SD cards using the flash tool from hypriot. Notice that *no* network information is provided.
 
 I used piX naming convention so that I can easily loop over all five RPI in the PicoCluster.
 
@@ -30,14 +30,14 @@ flash --hostname pi5 --device /dev/mmcblk0 https://github.com/hypriot/image-buil
 Using this function, you can find the IP addresses for the RPI.
 
 ```
-function getip() { (traceroute $1 2&gt;&amp;1 | head -n 1 | cut -d\( -f 2 | cut -d\) -f 1) }
+function getip() { (traceroute $1 2>&1 | head -n 1 | cut -d\( -f 2 | cut -d\) -f 1) }
 ```
 
 List the IP addresses.
 
 ```
 for i in `seq 1 5`; do 
-  echo "HOST: pi$i&nbsp; IP: $(getip pi$i.local)"; 
+  echo "HOST: pi$i; IP: $(getip pi$i.local)"; 
 done
 ```
 
@@ -117,4 +117,12 @@ docker service tasks ping
 docker service update --replicas 10 ping
 docker service tasks ping
 docker service rm ping
+```
+
+Shutdown the Swarm
+
+```
+for i in `seq 1 5`; do 
+  ssh -oStrictHostKeyChecking=no -oCheckHostIP=no pirate@pi$i.local sudo shutdown -h +0 "Shutting down"; 
+done
 ```
