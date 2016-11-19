@@ -65,6 +65,6 @@ function bedit {
   reload
 }
 
-alias gs="git stash"
+alias gs="git status"
 echo "RELOADED"
 
