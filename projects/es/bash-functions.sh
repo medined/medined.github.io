@@ -26,6 +26,11 @@ NGINX_IMAGE="$NGINX_IMAGE_NODE:$NGINX_VERSION"
 #  es-stack-stop
 #  getip
 
+function es-stack-start {
+  es-run-detached
+  nginx-run-detached
+}
+
 function es-get-stats {
   curl --silent -u $ES_USER:$ES_PASSWORD http://localhost:$NGINX_PORT/_nodes/stats/http?pretty
 }
