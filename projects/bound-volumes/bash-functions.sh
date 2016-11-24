@@ -24,20 +24,12 @@ NGINX_IMAGE="$NGINX_IMAGE_NODE:$NGINX_VERSION"
 #  es-search
 #  getip
 
-S3_CNAME=es-s3
-S3_IMAGE_NAME=scality/s3server
-S3_VERSION=50f9316
-S3_IMAGE="$S3_IMAGE_NAME:$S3_VERSION"
-S3_PORT=8000
+function es-insert-document {
+  curl -u $ES_USER:$ES_PASSWORD -XPOST "http://localhost:9200/boundvolumes/supremecourt" -d "{ \"fname\" : \"johnson\"}"
+}
 
-function s3-run-detached {
-  docker stop $S3_CNAME
-  docker rm $S3_CNAME
-  docker run \
-    --detach \
-    --name $S3_CNAME \
-    -p $S3_PORT:8000 \
-    $S3_IMAGE
+function es-search {
+  curl -u $ES_USER:$ES_PASSWORD "http://localhost:9200/_search?q=fname:johnson&size=5&pretty=true"
 }
 
 function es-stack-start {
@@ -74,6 +66,7 @@ function es-run-detached {
   docker run \
     --detach \
     --name $ES_CNAME \
+    --publish 14353:9300 \
     --volume $VOL_ES_DATA:/usr/share/elasticsearch/data \
     $ES_IMAGE \
     -Enode.name="$ES_NODE_NAME"
@@ -102,6 +95,10 @@ function reload {
 function bedit {
   vi bash-functions.sh
   reload
+}
+
+function bcmd {
+  egrep "^function " bash-functions.sh | cut -b10- | tr -d '{' | sort
 }
 
 alias gs="git status"
