@@ -1,5 +1,3 @@
-# hyper.sh
-
 Hyper.sh is a secure container hosting service. What makes it different from AWS (Amazon Web Services) is that you don't start servers, but start docker images directly from Docker Hub or other registries. Hyper.sh is running the containers in a new way, in which multi-tenants' containers are inherently safe to run side by side on bare metal, instead of being nested in VMs.
 
 # Running a $1/month web server
@@ -37,4 +35,3 @@ Visit your equivalent of http://209.177.88.159/index.html.
 
 That page costs about $1/month to host. ::))
 
-Good luck!
