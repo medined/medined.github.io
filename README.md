@@ -20,3 +20,4 @@ docker run --rm --label=jekyll --volume=$(pwd):/srv/jekyll   -it -p 127.0.0.1:40
 * https://help.github.com/articles/about-supported-custom-domains/ 
 * http://jekyll.tips/jekyll-casts/jekyll-search-using-lunr-js/
 
+
