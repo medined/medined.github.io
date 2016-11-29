@@ -36,3 +36,5 @@ echo "Hello World" > /www/index.html
 Visit your equivalent of http://209.177.88.159/index.html.
 
 That page costs about $1/month to host. ::))
+
+Good luck!
