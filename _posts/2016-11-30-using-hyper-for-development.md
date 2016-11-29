@@ -36,12 +36,6 @@ TmeVsBVUQPTs6K1IO3MEPfIN4m366MselXW0tLcvPi6hOPkl5Kzqj+o=
 EOF
 chmod 600 ~/.ssh/id_isa
 
-cat << EOF > ~/.ssh/id_rsa.pub
-ssh-rsa AAAAB3NzaxjZwmzhQnbFBcYJPjQ1Aqov8rDFpvk2u5QP+F1fHQ648n01
-xd---------------dQ9imXfNIcMmyohpO4QZeGRXK7sgjslptIGyLfBvdWfiTF+
-gC/YWIVBTTWfcB28J+i3LvUb root@87d3d377c35d
-EOF
-chmod 64 ~/.ssh/id_isa.pub
 ```
 
 * Install git so you can pull a project from GitHub.
