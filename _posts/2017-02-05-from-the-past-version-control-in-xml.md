@@ -5,8 +5,6 @@ author: David Medinets
 categories: xml
 ---
 
-# Introduction
-
 Back in 2004, I was working on a project that stored information in XML. I wrote the following notes about how to arrange the XML to make version control easier. The requirement was to store an unregulated set of attributes, any of which could be associated with a project. Another need was to quickly see changes from one version of the data to another.
 
 Version Control is an inherently complex topic. This short note only touchs on some best practices, ideas for storage, and examples using XML. While focusing on using XML as the storage medium for version-controlled objects there are several other mediums that can be used. For example, text files or tables in a relational database.
