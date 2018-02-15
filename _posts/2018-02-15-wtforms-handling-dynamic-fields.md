@@ -1,6 +1,6 @@
 ---
 layout: post
-title: python wtforms - handling dynamic fields II
+title: python wtforms - handling dynamic fields
 author: David Medinets
 categories: python wtforms
 ---
@@ -44,16 +44,21 @@ The getField() method is needed in order to find the right field to display
 in the template.
 
 ```
-\{% for n in range(1, daysInMonth+1) %}
-  \<tr>
-    \<td>\{{n}}\</td>
-    \<td>\{{ form.getField('morning' + n|string)(size="5") }}\</td>
-    \<td>\{{ form.getField('evening' + n|string)(size="5") }}\</td>
-  \</tr>
-\{% endfor %}
+{% raw %}
+{% for n in range(1, daysInMonth+1) %}
+  <tr>
+    <td>{{n}}</td>
+    <td>{{ form.getField('morning' + n|string)(size="5") }}</td>
+    <td>{{ form.getField('evening' + n|string)(size="5") }}</td>
+  </tr>
+{% endfor %}
+{% endraw %}
 ```
 
 In a world in which python supports static class members, I'd use a hash to
 cache the fields. This would avoid the for loop every time a field is needed.
 On the other hand, the cache might be premature optimization. For my little, tiny
 application with less than 40 fields running the for loop is not a problem.
+
+Footnote: Use raw and endraw inside {% raw %}{% %}{% endraw %} tags to display
+Jinja2 code inside GitHub Markdown.
