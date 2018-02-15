@@ -14,7 +14,7 @@ displayed in the jinja2 template, only daysInMonth fields are used.
 
 Here is the form definition:
 
-```
+```python
 from flask_wtf import FlaskForm
 from wtforms import FieldList, HiddenField, IntegerField, StringField, SubmitField, validators
 from wtforms.validators import DataRequired, UUID
@@ -44,13 +44,13 @@ The getField() method is needed in order to find the right field to display
 in the template.
 
 ```
-{% for n in range(1, daysInMonth+1) %}
-  <tr>
-    <td>{{n}}</td>
-    <td>{{ form.getField('morning' + n|string)(size="5") }}</td>
-    <td>{{ form.getField('evening' + n|string)(size="5") }}</td>
-  </tr>
-{% endfor %}
+\{% for n in range(1, daysInMonth+1) %}
+  \<tr>
+    \<td>\{{n}}\</td>
+    \<td>\{{ form.getField('morning' + n|string)(size="5") }}\</td>
+    \<td>\{{ form.getField('evening' + n|string)(size="5") }}\</td>
+  \</tr>
+\{% endfor %}
 ```
 
 In a world in which python supports static class members, I'd use a hash to
