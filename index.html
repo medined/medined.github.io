@@ -9,13 +9,8 @@ title: Home
 
   <!-- This loops through the paginated posts -->
   {% for post in paginator.posts %}
-    <h1><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h1>
-    <p class="author">
-      <span class="date">{{ post.date | date:"%m/%d/%Y" }}</span>
-    </p>
-    <div class="content">
-      {{ post.content }}
-    </div>
+    <h2>{{ post.date | date:"%m/%d/%Y" }}: <a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+    <div class="content">{{ post.content }}</div>
   {% endfor %}
 
   <hr />
