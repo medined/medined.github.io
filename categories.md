@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Categories
+category: menu
 ---
 
 {% for category in site.categories %}
