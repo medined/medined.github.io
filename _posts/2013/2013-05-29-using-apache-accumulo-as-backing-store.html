@@ -1,0 +1,183 @@
+---
+layout: post
+title: Using Apache Accumulo as the backing store for Apache Gora - a tutorial
+date: '2013-05-29T23:18:00.000-04:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2013-05-29T23:18:07.110-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-5218276916890532051
+blogger_orig_url: http://affy.blogspot.com/2013/05/using-apache-accumulo-as-backing-store.html
+year: 2013
+---
+
+Apache Gora (http://gora.apache.org/) provides an abstraction layer to work with various
+data storage engines. In this tutorial, we'll see how to use Gora with Apache Accumulo
+as the storage engine.
+
+
+I like to start projects with the Maven `pom.xml` file. So here is mine. It's important to <br />
+use Accumulo 1.4.3 instead of the newly released 1.5.0 because of an API incompatibility.<br />
+Otherwise, the `pom.xml` file is straightforward.<br />
+<br />
+<pre>  &lt;project ...&gt;
+      &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+      &lt;groupId&gt;com.affy&lt;/groupId&gt;
+      &lt;artifactId&gt;pojos-in-accumulo&lt;/artifactId&gt;
+      &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+      &lt;packaging&gt;jar&lt;/packaging&gt;
+
+      &lt;name&gt;POJOs in Accumulo&lt;/name&gt;
+      &lt;url&gt;http://affy.com&lt;/url&gt;
+
+      &lt;properties&gt;
+          &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+          &lt;!-- Dependency Versions --&gt;
+          &lt;accumulo.version&gt;1.4.3&lt;/accumulo.version&gt;
+          &lt;gora.version&gt;0.3&lt;/gora.version&gt;
+          &lt;slf4j.version&gt;1.7.5&lt;/slf4j.version&gt;
+          &lt;!-- Maven Plugin Dependencies --&gt;
+          &lt;maven-compiler-plugin.version&gt;2.3.2&lt;/maven-compiler-plugin.version&gt;
+          &lt;maven-jar-plugin.version&gt;2.4&lt;/maven-jar-plugin.version&gt;
+          &lt;maven-dependency-plugin.version&gt;2.4&lt;/maven-dependency-plugin.version&gt;
+          &lt;maven-clean-plugin.version&gt;2.4.1&lt;/maven-clean-plugin.version&gt;
+      &lt;/properties&gt;
+
+      &lt;dependencies&gt;
+          &lt;dependency&gt;
+              &lt;groupId&gt;org.apache.accumulo&lt;/groupId&gt;
+              &lt;artifactId&gt;accumulo-core&lt;/artifactId&gt;
+              &lt;version&gt;${accumulo.version}&lt;/version&gt;
+              &lt;type&gt;jar&lt;/type&gt;
+          &lt;/dependency&gt;
+          &lt;dependency&gt;
+              &lt;groupId&gt;org.apache.accumulo&lt;/groupId&gt;
+              &lt;artifactId&gt;accumulo-server&lt;/artifactId&gt;
+              &lt;version&gt;${accumulo.version}&lt;/version&gt;
+              &lt;type&gt;jar&lt;/type&gt;
+          &lt;/dependency&gt;
+          &lt;dependency&gt;
+              &lt;groupId&gt;org.apache.gora&lt;/groupId&gt;
+              &lt;artifactId&gt;gora-core&lt;/artifactId&gt;
+              &lt;version&gt;${gora.version}&lt;/version&gt;
+          &lt;/dependency&gt;
+          &lt;dependency&gt;
+              &lt;groupId&gt;org.apache.gora&lt;/groupId&gt;
+              &lt;artifactId&gt;gora-accumulo&lt;/artifactId&gt;
+              &lt;version&gt;${gora.version}&lt;/version&gt;
+          &lt;/dependency&gt;
+          &lt;dependency&gt;
+              &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+              &lt;artifactId&gt;slf4j-api&lt;/artifactId&gt;
+              &lt;version&gt;${slf4j.version}&lt;/version&gt;
+          &lt;/dependency&gt;
+          &lt;dependency&gt;
+              &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+              &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
+              &lt;version&gt;${slf4j.version}&lt;/version&gt;
+          &lt;/dependency&gt;
+          &lt;!--
+          TEST
+          --&gt;
+          &lt;dependency&gt;
+              &lt;groupId&gt;junit&lt;/groupId&gt;
+              &lt;artifactId&gt;junit&lt;/artifactId&gt;
+              &lt;version&gt;4.8.2&lt;/version&gt;
+              &lt;scope&gt;test&lt;/scope&gt;
+          &lt;/dependency&gt;
+      &lt;/dependencies&gt;
+
+  &lt;/project&gt;
+</pre><br />
+Now create a `src/main/resources/gora.properties` file configuring Gora by <br />
+specifying how to find Accumulo.<br />
+<br />
+<pre>    gora.datastore.default=org.apache.gora.accumulo.store.AccumuloStore
+    gora.datastore.accumulo.mock=true
+    gora.datastore.accumulo.instance=instance
+    gora.datastore.accumulo.zookeepers=localhost
+    gora.datastore.accumulo.user=root
+    gora.datastore.accumulo.password=
+</pre><br />
+There are some important items to note. Firstly, we'll be using the MockInstance of<br />
+Accumulo so that you don't actually need to have it installed. Secondly, the password<br />
+needs to be blank if you are depending on Accumulo 1.4.3, change the password to <br />
+'''secret''' if using an earlier version.<br />
+<br />
+That's all it takes to configure Gora. Now let's create a json file to define a very <br />
+simple object - a Person with just a first name. Create a json file with the <br />
+following:<br />
+<br />
+<pre>    {
+        "type": "record",
+        "name": "Person",
+        "namespace": "com.affy.generated",
+        "fields": [
+            {"name": "first", "type": "string"}
+        ]
+    }
+</pre><br />
+This is the simplest object I could think of. Not very useful for real applications, but <br />
+great for a simple proof-of-concept project.<br />
+<br />
+The json file needs to be compiled into a Java file with the Gora compiler. Hopefully, you<br />
+have installed Gora and put its ```bin``` directory onto your path. Run the following to<br />
+generate the Java code:<br />
+<br />
+<pre>    gora goracompiler src/main/avro/person.json src/main/java
+</pre>    <br />
+One last bit of setup is needed. Create a ```src/main/resources/gora-accumulo-mapping.xml``` <br />
+file with the following:<br />
+<br />
+<pre>    &lt;gora-orm&gt;
+        &lt;class table="people" keyClass="java.lang.String" name="com.affy.generated.Person"&gt;
+            &lt;field name="first" family="f" qualifier="q" /&gt;
+        &lt;/class&gt;
+    &lt;/gora-orm&gt;
+</pre><br />
+Finally we get to the fun part. Actually writing a Java program to create, save, and <br />
+read a Person object. The code is straightforward so I won't explain it, just show it. Create <br />
+a src/main/java/com/affy/Create_Save_Read_Person_Driver.java file like this:<br />
+<br />
+<pre>    package com.affy;
+
+    import com.affy.generated.Person;
+    import org.apache.avro.util.Utf8;
+    import org.apache.gora.store.DataStore;
+    import org.apache.gora.store.DataStoreFactory;
+    import org.apache.gora.util.GoraException;
+    import org.apache.hadoop.conf.Configuration;
+
+    public class Create_Save_Read_Person_Driver {
+
+        private void process() throws GoraException {
+            Person person = new Person();
+            person.setFirst(new Utf8("David"));
+            System.out.println("Person written: " + person);
+
+            DataStore&lt;String, Person&gt; datastore = DataStoreFactory.getDataStore(String.class, Person.class, new Configuration());
+            if (!datastore.schemaExists()) {
+                datastore.createSchema();
+            }
+            datastore.put("001", person);
+
+            Person p = datastore.get("001");
+            System.out.println("Person read: " + p);
+        }
+
+        public static void main(String[] args) throws GoraException {
+            Create_Save_Read_Person_Driver driver = new Create_Save_Read_Person_Driver();
+            driver.process();
+        }
+    }
+</pre><br />
+This program has this output:<br />
+<br />
+<pre>    Person written: com.affy.generated.Person@20c {
+      "first":"David"
+    }
+    Person read: com.affy.generated.Person@20c {
+      "first":"David"
+    }
+</pre>    <br />
+Hopefully, I'll be able to post more complex examples in the future.

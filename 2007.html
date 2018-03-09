@@ -1,0 +1,14 @@
+---
+layout: default
+title: 2007
+permalink: /2007/
+category: yearly
+---
+
+<h1>2007</h1>
+
+<table style="margin-top: 25px" cellpadding="3" cellspacing="3">
+  {% for post in site.posts %}
+    {% if post.year == 2007 %}<tr><td width="75px">{{ post.date | date:"%b %d" }}</td><td><a class="page-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></td></tr>{% endif %}
+  {% endfor %}
+</table>

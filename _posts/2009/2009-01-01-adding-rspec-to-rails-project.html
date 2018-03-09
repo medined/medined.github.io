@@ -1,0 +1,33 @@
+---
+layout: post
+title: Adding RSPEC to a Rails Project
+date: '2009-01-01T00:11:00.005-05:00'
+author: David Medinets
+categories: ruby
+modified_time: '2009-01-01T01:41:49.994-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-4232972107606512869
+blogger_orig_url: http://affy.blogspot.com/2009/01/adding-rspec-to-rails-project.html
+year: 2009
+---
+
+Adding RSPEC to a Rails Project
+
+
+<pre>
+$ <span style="font-weight:bold;">rails toshi</span>
+$ <span style="font-weight:bold;">script/generate rspec</span>
+Couldn't find 'rspec' generator
+$ <span style="font-weight:bold;">cd toshi/vendor/plugins</span>
+$ <span style="font-weight:bold;">git clone git://github.com/dchelimsky/rspec.git</span>
+$ <span style="font-weight:bold;">git clone git://github.com/dchelimsky/rspec-rails.git</span>
+$ <span style="font-weight:bold;">cd ../../</span>
+$ <span style="font-weight:bold;">script/generate rspec</span>
+      create  lib/tasks/rspec.rake
+      create  script/autospec
+      create  script/spec
+      create  script/spec_server
+      create  spec
+      create  spec/rcov.opts
+      create  spec/spec.opts
+      create  spec/spec_helper.rb
+</pre>

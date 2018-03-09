@@ -1,0 +1,41 @@
+---
+layout: post
+title: Installing Ruby and RubyGems On Ubuntu 8.10
+date: '2009-04-02T21:39:00.001-04:00'
+author: David Medinets
+categories: ruby
+modified_time: '2009-04-02T21:42:49.049-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-8064417321163857874
+blogger_orig_url: http://affy.blogspot.com/2009/04/installing-ruby-and-rubygems-on-ubuntu.html
+year: 2009
+---
+
+Installing Ruby and RubyGems On Ubuntu 8.10
+
+
+<pre>
+     # ruby
+    cd ~/rn
+    wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.1-p0.tar.gz
+    tar -xzvf ruby-1.9.1-p0.tar.gz
+    cd ~/rn/ruby-1.9.1-p0
+    ./configure
+    make
+    make test
+    sudo make install
+    # zlib
+    cd ~/rn/ruby-1.9.1-p0/ext/zlib
+    sudo apt-get install zlib1g-dev
+    ruby extconf.rb --with-zlib-include=/usr/include --with-zlib-lib=/usr/lib
+    make
+    sudo make install
+    # gem
+    cd ~/rn
+    wget http://rubyforge.org/frs/download.php/45905/rubygems-1.3.1.tgz
+    tar -xzvf rubygems-1.3.1.tgz
+    cd rubygems-1.3.1
+    sudo ruby setup.rb
+    # fix ruby executable
+    cd ~/rn/ruby-1.9.1-p0
+    sudo make install
+</pre>

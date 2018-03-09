@@ -1,0 +1,34 @@
+---
+layout: post
+title: Rails Tip - How Do I See Params From My Forms?
+date: '2010-02-09T09:07:00.002-05:00'
+author: David Medinets
+categories: ruby
+modified_time: '2010-02-09T09:13:06.162-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-3533489449485734501
+blogger_orig_url: http://affy.blogspot.com/2010/02/rails-tip-how-do-i-see-params-from-my.html
+year: 2010
+---
+
+I like to document what my forms are sending to my action methods. So most of the time, I create a method in my controller like this:
+
+
+<pre>def to_export
+  render :text => params.inspect
+end</pre>
+
+Then I use copy and paste to put the result into my code as a comment.
+
+<pre># {
+#   "commit"=>"Upload File",
+#   "authenticity_token"=>"17FvBH+Z4Meni6WvsCdPByrrk751BV9mNklzKDAo2Vc=",
+#   "action"=>"do_import",
+#   "import_criteria"=>{
+#     "primary_language_name"=>"Creole",
+#     "secondary_language_name"=>"English"
+#   },
+#   "form"=>{
+#     "file"=>"traveling_haiti.txt"
+#   },
+#   "controller"=>"import"
+# }</pre>

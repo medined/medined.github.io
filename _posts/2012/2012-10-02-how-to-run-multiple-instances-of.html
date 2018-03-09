@@ -1,0 +1,66 @@
+---
+layout: post
+title: How To Run Multiple Instances of Accumulo on One Hadoop Cluster
+date: '2012-10-02T18:23:00.000-04:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2012-10-16T23:31:19.789-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-6947562992297250081
+blogger_orig_url: http://affy.blogspot.com/2012/10/how-to-run-multiple-instances-of.html
+year: 2012
+---
+
+On the Accumulo User mailing list, Kristopher K. asked:<br />
+<blockquote>I built 1.5 from source last night and wanted to try it out on my existing Hadoop cluster without overwriting my current 1.4 set.  Is there a way to specify the /accumulo directory in HDFS such that you can run multiple instances?<br />
+</blockquote><br />
+
+
+Eric N. replied:<br />
+<blockquote>From the monitoring user interface, see the Documentation link, then Configuration, see the first property:<br />
+<br />
+instance.dfs.dir<br />
+<br />
+You'll also change all the port numbers from the defaults.  And there's a port number in conf/generic_logger.xml that points to the logging port on the monitor.<br />
+<br />
+For example, here are some entries from my conf/accumulo-site.xml file:<br />
+<br />
+&lt;property&gt;<br />
+&lt;name&gt;master.port.client&lt;/name&gt;<br />
+&lt;value&gt;10010&lt;/value&gt;<br />
+&lt;/property&gt;<br />
+<br />
+&lt;property&gt;<br />
+&lt;name&gt;tserver.port.client&lt;/name&gt;<br />
+&lt;value&gt;10011&lt;/value&gt;<br />
+&lt;/property&gt;<br />
+<br />
+&lt;property&gt;<br />
+&lt;name&gt;gc.port.client&lt;/name&gt;<br />
+&lt;value&gt;10101&lt;/value&gt;<br />
+&lt;/property&gt;<br />
+<br />
+&lt;property&gt;<br />
+&lt;name&gt;trace.port.client&lt;/name&gt;<br />
+&lt;value&gt;10111&lt;/value&gt;<br />
+&lt;/property&gt;<br />
+<br />
+&lt;property&gt;<br />
+&lt;name&gt;monitor.port.client&lt;/name&gt;<br />
+&lt;value&gt;11111&lt;/value&gt;<br />
+&lt;/property&gt;<br />
+<br />
+&lt;property&gt;<br />
+&lt;name&gt;monitor.port.log4j&lt;/name&gt;<br />
+&lt;value&gt;1560&lt;/value&gt;<br />
+&lt;/property&gt;<br />
+<br />
+And conf generic_logger.xml:<br />
+<br />
+&lt;!-- Send all logging data to a centralized logger --&gt;<br />
+&lt;appender name=&quot;N1&quot; class=&quot;org.apache.log4j.net.SocketAppender&quot;&gt;<br />
+&lt;param name=&quot;remoteHost&quot;     value=&quot;${org.apache.accumulo.core.host.log}&quot;/&gt;<br />
+&lt;param name=&quot;port&quot;           value=&quot;1560&quot;/&gt;<br />
+&lt;param name=&quot;application&quot;    value=&quot;${org.apache.accumulo.core.application}:${org.apache.accumulo.core.ip.localhost.hostname}&quot;/&gt;<br />
+&lt;param name=&quot;Threshold&quot;      value=&quot;WARN&quot;/&gt;<br />
+&lt;/appender&gt;<br />
+</blockquote>

@@ -1,0 +1,28 @@
+---
+layout: post
+title: Ubuntu Sound not working on HP Pavillion dv9000 Using the ICH8 Family
+date: '2008-02-03T02:25:00.000-05:00'
+author: David Medinets
+categories: ubuntu
+modified_time: '2008-02-03T02:29:42.165-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-5929289792441891870
+blogger_orig_url: http://affy.blogspot.com/2008/02/ubuntu-sound-not-working-on-hp.html
+year: 2008
+---
+
+I spent quite a bit of time researching my problem and found the solution at http://www.mail-archive.com/ubuntu-bugs@lists.ubuntu.com/msg549082.html
+
+
+Let me copy the relevant bits:<pre>
+cd /tmp
+wget ftp://ftp.alsa-project.org/pub/driver/alsa-driver-1.0.16rc2.tar.bz2
+tar -jxvf alsa-driver-1.0.16rc2.tar.bz2
+cd alsa-driver-1.0.16rc2/
+./configure --with-cards=hda-intel && make
+sudo make install
+sudo cp ./modules/snd-hda-intel.ko /lib/modules/$( uname -r )/ubuntu/media/snd-hda-intel/
+sudo depmod -a
+sudo reboot
+</pre>
+
+<b>Make sure that you check the ftp://ftp.alsa-project.org/pub/driver directory to see if a new version has been released.</b>

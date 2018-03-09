@@ -1,0 +1,32 @@
+---
+layout: post
+title: Super Simple Embedded Groovy
+date: '2007-12-03T12:26:00.000-05:00'
+author: David Medinets
+categories: java
+modified_time: '2007-12-03T12:30:04.187-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-3545397233417337622
+blogger_orig_url: http://affy.blogspot.com/2007/12/super-simple-embedded-groovy.html
+year: 2007
+---
+
+Here is the simplest possible Java program that runs a Groovy Script (as far as I know).
+
+
+<pre>
+package affy.groovy.driver;
+
+import groovy.lang.GroovyShell;
+
+public class GroovyDriver {
+ public static void main(String[] args) {
+  new GroovyShell().evaluate("println('Hello World');");
+ }
+}
+</pre>
+You'll need three jar files to make this program compile and execute:
+<pre>
+  groovy-1.0.jar
+  asm-2.2.jar
+  antlr-2.7.5.jar
+</pre>

@@ -1,0 +1,103 @@
+---
+layout: post
+title: How Can I Use Reverse Sort On Generic Accumulo Keys?
+date: '2012-11-12T16:02:00.002-05:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2012-11-12T16:50:34.531-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-536813126529061410
+blogger_orig_url: http://affy.blogspot.com/2012/11/how-can-i-use-reverse-sort-on-generic.html
+year: 2012
+---
+
+his note shows how to reverse the sorting of Accumulo (actually, the row values). As you might know, the standard sort order is lexical. This first example shows a standard usage of a mock Accumulo instance.
+
+
+ Notice that records inserted in reverse order (5, 4, 3, 2, 1) but are printed in lexical order.</p><pre>public static void main(String[] args) throws Exception {
+  // connect to a mock Accumulo instance.
+  Instance mock = new MockInstance("development");
+  Connector connector = mock.getConnector("root", "password".getBytes());
+  connector.tableOperations().create("TABLEA");
+  BatchWriter wr = connector.createBatchWriter("TABLEA", 10000000, 10000, 5);
+
+  // insert five records in reverse order.
+  for (int i = 5; i &gt; 0; --i) {
+    byte[] key = ("row_" + String.format("%04d", i)).getBytes();
+    Mutation m = new Mutation(new Text(key));
+    m.put("cf_" + String.format("%04d", i), "cq_" + 1, "val_" + 1);
+    wr.addMutation(m);
+  }
+  wr.close();
+
+  // display records; notice they are lexically sorted.
+  Scanner scanner = connector.createScanner("TABLEA", new Authorizations());
+  Iterator&ltMap.Entry&lyKey, Value&gt&gt iterator = scanner.iterator();
+  while (iterator.hasNext()) {
+    Map.Entry<Key, Value> entry = iterator.next();
+    Key key = entry.getKey();
+    System.out.println("ROW ID: " + key.getRow());
+  }
+ }
+</pre><p>The above code displays:</p><pre>ROW ID: row_0001
+ROW ID: row_0002
+ROW ID: row_0003
+ROW ID: row_0004
+ROW ID: row_0005
+</pre><p>Reverse sorting is accomplished by subtracting each byte in the row id from 255 as shown in the example below.<br />
+<pre><b>static byte[] convert(byte[] row) {
+  byte[] rv = new byte[row.length * 2];
+  for (int i = 0; i < row.length; i++) {
+    rv[i] = (byte) (255 - row[i]);
+  }
+  for (int i = 0; i < row.length; i++) {
+    rv[i + row.length] = row[i];
+  }
+  return rv;
+ }</b>
+
+ public static void main(String[] args) throws Exception {
+  // connect to a mock Accumulo instance.
+  Instance mock = new MockInstance("development");
+  Connector connector = mock.getConnector("root", "password".getBytes());
+  connector.tableOperations().create("TABLEA");
+  BatchWriter wr = connector.createBatchWriter("TABLEA", 10000000, 10000, 5);
+
+  // insert five records in reverse order.
+  for (int i = 5; i &gt; 0; --i) {
+    byte[] key = ("row_" + String.format("%04d", i)).getBytes();
+    <b>byte[] reverse_key = convert(key);</b>
+    Mutation m = new Mutation(new Text(<b>reverse_key</b>));
+    m.put("cf_" + String.format("%04d", i), "cq_" + 1, "val_" + 1);
+    wr.addMutation(m);
+  }
+  wr.close();
+
+  // display records; notice they are lexically sorted.
+  Scanner scanner = connector.createScanner("TABLEA", new Authorizations());
+  Iterator&ltMap.Entry&lyKey, Value&gt&gt iterator = scanner.iterator();
+  while (iterator.hasNext()) {
+    Map.Entry<Key, Value> entry = iterator.next();
+    Key key = entry.getKey();
+    System.out.println("ROW ID: " + key.getRow());
+  }
+ }
+</pre><p>The above code displays:</p><pre>ROW ID: ��������row_0005
+ROW ID: ��������row_0004
+ROW ID: ��������row_0003
+ROW ID: ��������row_0002
+ROW ID: ��������row_0001
+</pre><p>It's important to note that for teaching purposes, the key is stored once in reverse format and again normally. Thus when displayed you can verify that the key is stored in reverse order. Normally the convert method is used like this:</p><pre>static byte[] convert(byte[] row) {
+  byte[] rv = new byte[row.length];
+  for (int i = 0; i < row.length; i++) {
+    rv[i] = (byte) (255 - row[i]);
+  }
+  return rv;
+ }
+</pre>
+<p>For some use cases, you can convert the row bytes in place:</p><pre>static byte[] convert(byte[] row) {
+  for (int i = 0; i < row.length; i++) {
+    row[i] = (byte) (255 - row[i]);
+  }
+  return row;
+ }
+</pre>

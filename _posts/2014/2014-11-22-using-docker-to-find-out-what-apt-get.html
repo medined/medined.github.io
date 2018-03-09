@@ -1,0 +1,101 @@
+---
+layout: post
+title: Using Docker to find out what apt-get update does!
+date: '2014-11-22T23:26:00.001-05:00'
+author: David Medinets
+categories: docker
+modified_time: '2014-11-22T23:30:31.850-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-7126437064384279929
+blogger_orig_url: http://affy.blogspot.com/2014/11/using-docker-to-find-out-what-apt-get.html
+year: 2014
+---
+
+While I dabble in System Administration, I don't have a deep knowledge how packages are created or maintained. Today, we'll see how to use Docker to increase my understanding of "apt-get update". I was curious about this command because I read that it's good practice to remove the files created during the update process. <br />
+
+
+<br />
+I started a small container using<br />
+<br />
+<pre>docker run -i -t debian:wheezy /bin/bash
+</pre><br />
+In another window, I found the ID of the running container using "docker ps". Let's pretend that ID starts with "45...". Look for any changed files using<br />
+<br />
+<pre>docker diff "45"
+</pre><br />
+You'll see nothing displayed. Now run "apt-get update" in the wheezy container. Then run the diff command again. You should see the following differences:<br />
+<br />
+<pre>C /var
+C /var/lib
+C /var/lib/apt
+C /var/lib/apt/lists
+A /var/lib/apt/lists/http.debian.net_debian_dists_wheezy-updates_Release
+A /var/lib/apt/lists/http.debian.net_debian_dists_wheezy-updates_Release.gpg
+A /var/lib/apt/lists/http.debian.net_debian_dists_wheezy-updates_main_binary-amd64_Packages.gz
+A /var/lib/apt/lists/http.debian.net_debian_dists_wheezy_Release
+A /var/lib/apt/lists/http.debian.net_debian_dists_wheezy_Release.gpg
+A /var/lib/apt/lists/http.debian.net_debian_dists_wheezy_main_binary-amd64_Packages.gz
+A /var/lib/apt/lists/lock
+C /var/lib/apt/lists/partial
+A /var/lib/apt/lists/security.debian.org_dists_wheezy_updates_Release
+A /var/lib/apt/lists/security.debian.org_dists_wheezy_updates_Release.gpg
+A /var/lib/apt/lists/security.debian.org_dists_wheezy_updates_main_binary-amd64_Packages.gz
+</pre><br />
+Inside the wheezy container we now know where to look to find file sizes:<br />
+<br />
+<pre># ls -lh /var/lib/apt/lists
+total 8.0M
+-rw-r--r-- 1 root root 121K Nov 23 02:49 http.debian.net_debian_dists_wheezy-updates_Release
+-rw-r--r-- 1 root root  836 Nov 23 02:49 http.debian.net_debian_dists_wheezy-updates_Release.gpg
+-rw-r--r-- 1 root root    0 Nov 23 02:37 http.debian.net_debian_dists_wheezy-updates_main_binary-amd64_Packages
+-rw-r--r-- 1 root root 165K Oct 18 10:33 http.debian.net_debian_dists_wheezy_Release
+-rw-r--r-- 1 root root 1.7K Oct 18 10:44 http.debian.net_debian_dists_wheezy_Release.gpg
+-rw-r--r-- 1 root root 7.3M Oct 18 10:07 http.debian.net_debian_dists_wheezy_main_binary-amd64_Packages.gz
+-rw-r----- 1 root root    0 Nov 23 04:09 lock
+drwxr-xr-x 2 root root 4.0K Nov 23 04:09 partial
+-rw-r--r-- 1 root root 100K Nov 20 16:31 security.debian.org_dists_wheezy_updates_Release
+-rw-r--r-- 1 root root  836 Nov 20 16:31 security.debian.org_dists_wheezy_updates_Release.gpg
+-rw-r--r-- 1 root root 270K Nov 20 16:31 security.debian.org_dists_wheezy_updates_main_binary-amd64_Packages.gz
+</pre><br />
+Obviously, those .gz files might be interesting. It's easy enough to uncompress them:<br />
+<br />
+<pre>gzip -d http.debian.net_debian_dists_wheezy_main_binary-amd64_Packages.gz
+</pre><br />
+And now it's possible to see what's inside:<br />
+<br />
+<pre># more http.debian.net_debian_dists_wheezy_main_binary-amd64_Packages
+Package: 0ad
+Version: 0~r11863-2
+Installed-Size: 8260
+Maintainer: Debian Games Team <pkg-games-devel lists.alioth.debian.org="">
+Architecture: amd64
+Depends: 0ad-data (&gt;= 0~r11863), 0ad-data (&lt;= 0~r11863-2), gamin | fam, libboost-signals1.49.0 (&gt;= 1.49.0-1), libc6 (&gt;= 2.11), libcurl3-gnutls (&gt;= 7.16.2), libenet1a, libgamin0 | libfam0, libgcc1 (&gt;= 1:4.1.1), libgl1-mesa-glx | libgl1, lib
+jpeg8 (&gt;= 8c), libmozjs185-1.0 (&gt;= 1.8.5-1.0.0+dfsg), libnvtt2, libopenal1, libpng12-0 (&gt;= 1.2.13-4), libsdl1.2debian (&gt;= 1.2.11), libstdc++6 (&gt;= 4.6), libvorbisfile3 (&gt;= 1.1.2), libwxbase2.8-0 (&gt;= 2.8.12.1), libwxgtk2.8-0 (&gt;= 2.8.12.1), l
+ibx11-6, libxcursor1 (&gt;&gt; 1.1.2), libxml2 (&gt;= 2.7.4), zlib1g (&gt;= 1:1.2.0)
+Pre-Depends: dpkg (&gt;= 1.15.6~)
+Description: Real-time strategy game of ancient warfare
+Homepage: http://www.wildfiregames.com/0ad/
+Description-md5: d943033bedada21853d2ae54a2578a7b
+Tag: game::strategy, implemented-in::c++, interface::x11, role::program,
+ uitoolkit::sdl, uitoolkit::wxwidgets, use::gameplaying,
+ x11::application
+Section: games
+Priority: optional
+Filename: pool/main/0/0ad/0ad_0~r11863-2_amd64.deb
+Size: 2260694
+MD5sum: cf71a0098c502ec1933dea41610a79eb
+SHA1: aa4a1fdc36498f230b9e38ae0116b23be4f6249e
+SHA256: e28066103ecc6996e7a0285646cd2eff59288077d7cc0d22ca3489d28d215c0a
+
+...
+</pkg-games-devel></pre><br />
+Given the information about the text file, we can find out how many packages are available:<br />
+<br />
+<pre># grep "Package" http.debian.net_debian_dists_wheezy_main_binary-amd64_Packages | wc -l
+36237
+</pre><br />
+Now you know why it's important to run the following in your Dockerfile after using apt-get to install software.<br />
+<br />
+<pre>rm -rf /var/lib/apt/lists/*
+</pre><br />
+Have fun exploring!<br />
+<br />

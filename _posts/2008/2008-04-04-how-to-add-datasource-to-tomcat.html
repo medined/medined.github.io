@@ -1,0 +1,61 @@
+---
+layout: post
+title: How To Add a Datasource To Tomcat Server.XML File.
+date: '2008-04-04T09:51:00.002-04:00'
+author: David Medinets
+categories: java
+modified_time: '2008-04-04T09:57:23.882-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-1741084000956849410
+blogger_orig_url: http://affy.blogspot.com/2008/04/how-to-add-datasource-to-tomcat.html
+year: 2008
+---
+
+How To Add a Datasource To Tomcat Server.XML File.
+
+
+<Server>
+  ...
+  <GlobalNamingResources>
+    ...
+    <Resource
+       auth="Container" name="jdbc/project_datasource_name" scope="sharable"
+       type="oracle.jdbc.pool.OracleDataSource"
+    />
+      <Resource
+        auth="Container" description="..." name="UserDatabase"
+        type="org.apache.catalina.UserDatabase"
+      />
+        <ResourceParams name="jdbc/project_datasource_name">
+          <parameter>
+            <name>factory</name>
+            <value>oracle.jdbc.pool.OracleDataSourceFactory</value>
+          </parameter>
+          <parameter>
+            <name>validationQuery</name>
+            <value>select 1 from dual</value>
+          </parameter>
+          <parameter>
+            <name>url</name>
+            <value>jdbc:oracle:thin:USERNAME/PASSWORD@localhost:1521:XE</value>
+          </parameter>
+          <parameter>
+            <name>maxActive</name>
+            <value>4</value>
+          </parameter>
+          <parameter>
+            <name>maxWait</name>
+            <value>5000</value>
+          </parameter>
+          <parameter>
+            <name>driverClassName</name>
+            <value>oracle.jdbc.OracleDriver</value>
+          </parameter>
+          <parameter>
+            <name>maxIdle</name>
+            <value>2</value>
+          </parameter>
+        </ResourceParams>
+      ...
+  </GlobalNamingResources>
+  ..
+</Server>

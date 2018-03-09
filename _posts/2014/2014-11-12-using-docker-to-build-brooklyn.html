@@ -1,0 +1,102 @@
+---
+layout: post
+title: Using Docker to Build Brooklyn
+date: '2014-11-12T23:13:00.001-05:00'
+author: David Medinets
+categories: docker
+modified_time: '2014-11-12T23:14:42.369-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-3984995026282226010
+blogger_orig_url: http://affy.blogspot.com/2014/11/using-docker-to-build-brooklyn.html
+year: 2014
+---
+
+Brooklyn is a large project with a lot of dependencies. I wanted to compile it, but I also wanted to remove all traces of the project when I was done experimenting. I used Docker to accomplish this goal.<br />
+
+
+<br />
+See the files below at https://github.com/medined/docker-brooklyn.<br />
+<br />
+First, I created a Dockerfile to load java, maven, and clone the repository.<br />
+<br />
+<pre>$ cat Dockerfile
+FROM ubuntu:14.04
+MAINTAINER David Medinets <david.medinets@gmail.com>
+
+#
+# Install Java
+#
+
+RUN apt-get update && \
+  apt-get install -y software-properties-common && \
+  add-apt-repository -y ppa:webupd8team/java && \
+  echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections && \
+  echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections && \
+  apt-get update && \
+  apt-get install -y oracle-java8-installer
+
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+
+#
+# Install Maven
+#
+RUN echo "deb http://ppa.launchpad.net/natecarlson/maven3/ubuntu precise main" >> /etc/apt/sources.list && \
+  echo "deb-src http://ppa.launchpad.net/natecarlson/maven3/ubuntu precise main" >> /etc/apt/sources.list && \
+  apt-get update && \
+  apt-get -y --force-yes install maven3 && \
+  rm -f /usr/bin/mvn && \
+  ln -s /usr/share/maven3/bin/mvn /usr/bin/mvn
+
+RUN mkdir -p /root/.m2
+
+ADD settings.xml /root/.m2/settings.xml
+
+#
+# Clone the brooklyn project
+#
+RUN apt-get install -y git
+RUN git clone https://github.com/apache/incubator-brooklyn.git
+
+WORKDIR /incubator-brooklyn
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+</pre><br />
+There is one twist - that settings.xml file. It's used to connect to a Docker-based Artifactory image later.<br />
+<br />
+Then I created a script to build the image.<br />
+<br />
+<pre>$ cat build_image.sh
+#!/bin/bash
+sudo DOCKER_HOST=$DOCKER_HOST docker build --no-cache --rm=true -t medined/brooklyn.build .
+</pre><br />
+Also a script to run the image.<br />
+<br />
+<pre>$ cat run_image.sh
+#!/bin/bash
+
+#####
+# Make sure that Artifactory is running.
+#
+ARTIFACTORY_COUNT=$(docker ps --filter=status=running | grep artifactory | wc -l)
+if [ "${ARTIFACTORY_COUNT}" != "1" ]
+then
+  echo "Starting Artifactory"
+  docker run --name "artifactorydata" -v /opt/artifactory/data -v /opt/artifactory/logs tianon/true
+  docker run -d -p 8081:8081 --name "artifactory" --volumes-from artifactorydata  codingtony/artifactory
+fi
+
+IMAGEID=$(docker ps -a |grep "brooklyn.build" | awk '{print $1}')
+if [ "$IMAGEID" != "" ]
+then
+  echo "Stopping $IMAGEID"
+  IMAGEID=$(sudo DOCKER_HOST=$DOCKER_HOST docker stop $IMAGEID | xargs docker rm)
+fi
+
+sudo DOCKER_HOST=$DOCKER_HOST \
+  docker run \
+    --link artifactory:artifactory \
+    -i \
+    -t medined/brooklyn.build \
+    /bin/bash
+</pre><br />
+In the run script, an Artifactory image is started if one isn't running. Artifactory lets you compile Brooklyn over and over with needing to download the dependencies more than once.<br />
+<br />

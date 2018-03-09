@@ -1,0 +1,67 @@
+---
+layout: post
+title: Automatic Directory Creation via Spring Application Context File
+date: '2007-09-18T13:23:00.000-04:00'
+author: David Medinets
+categories: java
+modified_time: '2007-09-18T13:27:22.913-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-5582953568266178694
+blogger_orig_url: http://affy.blogspot.com/2007/09/automatic-directory-creation-via-spring.html
+year: 2007
+---
+
+Spring lets you define property editors that convert from a text representation to an object representation. We can hook into this feature to automate directory creation like this:
+
+
+<pre>
+public class DirectoryEditor extends PropertyEditorSupport {
+
+ public void setAsText(String textValue) {
+  File f = new File(textValue);
+  if (!f.exists()) {
+   if (!f.mkdirs()) {
+    throw new ConfigurationException("Unable To Create Directory: [" + textValue + "]");
+   }
+  } else if (!f.isDirectory()) {
+   throw new ConfigurationException("File Is Not a Directory: [" + textValue + "]");
+  }
+  setValue(new Directory(textValue));
+ }
+
+}
+</pre>
+Then create a bean definition so that Spring knows about it:
+<pre>
+  &lt;bean id="customEditorConfigurer"
+class="org.springframework.beans.factory.config.CustomEditorConfigurer"&gt;
+    &lt;property name="customEditors"&gt;
+      &lt;map&gt;
+        &lt;entry key="com.twintechs.spring.Directory"&gt;
+          &lt;bean id="directoryEditor" class="com.twintechs.spring.DirectoryEditor" /&gt;
+        &lt;/entry&gt;
+      &lt;/map&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</pre>
+Then create a Directory class:
+<pre>
+public class Directory {
+
+ private String name;
+
+ public Directory(String _name) {
+  super();
+  this.name = _name;
+ }
+
+ public String getName() {
+  return name;
+ }
+
+ public void setName(String name) {
+  this.name = name;
+ }
+
+}
+</pre>
+The last step is to use the Directory class in place of the String class in any Java objects.

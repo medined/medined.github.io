@@ -1,0 +1,21 @@
+---
+layout: post
+title: Getting "Client.InvalidKeyPair.NotFound" Error With Selenium Grid
+date: '2008-07-13T22:10:00.002-04:00'
+author: David Medinets
+categories: selenium
+modified_time: '2008-07-13T22:41:41.630-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-6839647206921907128
+blogger_orig_url: http://affy.blogspot.com/2008/07/getting-clientinvalidkeypairnotfound.html
+year: 2008
+---
+
+<p>When running the <code>cap grid:boot</code> command, I received the following error:</p>
+<pre>Client.InvalidKeyPair.NotFound: The key pair '/home/medined/.ec2/affy.pem' does not exist</pre>
+
+
+It turned out that the EC2_KEYPAIR_NAME system variable was set incorrectly. You can find the correct value using the <code>ec2-describe-keypairs</code> command. Here is an example of its use:</p>
+<pre>$ <b>ec2-describe-keypairs</b>
+KEYPAIR affy c3:e7:5f:09:50:66:f5:2b:3d:2b:ac:1d:09:52:9d:34:29:85:1b:76
+</pre>
+<p>So the correct value for me is <code>affy</code>, <i>not</i> the filename.</p>

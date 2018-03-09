@@ -1,0 +1,30 @@
+---
+layout: post
+title: Using Rails Gem to Generate a New Project on Ubuntu
+date: '2009-03-14T23:29:00.004-04:00'
+author: David Medinets
+categories: ruby
+modified_time: '2009-03-15T00:07:11.032-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-149252264518921141
+blogger_orig_url: http://affy.blogspot.com/2009/03/using-rails-gem-to-generate-new-project.html
+year: 2009
+---
+
+<p>Using the rails installed by apt-get was a bit confusing because the rails project being generated was not the rails version that I expected. I had installed the rails gem v2.2.2 but the config/environment.rb file showed rails v2.1.</p>
+
+
+<p>I fixed this issue by removing the default rails.</p>
+
+<pre>sudo apt-get remove rails</pre>
+
+<p>And then using an alias:</p>
+
+<pre>export GEMDIR=`gem environment gemdir`
+export RAILS_VERSION=`gem list rails | grep "rails " | cut -b8- | awk '{sub(/\)/, "");print}'`
+alias rails='ruby $GEMDIR/gems/rails-$RAILS_VERSION/bin/rails'</pre>
+
+<p>Now when I do</p>
+
+<pre>rails dool</pre>
+
+<p>The project uses the right version of rails!</p>

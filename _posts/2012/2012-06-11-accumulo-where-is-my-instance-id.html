@@ -1,0 +1,26 @@
+---
+layout: post
+title: 'Accumulo: Where is my instance id?'
+date: '2012-06-11T21:51:00.000-04:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2012-08-28T23:32:59.354-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-7864439296232684263
+blogger_orig_url: http://affy.blogspot.com/2012/06/accumulo-where-is-my-instance-id.html
+year: 2012
+---
+
+When running a Java program to interact with Accumulo, I ran into the following exception:<br />
+<br />
+<pre>Exception in thread "main" java.lang.RuntimeException: Accumulo not initialized, there is no instance id at /accumulo/instance_id
+    at org.apache.accumulo.core.client.ZooKeeperInstance.getInstanceIDFromHdfs(ZooKeeperInstance.java:263)
+    at org.apache.accumulo.server.client.HdfsZooInstance._getInstanceID(HdfsZooInstance.java:123)
+    at org.apache.accumulo.server.client.HdfsZooInstance.getInstanceID(HdfsZooInstance.java:116)
+</pre><br />
+/accumulo/instance_id should be an HDFS directory with just one file whose name is that of the Accumulo instance. For example:<br />
+<br />
+<pre>$ <b>hadoop fs -ls /accumulo/instance_id</b>
+Found 1 items
+-rw-r--r--   1 medined supergroup          0 2012-06-11 17:58 /accumulo/instance_id/b519799c-3a51-4c9b-af21-96d577e2c11f
+</pre><br />
+This issue was resolved when I added the Hadoop configuration directory to my classpath. Making this change enabled the Java program to look at HDFS instead of the local filesystem.

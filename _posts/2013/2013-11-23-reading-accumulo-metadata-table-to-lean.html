@@ -1,0 +1,91 @@
+---
+layout: post
+title: Reading Accumulo Metadata Table to Learn How Many Entries Are In Each Tablet.
+date: '2013-11-23T00:15:00.001-05:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2013-11-24T22:52:20.725-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-4599393110099659080
+blogger_orig_url: http://affy.blogspot.com/2013/11/reading-accumulo-metadata-table-to-lean.html
+year: 2013
+---
+
+After compacting the table, you can run the following program to learn how many entries are in each table. Accumulo does a nice job of splitting tables by byte size but if you have small records then it's fairly easy to run the "Curse of the Last Reducer!" I've run into situations where some tablets have 50K and other with 50M.
+
+
+
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">package com.affy;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import java.io.IOException;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import java.io.InputStream;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import java.util.Map.Entry;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import java.util.Properties;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.Constants;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.AccumuloException;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.AccumuloSecurityException;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.Connector;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.Instance;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.IsolatedScanner;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.IteratorSetting;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.Scanner;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.TableNotFoundException;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.ZooKeeperInstance;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.impl.Tables;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.client.security.tokens.PasswordToken;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.data.Key;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.data.KeyExtent;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.data.Range;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.data.Value;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.iterators.user.RegExFilter;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.accumulo.core.util.ByteBufferUtil;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">import org.apache.hadoop.io.Text;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">public class GetEntryCountForTable {</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; public static void main(String[] args) throws IOException, AccumuloException, AccumuloSecurityException, TableNotFoundException {</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; String accumuloTable = "tableA";</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; Properties prop = new Properties();</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; ClassLoader loader = Thread.currentThread().getContextClassLoader();</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; InputStream in = loader.getResourceAsStream("accumulo.properties");</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; prop.load(in);</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; String user = prop.getProperty("accumulo.user");</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; String password = prop.getProperty("accumulo.password");</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; String instanceInfo = prop.getProperty("accumulo.instance");</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; String zookeepers = prop.getProperty("accumulo.zookeepers");</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; Instance instance = new ZooKeeperInstance(instanceInfo, zookeepers);</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; Connector connector = instance.getConnector(user, new PasswordToken(password));</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; String tableId = Tables.getNameToIdMap(instance).get(accumuloTable);</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; Scanner scanner = new IsolatedScanner(connector.createScanner(Constants.METADATA_TABLE_NAME, Constants.NO_AUTHS));</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; scanner.fetchColumnFamily(Constants.METADATA_DATAFILE_COLUMN_FAMILY);</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; scanner.setRange(new KeyExtent(new Text(tableId), null, null).toMetadataRange());</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; int fileSize = 0;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; int numEntries = 0;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; int numSplits = 1;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; for (Entry<key value=""> entry : scanner) {</key></span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; String value = entry.getValue().toString();</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; String[] components = value.split(",");</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; fileSize += Integer.parseInt(components[0]);</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; numEntries += Integer.parseInt(components[1]);</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; numSplits++;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; }</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; int average = numEntries / numSplits;</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; System.out.println(String.format("fileSize: %,d", fileSize));</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; System.out.println(String.format("numEntries: %,d", numEntries));</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; &nbsp; &nbsp; System.out.println(String.format("average: %,d", average));</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;"><br /></span>
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">&nbsp; &nbsp; }</span><br />
+<span style="font-family: Courier New, Courier, monospace; font-size: x-small;">}</span><br />
+<div>
+<br /></div>
+<div>
+<br /></div>

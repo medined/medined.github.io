@@ -1,0 +1,32 @@
+---
+layout: post
+title: Avoiding the  undefined method `use_transactional_fixtures=' error.
+date: '2009-01-01T01:34:00.004-05:00'
+author: David Medinets
+categories: ruby
+modified_time: '2009-01-01T01:42:12.541-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-1635984080764106652
+blogger_orig_url: http://affy.blogspot.com/2009/01/avoiding-undefined-method.html
+year: 2009
+---
+
+Avoiding the  undefined method `use_transactional_fixtures=' error.
+
+
+After adding <span style="font-weight:bold;">rspec</span> to my project and generating a model with <span style="font-weight:bold;">rspec_model</span>, I tried to run the generated spec test:
+<pre>
+$ <span style="font-weight:bold;">spec -cfprofile spec/</span>
+.../toshi/spec/spec_helper.rb:12: undefined method `use_transactional_fixtures=' for #<Spec::Example::Configuration:0xb7914b98> (NoMethodError)
+ from /usr/lib/ruby/gems/1.8/gems/rspec-1.1.11/lib/spec/runner.rb:184:in `configure'
+ from /home/medined/Workspaces/toshi/spec/spec_helper.rb:8
+ from /usr/local/lib/site_ruby/1.8/rubygems/custom_require.rb:31:in `gem_original_require'
+ from /usr/local/lib/site_ruby/1.8/rubygems/custom_require.rb:31:in `require'
+ from /home/medined/Workspaces/toshi/spec/models/book_spec.rb:1
+</pre>
+After a fruitless internet search, I tried using a rake task:
+<pre>
+$ <span style="font-weight:bold;">rake spec</span>
+.
+Finished in 0.061996 seconds
+1 example, 0 failures
+</pre>

@@ -1,0 +1,19 @@
+---
+layout: post
+title: Using SCP with Capistrano
+date: '2008-07-10T14:07:00.002-04:00'
+author: David Medinets
+categories: ruby
+modified_time: '2008-07-10T14:14:50.161-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-2136970408948226618
+blogger_orig_url: http://affy.blogspot.com/2008/07/using-scp-with-capistrano.html
+year: 2008
+---
+
+t took me several hours to find out how to send a file to my remote computer via <code>scp</code> using <a href="http://en.wikipedia.org/wiki/Capistrano" title="Capistrano" rel="wikipedia" class="zem_slink">Capistrano</a>. It's actually quite easy.
+
+
+There is a method called <code>upload</code> which has a <code>via</code> option. Here is an example of its use:</p>
+<pre>upload("products.txt", "/home/medined", :via =&gt; :scp)</pre>
+<p>If you need to change the files name, you can also specify it in the second parameter. For example,</p>
+<pre>upload("products.txt", "/home/medined/products_new.txt", :via =&gt; :scp)</pre><div style="margin-top: 10px; height: 15px;" class="zemanta-pixie"><a class="zemanta-pixie-a" href="http://reblog.zemanta.com/zemified/d8ef19e1-0df3-40ea-8318-ce9458d45365/" title="Zemified by Zemanta"><img style="border: medium none ; float: right;" class="zemanta-pixie-img" src="http://img.zemanta.com/reblog_e.png?x-id=d8ef19e1-0df3-40ea-8318-ce9458d45365" alt="Zemanta Pixie"></a></div>

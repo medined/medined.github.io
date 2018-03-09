@@ -1,0 +1,99 @@
+---
+layout: post
+title: Running a Single-Node Accumulo Docker container
+date: '2014-07-12T09:35:00.000-04:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2014-07-12T09:35:07.972-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-8553817627625133807
+blogger_orig_url: http://affy.blogspot.com/2014/07/running-single-node-accumulo-docker.html
+year: 2014
+---
+
+Running a Single-Node Accumulo Docker container
+
+
+<br />
+<p>Based on the work by sroegner, I have a github project at https://github.com/medined/docker-accumulo which lets you run multiple single-node Accumulo instances using Docker.<br />
+</p><br />
+<p>First, create the image.<p><br />
+<pre>git clone https://github.com/medined/docker-accumulo.git
+cd docker-accumulo/single_node
+./make_image.sh
+</pre><br />
+<p>Now start your first container.</p><br />
+<pre>export HOSTNAME=bellatrix
+export IMAGENAME=bellatrix
+export BRIDGENAME=brbellatrix
+export SUBNET=10.0.10
+export NODEID=1
+export HADOOPHOST=10.0.10.1
+./make_container.sh $HOSTNAME $IMAGENAME $BRIDGENAME $SUBNET $NODEID $HADOOPHOST yes
+</pre><br />
+And then you can start a second one:<br />
+<br />
+<pre>export HOSTNAME=rigel
+export IMAGENAME=rigel
+export BRIDGENAME=brrigel
+export SUBNET=10.0.11
+export NODEID=1
+export HADOOPHOST=10.0.11.1
+./make_container.sh $HOSTNAME $IMAGENAME $BRIDGENAME $SUBNET $NODEID $HADOOPHOST no
+</pre><br />
+And a third!<br />
+<br />
+<pre>export HOSTNAME=saiph
+export IMAGENAME=saiph
+export BRIDGENAME=brbellatrix
+export SUBNET=10.0.12
+export NODEID=1
+export HADOOPHOST=10.0.12.1
+./make_container.sh $HOSTNAME $IMAGENAME $BRIDGENAME $SUBNET $NODEID $HADOOPHOST no
+</pre><br />
+<blockquote>The SUBNET is different for all containers. This isolates the Accumulo containers from each other. </blockquote><br />
+<p>Look at the running containers</p><br />
+<div style="overflow:auto;"><pre>$ docker ps
+CONTAINER ID        IMAGE                     COMMAND                CREATED             STATUS              PORTS
+                    NAMES
+41da6f17261f        medined/accumulo:latest   /docker/run.sh saiph   4 seconds ago       Up 2 seconds        0.0.0.0:49179->19888/tcp, 0.0.0.0:49180->2181/tcp, 0.0.0.0:49181->50070/tcp, 0.0.0.0:49182->50090/tcp, 0.0.0.0:49183->8141/tcp, 0.0.0.0:49184->10020/tcp, 0.0.0.0:49185->22/tcp, 0.0.0.0:49186->50095/tcp, 0.0.0.0:49187->8020/tcp, 0.0.0.0:49188->8025/tcp, 0.0.0.0:49189->8030/tcp, 0.0.0.0:49190->8050/tcp, 0.0.0.0:49191->8088/tcp   saiph
+23692dfe3f1e        medined/accumulo:latest   /docker/run.sh rigel   10 seconds ago      Up 9 seconds        0.0.0.0:49166->19888/tcp, 0.0.0.0:49167->2181/tcp, 0.0.0.0:49168->50070/tcp, 0.0.0.0:49169->8025/tcp, 0.0.0.0:49170->8088/tcp, 0.0.0.0:49171->10020/tcp, 0.0.0.0:49172->22/tcp, 0.0.0.0:49173->50090/tcp, 0.0.0.0:49174->50095/tcp, 0.0.0.0:49175->8020/tcp, 0.0.0.0:49176->8030/tcp, 0.0.0.0:49177->8050/tcp, 0.0.0.0:49178->8141/tcp   rigel
+63f8f1a7141f        medined/accumulo:latest   /docker/run.sh bella   21 seconds ago      Up 20 seconds       0.0.0.0:49153->19888/tcp, 0.0.0.0:49154->50070/tcp, 0.0.0.0:49155->8020/tcp, 0.0.0.0:49156->8025/tcp, 0.0.0.0:49157->8030/tcp, 0.0.0.0:49158->8050/tcp, 0.0.0.0:49159->8088/tcp, 0.0.0.0:49160->8141/tcp, 0.0.0.0:49161->10020/tcp, 0.0.0.0:49162->2181/tcp, 0.0.0.0:49163->22/tcp, 0.0.0.0:49164->50090/tcp, 0.0.0.0:49165->50095/tcp   bellatrix
+</pre></div><br />
+<p>You can connect to running instances using the public ports. Especially useful is the public zookeeper port. Rather than searching through the ports listed above, here is an easier way.</p><br />
+<pre>$  docker port saiph 2181
+0.0.0.0:49180
+$ docker port rigel 2181
+0.0.0.0:49167
+$ docker port bellatrix 2181
+0.0.0.0:49162
+</pre><br />
+<blockquote>Having '0.0.0.0' in the response means that any IP address can connect.</blockquote><br />
+<p>You can enter the namespace of a container (i.e., access a bash shell) this way.<p><br />
+<pre>$ ./enter_image.sh rigel
+-bash-4.1# hdfs dfs -ls /
+Found 2 items
+drwxr-xr-x   - accumulo accumulo            0 2014-07-12 09:13 /accumulo
+drwxr-xr-x   - hdfs     supergroup          0 2014-07-11 21:06 /user
+
+-bash-4.1# accumulo shell -u root -p secret
+Shell - Apache Accumulo Interactive Shell
+-
+- version: 1.5.1
+- instance name: accumulo
+- instance id: bb713243-3546-487f-b6d6-cfaa272efb30
+-
+- type 'help' for a list of available commands
+-
+root@accumulo&gt; tables
+!METADATA
+</pre><br />
+<p>Now let's start an edge node. For my purposes, an edge node can connect to Hadoop, Zookeeper and Accumulo without running any of those processes. All of the edge node's resources are dedicated to client work.</p><br />
+<pre>export HOSTNAME=rigeledge
+export IMAGENAME=rigeledge
+export BRIDGENAME=brrigel
+export SUBNET=10.0.11
+export NODEID=2
+export HADOOPHOST=10.0.11.1
+./make_container.sh $HOSTNAME $IMAGENAME $BRIDGENAME $SUBNET $NODEID $HADOOPHOST no
+</pre><br />
+<p>As this container is started, the 'no' means that the supervisor configuration files will be deleted. So while supervisor will be running, it won't be managing any processes. This is not a best practice. It's just the way I chose for this prototype.</p>

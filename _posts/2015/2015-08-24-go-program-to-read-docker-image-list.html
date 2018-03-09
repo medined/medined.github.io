@@ -1,0 +1,20 @@
+---
+layout: post
+title: Go Program to Read Docker Image List From Unix Socket (/var/run/docker.sock)
+date: '2015-08-24T21:20:00.002-04:00'
+author: David Medinets
+categories: docker go
+modified_time: '2015-08-24T21:20:42.303-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-8339026673321635813
+blogger_orig_url: http://affy.blogspot.com/2015/08/go-program-to-read-docker-image-list.html
+year: 2015
+---
+
+It took me a bit of time to get this simple program working so I'm sharing for other people new to Go.<br />
+
+
+<br />
+<pre></pre>
+<br />
+package main<br /><br />import (<br />&nbsp;&nbsp;&nbsp; "fmt"<br />&nbsp;&nbsp;&nbsp; "io"<br />&nbsp;&nbsp;&nbsp; "net"<br />)<br /><br />func reader(r io.Reader) {<br />&nbsp;&nbsp;&nbsp; buf := make([]byte, 1024)<br />&nbsp;&nbsp;&nbsp; for {<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; n, err := r.Read(buf[:])<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if err != nil {<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; println(string(buf[0:n]))<br />&nbsp;&nbsp;&nbsp; }<br />}<br /><br />func main() {<br />&nbsp;&nbsp;&nbsp; c, err := net.Dial("unix", "/var/run/docker.sock")<br />&nbsp;&nbsp;&nbsp; if err != nil {<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; panic(err)<br />&nbsp;&nbsp;&nbsp; }<br />&nbsp;&nbsp;&nbsp; defer c.Close()<br /><br />&nbsp;&nbsp;&nbsp; fmt.Fprintf(c, "GET /images/json HTTP/1.0\r\n\r\n")<br /><br />&nbsp;&nbsp;&nbsp; reader(c)<br />}<br />
+<br />
