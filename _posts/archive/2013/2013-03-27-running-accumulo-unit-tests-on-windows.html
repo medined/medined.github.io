@@ -1,0 +1,181 @@
+---
+layout: post
+title: Running Accumulo Unit Tests On Windows
+date: '2013-03-27T19:22:00.000-04:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2013-03-30T18:58:54.562-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-6261271154897860552
+blogger_orig_url: http://affy.blogspot.com/2013/03/running-accumulo-unit-tests-on-windows.html
+year: 2013
+theme: accumulo
+---
+
+Accumulo is not designed to run under Windows. Nor are its unit tests. However, if you persist in this foolishness, add the following elements to the indicated pom.xml files.
+
+
+
+<pre>core/pom.xml
+
+    &lt;profile&gt;
+        &lt;id&gt;skipped_tests_on_windows&lt;/id&gt;
+        &lt;activation&gt;
+            &lt;activeByDefault&gt;false&lt;/activeByDefault&gt;
+            &lt;os&gt;
+                &lt;family&gt;Windows&lt;/family&gt;
+            &lt;/os&gt;
+            &lt;/activation&gt;
+        &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                &lt;configuration&gt;
+                    &lt;excludes&gt;
+                        &lt;exclude&gt;**/AccumuloFileOutputFormatTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/AccumuloFileInputFormatTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/AccumuloOutputFormatTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/AccumuloRowInputFormatTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/AccumuloInputFormatTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/MockTableOperationsTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/AggregatingIteratorTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/IterUtilTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/CombinerTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/FormatterCommandTest.java&lt;/exclude&gt;
+                        &lt;/excludes&gt;
+                    &lt;/configuration&gt;
+                &lt;/plugin&gt;
+            &lt;/plugins&gt;
+        &lt;/build&gt;
+    &lt;/profile&gt;
+
+examples/simple/pom.xml
+
+    &lt;profile&gt;
+        &lt;id&gt;skipped_tests_on_windows&lt;/id&gt;
+        &lt;activation&gt;
+            &lt;activeByDefault&gt;false&lt;/activeByDefault&gt;
+            &lt;os&gt;
+                &lt;family&gt;Windows&lt;/family&gt;
+            &lt;/os&gt;
+            &lt;/activation&gt;
+        &lt;build&gt;
+            &lt;plugins&gt;
+                &lt;plugin&gt;
+                    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                    &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                    &lt;configuration&gt;
+                        &lt;excludes&gt;
+                            &lt;exclude&gt;**/ChunkInputFormatTest.java&lt;/exclude&gt;
+                            &lt;/excludes&gt;
+                    &lt;/configuration&gt;
+                &lt;/plugin&gt;
+            &lt;/plugins&gt;
+        &lt;/build&gt;
+    &lt;/profile&gt;
+
+proxy/pom.xml
+
+    &lt;profile&gt;
+        &lt;id&gt;skipped_tests_on_windows&lt;/id&gt;
+        &lt;activation&gt;
+            &lt;activeByDefault&gt;false&lt;/activeByDefault&gt;
+            &lt;os&gt;
+                &lt;family&gt;Windows&lt;/family&gt;
+            &lt;/os&gt;
+            &lt;/activation&gt;
+        &lt;build&gt;
+            &lt;plugins&gt;
+                &lt;plugin&gt;
+                    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                    &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                    &lt;configuration&gt;
+                        &lt;excludes&gt;
+                            &lt;exclude&gt;**/SimpleTest.java&lt;/exclude&gt;
+                            &lt;exclude&gt;**/TestProxyInstanceOperations.java&lt;/exclude&gt;
+                        &lt;/excludes&gt;
+                    &lt;/configuration&gt;
+                &lt;/plugin&gt;
+            &lt;/plugins&gt;
+        &lt;/build&gt;
+    &lt;/profile&gt;
+  &lt;/profiles&gt;
+
+server/pom.xml
+
+    &lt;profile&gt;
+        &lt;id&gt;skipped_tests_on_windows&lt;/id&gt;
+        &lt;activation&gt;
+            &lt;activeByDefault&gt;false&lt;/activeByDefault&gt;
+            &lt;os&gt;
+                &lt;family&gt;Windows&lt;/family&gt;
+            &lt;/os&gt;
+            &lt;/activation&gt;
+        &lt;build&gt;
+            &lt;plugins&gt;
+                &lt;plugin&gt;
+                    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                    &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                    &lt;configuration&gt;
+                        &lt;excludes&gt;
+                            &lt;exclude&gt;**/TableLoadBalancerTest.java&lt;/exclude&gt;
+                            &lt;/excludes&gt;
+                    &lt;/configuration&gt;
+                &lt;/plugin&gt;
+            &lt;/plugins&gt;
+        &lt;/build&gt;
+    &lt;/profile&gt;
+
+start/pom.xml
+
+    &lt;profile&gt;
+        &lt;id&gt;skipped_tests_on_windows&lt;/id&gt;
+        &lt;activation&gt;
+            &lt;activeByDefault&gt;false&lt;/activeByDefault&gt;
+            &lt;os&gt;
+                &lt;family&gt;Windows&lt;/family&gt;
+            &lt;/os&gt;
+            &lt;/activation&gt;
+        &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                &lt;configuration&gt;
+                    &lt;excludes&gt;
+                        &lt;exclude&gt;**/AccumuloVFSClassLoaderTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/ReadOnlyHdfsFileProviderTest.java&lt;/exclude&gt;
+                        &lt;exclude&gt;**/VfsClassLoaderTest.java&lt;/exclude&gt;
+                        &lt;/excludes&gt;
+                    &lt;/configuration&gt;
+                &lt;/plugin&gt;
+            &lt;/plugins&gt;
+        &lt;/build&gt;
+    &lt;/profile&gt;
+
+test/pom.xml
+
+    &lt;profile&gt;
+        &lt;id&gt;skipped_tests_on_windows&lt;/id&gt;
+        &lt;activation&gt;
+            &lt;activeByDefault&gt;false&lt;/activeByDefault&gt;
+            &lt;os&gt;
+                &lt;family&gt;Windows&lt;/family&gt;
+            &lt;/os&gt;
+            &lt;/activation&gt;
+        &lt;build&gt;
+            &lt;plugins&gt;
+                &lt;plugin&gt;
+                    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                    &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                    &lt;configuration&gt;
+                        &lt;excludes&gt;
+                            &lt;exclude&gt;**/MiniAccumuloClusterTest.java&lt;/exclude&gt;
+                            &lt;exclude&gt;**/ShellServerTest.java&lt;/exclude&gt;
+                        &lt;/excludes&gt;
+                    &lt;/configuration&gt;
+                &lt;/plugin&gt;
+            &lt;/plugins&gt;
+        &lt;/build&gt;
+    &lt;/profile&gt;
+</pre>

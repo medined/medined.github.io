@@ -1,0 +1,101 @@
+---
+layout: post
+title: Testing Your GrepIterator Without Running Accumulo
+date: '2013-03-30T18:58:00.000-04:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2013-03-30T18:58:01.087-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-7249087542945069590
+blogger_orig_url: http://affy.blogspot.com/2013/03/testing-your-grepiterator-without.html
+year: 2013
+theme: accumulo
+---
+
+Testing Your GrepIterator Without Running Accumulo
+
+
+<pre>package com.affy;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import org.apache.accumulo.core.client.IteratorSetting;
+import org.apache.accumulo.core.client.impl.MasterClient;
+import org.apache.accumulo.core.data.ByteSequence;
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Range;
+import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.iterators.SortedMapIterator;
+import org.apache.accumulo.core.iterators.user.GrepIterator;
+import org.apache.log4j.Logger;
+
+public class AccumuloGrepIteratorPlayground {
+
+    private static final Logger log = Logger.getLogger(AccumuloGrepIteratorPlayground.class);
+    private static final Collection<ByteSequence> EMPTY_COL_FAMS = new ArrayList<ByteSequence>();
+
+    public static void main(final String[] args) throws IOException {
+        final String term = "/1";
+
+        final SortedMap&lt;Key, Value&gt; input = new TreeMap&lt;Key, Value&gt;();
+        input.put(new Key("1111", "2222", "3333", 0), new Value("4444".getBytes()));
+        input.put(new Key("/1111", "2222", "3333", 0), new Value("4444".getBytes()));
+
+        final GrepIterator grepIterator = new GrepIterator();
+        final IteratorSetting iteratorSetting = new IteratorSetting(1, GrepIterator.class);
+        GrepIterator.setTerm(iteratorSetting, term);
+        grepIterator.init(new SortedMapIterator(input), iteratorSetting.getOptions(), null);
+        grepIterator.seek(new Range(), EMPTY_COL_FAMS, false);
+
+        while (grepIterator.hasTop()) {
+            final Key key = grepIterator.getTopKey();
+            final Value value = grepIterator.getTopValue();
+            log.info(key + " --&gt; " + value);
+            grepIterator.next();
+        }
+
+    }
+}
+</pre><br />
+The pom.xml looks like this:<br />
+<br />
+<pre>&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;groupId&gt;com.mycompany&lt;/groupId&gt;
+    &lt;artifactId&gt;AccumuloGrepIterator&lt;/artifactId&gt;
+    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+    &lt;packaging&gt;jar&lt;/packaging&gt;
+
+    &lt;name&gt;AccumuloGrepIterator&lt;/name&gt;
+    &lt;url&gt;http://maven.apache.org&lt;/url&gt;
+
+    &lt;properties&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.apache.accumulo&lt;/groupId&gt;
+            &lt;artifactId&gt;accumulo-core&lt;/artifactId&gt;
+            &lt;version&gt;1.4.2&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.apache.hadoop&lt;/groupId&gt;
+            &lt;artifactId&gt;hadoop-common&lt;/artifactId&gt;
+            &lt;version&gt;0.23.6&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;junit&lt;/groupId&gt;
+            &lt;artifactId&gt;junit&lt;/artifactId&gt;
+            &lt;version&gt;3.8.1&lt;/version&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</pre><br />
+<br />

@@ -3,6 +3,7 @@ layout: post
 title: python wtforms - handling dynamic fields
 author: David Medinets
 categories: python wtforms
+year: 2018
 ---
 
 I wanted to have a web form with a variable number of fields - one for each

@@ -1,0 +1,13 @@
+---
+layout: default
+title: Go Language
+permalink: /golang/
+---
+
+<h1>Go Langage</h1>
+
+<table style="margin-top: 25px" cellpadding="3" cellspacing="3">
+  {% for post in site.posts %}
+    {% if post.theme == 'golang' %}<tr><td width="100px">{{ post.date | date:"%Y-%m-%d" }}</td><td><a class="page-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></td></tr>{% endif %}
+  {% endfor %}
+</table>

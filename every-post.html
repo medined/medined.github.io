@@ -1,0 +1,14 @@
+---
+layout: default
+title: Every Post
+permalink: /every-post/
+category: menu
+---
+
+<h1>Every Post</h1>
+
+<table style="margin-top: 25px" cellpadding="3" cellspacing="3">
+  {% for post in site.posts %}
+    <tr><td width="100px">{{ post.date | date:"%Y-%m-%d" }}</td><td><a class="page-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></td></tr>
+  {% endfor %}
+</table>

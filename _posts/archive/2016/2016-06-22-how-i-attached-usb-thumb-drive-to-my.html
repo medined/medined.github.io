@@ -1,0 +1,105 @@
+---
+layout: post
+title: How I attached a USB Thumb drive to my Raspberry PI and used it to hold Docker's Root Directory!
+date: '2016-06-22T23:52:00.007-04:00'
+author: David Medinets
+categories: docker raspberry-pi
+modified_time: '2016-06-22T23:55:50.371-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-5073925967198413356
+blogger_orig_url: http://affy.blogspot.com/2016/06/how-i-attached-usb-thumb-drive-to-my.html
+year: 2016
+theme: docker
+---
+
+This post tells how I attached a USB Thumb drive to my Raspberry PI and used it to hold Docker's Root Directory.<br />
+
+
+<br />
+The first step is to connect to the RPI.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ ssh -o 'StrictHostKeyChecking=no' -o 'CheckHostIP=no' 'pirate@pi02.local'</span><br />
+<br />
+Now create a mount point. This is just a directory, nothing fancy. It should be owned by root because Docker runs as root. Don't try to use "pirate" as the owner. I tried that. It failed. Leave the owner as root.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo mkdir /media/usb</span><br />
+<br />
+Then look at the attached USB devices.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo blkid</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">/dev/mmcblk0: PTTYPE="dos"</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">/dev/mmcblk0p1: SEC_TYPE="msdos" LABEL="HypriotOS" UUID="D6D9-1D76" TYPE="vfat"</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">/dev/mmcblk0p2: LABEL="root" UUID="81e5bfc7-0701-4a09-80aa-fe5bc3eecbcf" TYPE="ext4"</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">/dev/sda1: LABEL="STORE N GO" UUID="F171-FAE6" TYPE="vfat" PARTUUID="f11d6f2b-01"</span><br />
+<br />
+Note that the USB thumb drive is /dev/sda1. The information above is for the original formatting of the drive. After formatting the drive to use "ext3" the information looks like:<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">/dev/sda1: LABEL="PI02" UUID="801b666c-ea47-4f6f-ab6b-b88acceff08f" TYPE="ext3" PARTUUID="f11d6f2b-01"</span><br />
+<br />
+This is the command that I used to format the drive to use ext3. Notiice that I named the drive the same as the hostname. I have no particular reason to do this. It just seemed right. Only run this formatting command once.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo mkfs.ext3 -L "PI02" /dev/sda1</span><br />
+<br />
+Now it's time to mount the thumb drive. Here we connect the device (/dev/sda1) to the mount point. After this command is run you'll be able to use /media/usb as a normal directory.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo mount /dev/sda1 /media/usb</span><br />
+<br />
+Next we setup the thumb drive to be available whenever the RPI is rebooted. First, find the UUID. It's whatever UUID is associated with sda1.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo ls -l /dev/disk/by-uuid</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">total 0</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">lrwxrwxrwx 1 root root 10 Jul &nbsp;3 &nbsp;2014 801b666c-ea47-4f6f-ab6b-b88acceff08f -&gt; ../../sda1</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">lrwxrwxrwx 1 root root 15 Jul &nbsp;3 &nbsp;2014 81e5bfc7-0701-4a09-80aa-fe5bc3eecbcf -&gt; ../../mmcblk0p2</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">lrwxrwxrwx 1 root root 15 Jul &nbsp;3 &nbsp;2014 D6D9-1D76 -&gt; ../../mmcblk0p1</span><br />
+<br />
+Now add that UUID to the /etc/fstab file so it will be recognized across reboots. If you re-flash your SD card, you'll need to execute this step again.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ echo "UUID=801b666c-ea47-4f6f-ab6b-b88acceff08f /media/usb nofail 0 0" | sudo tee -a /etc/fstab</span><br />
+<br />
+Some images already on the Hypriot SD card. We'll make sure they are available after we move the Docker Root directory.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ docker images</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">REPOSITORY &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; TAG &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; IMAGE ID &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;CREATED &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SIZE</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">hypriot/rpi-swarm &nbsp; &nbsp;1.2.2 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; f13b7205f2db &nbsp; &nbsp; &nbsp; &nbsp;5 weeks ago &nbsp; &nbsp; &nbsp; &nbsp; 13.97 MB</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">hypriot/rpi-consul &nbsp; 0.6.4 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 879ac05d5353 &nbsp; &nbsp; &nbsp; &nbsp;6 weeks ago &nbsp; &nbsp; &nbsp; &nbsp; 19.71 MB</span><br />
+<br />
+Stop Docker to ensure that the Docker root directory does not change.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo systemctl stop docker</span><br />
+<br />
+Copy files to the new location. Don't bother deleting the original files.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo cp --no-preserve=mode --recursive /var/lib/docker /media/usb/docker</span><br />
+<br />
+If you are paranoid, you can compare the two directory trees.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo diff /var/lib/docker /media/usb/docker</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">Common subdirectories: /var/lib/docker/containers and /media/usb/docker/containers</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">Common subdirectories: /var/lib/docker/image and /media/usb/docker/image</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">Common subdirectories: /var/lib/docker/network and /media/usb/docker/network</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">Common subdirectories: /var/lib/docker/overlay and /media/usb/docker/overlay</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">Common subdirectories: /var/lib/docker/tmp and /media/usb/docker/tmp</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">Common subdirectories: /var/lib/docker/trust and /media/usb/docker/trust</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">Common subdirectories: /var/lib/docker/volumes and /media/usb/docker/volumes</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;"><br /></span>
+Edit the docker service file to add --graph "/media/usb/docker" to the end of the ExecStart line.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo vi /etc/systemd/system/docker.service</span><br />
+<br />
+Now reload the systemctl daemon and start docker.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">sudo systemctl daemon-reload</span><br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">sudo systemctl start docker</span><br />
+<br />
+Confirm that the ExecStart is correct - that is has the graph parameter.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ sudo systemctl show docker | grep ExecStart</span><br />
+<br />
+Confirm that the Docker Root Directory has changed.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ docker info | grep "Root Dir"</span><br />
+<br />
+And finally, confirm that you can see docker images.<br />
+<br />
+<span style="font-family: &quot;courier new&quot; , &quot;courier&quot; , monospace;">$ docker images</span><br />
+<div>
+<br /></div>

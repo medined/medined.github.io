@@ -3,6 +3,8 @@ layout: post
 title: Environment Variables Available In AWS Lambda Go
 author: David Medinets
 categories: aws lambda golang
+year: 2018
+theme: golang
 ---
 
 The short version of this story is simple. Below is a sorted list of the
