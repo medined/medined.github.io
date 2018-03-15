@@ -10,8 +10,7 @@ theme: golang
 The examples that I have seen online about how to use Go template did not
 mention that parseFiles method required the full path to the template file while
 the ExecuteTemplate method needs just the template name. Below I demonstrate
-this point.
-
+this point!
 
 First let me show you the `$GOPATH/src/templateExample/templates/index.template`
 file to define the template.
@@ -25,7 +24,7 @@ Hello {{.UserName}}!
 And here is the Go code. I placed it in a file called
 `$GOPATH/src/templateExample/examples/parse-template-file.go`
 
-```
+```Go
 package main
 
 import (
@@ -54,7 +53,7 @@ func main() {
 
 The Go code is executed like this:
 
-```
+```bash
 cd $GOPATH/src/templateExample/examples
 go run parse-template-file.go
 ```
