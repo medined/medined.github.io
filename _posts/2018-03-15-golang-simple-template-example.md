@@ -17,7 +17,9 @@ First let me show you the `$GOPATH/src/templateExample/templates/index.template`
 file to define the template.
 
 ```
+{% raw %}
 Hello {{.UserName}}!
+{% endraw %}
 ```
 
 And here is the Go code. I placed it in a file called
