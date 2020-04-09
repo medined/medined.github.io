@@ -7,6 +7,8 @@ year: 2020
 theme: aws
 ---
 
+UPDATE: 2020-04-08 My workaround below does not actually work. When I turn off Docker (and add the healthz service) inside the worker nodes, the Target Group reports them as healthy but they not longer join the cluster. I don't understand what the issue is yet.
+
 I've been asked to help the Enterprise Design Patterns team at the Department of Veteran's Affairs (https://www.oit.va.gov/library/recurring/edp/index.cfm) to research different ways to provision Kubernetes clusters.
 
 Naturally, they would like to use Fedora CoreOS (FCOS - https://getfedora.org/coreos/) in order to have immutable nodes and kernel isolaton.
