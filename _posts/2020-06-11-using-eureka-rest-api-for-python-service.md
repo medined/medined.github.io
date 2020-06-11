@@ -14,6 +14,12 @@ Eureka has a REST API that allows non-java technologies (like Python) to interac
 
 Eureka doesn't care if a service is actually running. It only cares about the information being sent to it. Therefore, this directory will use FAKE_SERVICE as its service name.
 
+## Security Alert
+
+From what I can tell, Eureka provides no security around its REST service. Any process that can reach the Eureka service can change a service's status or de-register a service. Please make sure your security team understands this issue.
+
+## Starting Eureka
+
 The first step is to start a Eureka server. You can do this any way you'd like. The easiest way, if you have `docker` installed is to run the following command. See https://hub.docker.com/repository/docker/medined/eureka-server if you want more information about the image.
 
 ```bash
