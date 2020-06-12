@@ -28,7 +28,7 @@ Define an `inventory` file with the IP address of the remote server.
 ```bash
 cat <<EOF > inventory
 [fcos]
-3.235.161.106
+5.235.160.104
 EOF
 ```
 
