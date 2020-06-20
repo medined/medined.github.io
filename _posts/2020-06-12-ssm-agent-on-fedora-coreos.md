@@ -4,7 +4,7 @@ title: Add AWS SSM Agent on Fedora CoreOS
 author: David Medinets
 categories: aws fedora coros ansible
 year: 2020
-theme: ansible
+theme: fedora-coreos
 ---
 
 This article shows how to install the AWS SSM Agent on Fedora CoreOS. My goal was to alert when 'denied' messages appear in audit logs. My first step towards this goal was to install the SSM agent to allow the server's `/var/log/audit/audit.log` file to appear in the CloudWatch Logs console.
