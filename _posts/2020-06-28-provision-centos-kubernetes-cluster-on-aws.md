@@ -16,6 +16,8 @@ Creating a cluster takes two steps:
 
 It should take less than 20 minutes to create a small cluster. I have just one controller node and one worker node. Kubespray also creates two basion nodes. I don't mind one bastion but I don't know why two would be helpful.
 
+This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
+
 ## Provisioning Infrastructure
 
 * Connect to a base project directory. I use `/data/project` which is on a separate partition.

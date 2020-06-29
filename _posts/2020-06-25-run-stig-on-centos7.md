@@ -9,6 +9,8 @@ theme: stig
 
 This is going to be a long post. We'll start from scratch and develop the ability to run the MindPoint Group RHEL7 STIG on Centos 7. If you want to go farther, there is also discussion of Lynis. Just running the STIG playbook results in the server having a Lynis hardening index of 73. It can be better.
 
+This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
+
 ## Overview
 
 * Provision a server.
