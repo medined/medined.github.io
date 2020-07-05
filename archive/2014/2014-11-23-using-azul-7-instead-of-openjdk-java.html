@@ -1,0 +1,60 @@
+---
+layout: post
+title: Using AZUL 7 instead of OpenJDK Java for smaller Docker images.
+date: '2014-11-23T20:01:00.004-05:00'
+author: David Medinets
+categories: docker java
+modified_time: '2014-11-23T20:01:41.790-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-6808407728483699104
+blogger_orig_url: http://affy.blogspot.com/2014/11/using-azul-7-instead-of-openjdk-java.html
+year: 2014
+theme: docker
+---
+
+Witness a tale of two Dockerfiles that perform the same task. See the size difference. Imagine how it might change infrastructure costs.<br />
+
+
+<br />
+<h4>
+DOCKERFILE ONE</h4>
+<br />
+<pre>FROM debian:wheezy
+
+RUN apt-get update &amp;&amp; apt-get install -y openjdk-7-jre &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+ADD target/si-standalone-sample-1.0-SNAPSHOT.jar /
+
+ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
+ENV CLASSPATH si-standalone-sample-1.0-SNAPSHOT.jar
+
+CMD [ "java", "org.springframework.boot.loader.JarLauncher" ]
+</pre>
+<br />
+<br />
+<h4>
+DOCKERFILE TWO</h4>
+<br />
+<pre>FROM debian:wheezy
+
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0x219BD9C9 &amp;&amp; \
+  echo "deb http://repos.azulsystems.com/ubuntu precise main" &gt;&gt; /etc/apt/sources.list.d/zulu.list &amp;&amp; \
+  apt-get -qq update &amp;&amp; \
+  apt-get -qqy install zulu-7 &amp;&amp; \
+  rm -rf /var/lib/apt/lists/*
+
+ADD target/si-standalone-sample-1.0-SNAPSHOT.jar /
+
+ENV JAVA_HOME /usr/lib/jvm/zulu-7-amd64
+ENV CLASSPATH si-standalone-sample-1.0-SNAPSHOT.jar
+
+CMD [ "java", "org.springframework.boot.loader.JarLauncher" ]
+</pre>
+<br />
+Notice the only difference is which Java is being installed. Here are the image sizes:<br />
+<br />
+<pre>spring-integration   openjdk  549.1 MB
+spring-integration   azul     261.3 MB
+</pre>
+<br />
+That's a 288MB difference.<br />
+<br />

@@ -1,0 +1,27 @@
+---
+layout: post
+title: Advanced Rails Recipes - Chapter Two - The missing copy method.
+date: '2008-09-29T20:23:00.002-04:00'
+author: David Medinets
+categories: ruby
+modified_time: '2008-09-29T20:28:49.215-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-7403458078584931023
+blogger_orig_url: http://affy.blogspot.com/2008/09/advanced-rails-recipes-chapter-two.html
+year: 2008
+theme: ruby
+---
+
+<p>I am reading through the <a href="http://pragprog.com/titles/fr_arr/advanced-rails-recipes">Advanced Rails Recipes</a> book. In chapter two, it refers to an <code>Event.copy</code> method which is not shown in the book. Shown below is the missing method from <code>app/models/event.rb</code>.</p>
+
+
+<pre>
+class Event < ActiveRecord::Base
+
+  def self.copy(other)
+    self.new(other.attributes.merge(:name => "Copy of #{other.name}"))
+  end
+
+end
+</pre>
+
+<p align="center"><img src="http://www.pragprog.com/images/covers/190x228/fr_arr.jpg"></p>

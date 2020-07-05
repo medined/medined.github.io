@@ -1,0 +1,35 @@
+---
+layout: post
+title: Alastrina - a gem to push model changes to twitter
+date: '2010-06-28T19:11:00.001-04:00'
+author: David Medinets
+categories: ruby
+modified_time: '2010-06-28T19:44:11.271-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-2181233809642783260
+blogger_orig_url: http://affy.blogspot.com/2010/06/alastrina-gem-to-push-model-changes-to.html
+year: 2010
+theme: ruby
+---
+
+Alastrina - a gem to push model changes to twitter
+
+
+<p>http://github.com/medined/alastrina - the gem</p>
+
+<p>http://github.com/medined/alastrina_demo - a demo application</p>
+
+<p>http://twitter.com/Alastrina_gem - the result</p>
+
+<p>I was doodling in code this weekend and the result is a small gem that
+hooks into the after_save callback to send model changes to a Twitter
+account.</p>
+
+<p>Make sure you install the Twitter gem. Then in the demo app, update
+the config/alastrina.yml file with your Twitter credentials. Open a
+console and do:</p>
+
+<pre>a = Place.new
+a.name = "GGG"
+a.save</pre>
+
+<p>And, presto, the model changes should be posted to your Twitter feed.</p>

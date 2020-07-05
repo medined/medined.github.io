@@ -1,0 +1,27 @@
+---
+layout: post
+title: Using ImageMagick To Create Horizontally Repeating Background Image
+date: '2010-07-11T10:35:00.003-04:00'
+author: David Medinets
+modified_time: '2010-07-11T10:43:02.851-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-6401588176736821602
+blogger_orig_url: http://affy.blogspot.com/2010/07/using-imagemagick-to-create.html
+year: 2010
+---
+
+Using ImageMagick To Create Horizontally Repeating Background Image
+
+
+<ol>
+<li>Find an image that you want to slice vertically, which I'll refer to as the base image. This slice is what will be repeated across the background of the web page.</li>
+<li>Use the <code>identify home_page.jpg</code> command to find out some details about the base image. The result of this command looks like this: <code>home_page.jpg JPEG 1300x1380 1300x1380+0+0 8-bit DirectClass 736KiB 0.240u 0:00.240</code></li>
+<li>For our purposes, the first set of numbers is sufficient. They hold the width and height.</li>
+<li>The next step involves extracting a vertical slice (top to bottom) from the base image. Use this command: <code>convert -extract 10x1380+0+0 home_page.jpg body_background.png</code>. Notice that you can vary the width of the slice using the first number. In this case, I use 10 but some other number is probably more appropriate for you.</li>
+<li>If you want to test various widths, you can 'tail' the background image using  <code>display -update 1 body_background.png</code> which redisplays the image every second.</li>
+<li>Once you've got the vertical slice, you need to integrate it with your web page.</li>
+<li>Use CSS similar to this:
+<pre>body {
+  background-image: url('body_background.png');
+  background-repeat: repeat-x;
+}</pre></li>
+</ol>

@@ -1,0 +1,42 @@
+---
+layout: post
+title: 'Running Maven inside Docker. '
+date: '2015-04-20T16:23:00.001-04:00'
+author: David Medinets
+categories: docker
+modified_time: '2015-04-20T16:23:49.924-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-5247954407266276667
+blogger_orig_url: http://affy.blogspot.com/2015/04/running-maven-inside-docker.html
+year: 2015
+theme: docker
+---
+
+I recently reinstalled Ubuntu on my zareason laptop. As I was thinking about installing my development tools, I thought about how to integrate Docker into the process. Below I show how simple using the Maven container can be:<br />
+
+
+<br />
+* Create an alias to the Maven container.<br />
+<br />
+alias mvn="docker run \<br />&nbsp; -it \<br />&nbsp; --rm \<br />
+&nbsp; --name my-maven-project \<br />
+&nbsp; -v "$PWD":/usr/src/mymaven \<br />&nbsp; -w /usr/src/mymaven \<br />&nbsp; maven:3.3-jdk-8 \<br />&nbsp; mvn"<br />
+<br />
+* Clone my ragnvald Java project.<br />
+<br />
+git clone git@github.com:medined/ragnvald.git<br />
+<br />
+* cd ragnvald<br />
+<br />
+* Package&nbsp; the project.<br />
+<br />
+mvn package<br />
+&nbsp;That's it. You're using Maven without installing onto your laptop! The results of the compilation are placed into the target directory.<br />
+<br />
+If you need to specify a Maven settings.xml file that's fairly easy as well. Simply create it alongside the pom.xml file. Then slightly modify your alias:<br />
+<br />
+alias mvn="docker run \<br />&nbsp; -it \<br />&nbsp; --rm \<br />
+&nbsp; --name my-maven-project \<br />
+&nbsp;&nbsp; -v "$PWD":/root/.m2 \<br />&nbsp;&nbsp; -v "$PWD":/usr/src/mymaven \<br />&nbsp;&nbsp; -w /usr/src/mymaven \<br />&nbsp; maven:3.3-jdk-8 \<br />&nbsp; mvn"<br />
+<br />
+The ragnvald project goes one step farther to use an Artifactory container so that I can use the Artifactory web interface if needed. That's quite convenient!<br />
+<br />

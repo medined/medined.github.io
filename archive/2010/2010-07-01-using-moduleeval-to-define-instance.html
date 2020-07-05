@@ -1,0 +1,85 @@
+---
+layout: post
+title: Using module_eval to Define Instance Methods in a Ruby Gem to Enable Per-Model Configuration
+date: '2010-07-01T17:50:00.003-04:00'
+author: David Medinets
+categories: ruby
+modified_time: '2010-07-01T18:05:55.023-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-5368078324173569191
+blogger_orig_url: http://affy.blogspot.com/2010/07/using-moduleeval-to-define-instance.html
+year: 2010
+theme: ruby
+---
+
+<p>In the last post, I mentioned that I wrote a small gem to post changes to <a class="zem_slink" href="http://en.wikipedia.org/wiki/Active_record_pattern" title="Active record pattern" rel="wikipedia">ActiveRecord</a> models to <a class="zem_slink" href="http://twitter.com/" title="Twitter" rel="homepage">Twitter</a>. In that version, the configuration was handled by a <a class="zem_slink" href="http://en.wikipedia.org/wiki/YAML" title="YAML" rel="wikipedia">YAML</a> file. I wanted to evolve the gem so that developers could switch Twitter accounts for each model.</p>
+
+
+<p>Basically, I wanted to able to the use the following:</p>
+<pre>class Place < ActiveRecord::Base
+  alastrina :twitter => { :username => 'alastrina_gem', :password => 'QQQQQQ' }
+end</pre>
+<p>After a bit of tinkering and searching, I decided to use the following code in my gem.</p>
+<pre>
+ALASTRINA_CONFIGURATION_FILE = 'config/alastrina.yml'
+
+module Alastrina
+  def self.included(base)
+    base.extend(ClassMethods)
+  end
+
+  module ClassMethods
+    def alastrina hash
+      module_eval do
+        def configuration
+          throw "Missing #{ALASTRINA_CONFIGURATION_FILE}" unless File.exists? ALASTRINA_CONFIGURATION_FILE
+          @config ||= YAML::load(File.read(ALASTRINA_CONFIGURATION_FILE))
+        end
+        if hash[:twitter]
+          def send_to_twitter?
+            true
+          end
+          eval"def twitter_username\n\"#{hash[:twitter][:username]}\"\nend\n"
+          eval "def twitter_password\n\"#{hash[:twitter][:password]}\"\nend\n"
+        else
+          def send_to_twitter?
+            @twitter_flag ||= !configuration['twitter'].blank?
+          end
+          def twitter_username
+            @twitter_username ||= configuration['twitter']['username'] if send_to_twitter?
+          end
+          def twitter_password
+            @twitter_password ||= configuration['twitter']['password'] if send_to_twitter?
+          end
+        end
+      end
+    end
+  end
+
+  def after_save
+    if send_to_twitter?
+      require 'twitter'
+      throw "Missing Twitter userid" if twitter_username.blank?
+      throw "Missing Twitter password" if twitter_password.blank?
+      send_via_twitter
+    end
+  end
+
+private
+
+  def send_via_twitter
+    if changes.size > 0
+      httpauth = Twitter::HTTPAuth.new(twitter_username, twitter_password)
+      client = Twitter::Base.new(httpauth)
+      begin
+        client.update(changes.to_yaml)
+      rescue
+        RAILS_DEFAULT_LOGGER.error "alastrina.send_via_twitter; Unable to send change. Message[#{$!}] Change[#{changes.to_yaml}]"
+      end
+    end
+  end
+
+end
+
+ActiveRecord::Base.class_eval { include Alastrina }
+</pre>
+<p>The key insight to this code is how the hash passed on the <code>alastrina</code> of the Model is passed down into the instance. The code is fairly straightforward once you see what the eval is doing.</p>

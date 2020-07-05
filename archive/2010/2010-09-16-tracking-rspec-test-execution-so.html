@@ -1,0 +1,29 @@
+---
+layout: post
+title: Tracking RSPEC Test Execution So Debugging Statements Are Segmented
+date: '2010-09-16T14:33:00.001-04:00'
+author: David Medinets
+categories: ruby
+modified_time: '2010-09-16T14:34:45.765-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-5801949958383605923
+blogger_orig_url: http://affy.blogspot.com/2010/09/tracking-rspec-test-execution-so.html
+year: 2010
+theme: ruby
+---
+
+Tracking RSPEC Test Execution So Debugging Statements Are Segmented
+
+
+<p>Throw the following into an initializer:</p>
+
+<pre>module Spec
+  module Example
+    module ExampleMethods
+      def execute_with_print_logging(run_options, instance_variables)
+        p "RSPEC TRACE: #{description} => #{@_proxy.location}"
+        execute_without_print_logging(run_options, instance_variables)
+      end
+      alias_method_chain :execute, :print_logging
+    end
+ end
+end</pre>

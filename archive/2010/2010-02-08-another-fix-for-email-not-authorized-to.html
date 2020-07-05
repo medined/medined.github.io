@@ -1,0 +1,18 @@
+---
+layout: post
+title: Another Fix for EMAIL not authorized to access APP
+date: '2010-02-08T22:00:00.002-05:00'
+author: David Medinets
+modified_time: '2010-02-08T22:04:36.889-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-5489107110801571485
+blogger_orig_url: http://affy.blogspot.com/2010/02/another-fix-for-email-not-authorized-to.html
+year: 2010
+---
+
+<p>I wanted to change the primary email associated with my Heroku account. So I removed the email from the authorization list. The next time I pulled from git, I got the following error:</p>
+
+<pre>heroku@david-medinets.otherinbox.com not authorized to access crisiscamp-translation</pre>
+
+The email address is pulled from your public/private keys which can be recreated using the following command:
+
+<pre>ssh-keygen -t rsa -C EMAIL</pre>

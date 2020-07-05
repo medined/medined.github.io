@@ -1,0 +1,94 @@
+---
+layout: post
+title: How Can I Use Reverse Sort On Integer (or Long) Accumulo Keys?
+date: '2012-11-12T17:04:00.001-05:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2013-11-24T22:57:34.574-05:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-7188943587597231817
+blogger_orig_url: http://affy.blogspot.com/2012/11/how-can-i-use-reverse-sort-on-integer.html
+year: 2012
+theme: accumulo
+---
+
+Here is code with debugging (i.e., the original key is retained) so that you can see the reverse sort is working.
+
+
+<pre>package com.codebits.accumulo;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.accumulo.core.client.AccumuloException;
+import org.apache.accumulo.core.client.AccumuloSecurityException;
+import org.apache.accumulo.core.client.BatchWriter;
+import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.client.Instance;
+import org.apache.accumulo.core.client.Scanner;
+import org.apache.accumulo.core.client.TableExistsException;
+import org.apache.accumulo.core.client.TableNotFoundException;
+import org.apache.accumulo.core.client.mock.MockInstance;
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Mutation;
+import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.security.Authorizations;
+import org.apache.hadoop.io.Text;
+
+public class ReversingIntSortOrderWithMockInstanceDriver {
+
+  static byte[] convert(int value) {
+    byte[] key = ByteBuffer.allocate(4).putInt(value).array();
+    byte[] reverse_key = ByteBuffer.allocate(4).putInt(Integer.MAX_VALUE - value).array();
+    byte[] rv = new byte[8];
+    for (int i = 0; i &lt; 4; i++) {
+      rv[i] = reverse_key[i];
+    }
+    for (int i = 0; i &lt; 4; i++) {
+      rv[i + 4] = key[i];
+    }
+    return rv;
+  }
+
+  public static String toHexString(byte[] ba) {
+    StringBuilder str = new StringBuilder();
+    for (int i = 0; i &lt; ba.length; i++)
+      str.append(String.format("%x", ba[i]));
+    return str.toString();
+  }
+
+  public static void main(String[] args) throws IOException, AccumuloException, AccumuloSecurityException, TableExistsException, TableNotFoundException {
+    Instance mock = new MockInstance("development");
+    Connector connector = mock.getConnector("root", "password".getBytes());
+    connector.tableOperations().create("TABLEA");
+
+    BatchWriter wr = connector.createBatchWriter("TABLEA", 10000000, 10000, 5);
+    for (int i = 5; i &gt; 0; --i) {
+      byte[] key = convert(i);
+      Mutation m = new Mutation(new Text(key));
+      m.put("cf", "cq", "value");
+      wr.addMutation(m);
+    }
+    wr.close();
+
+    Scanner scanner = connector.createScanner("TABLEA", new Authorizations());
+    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();
+    while (iterator.hasNext()) {
+      Map.Entry<key value=""> entry = iterator.next();
+      Key key = entry.getKey();
+      System.out.println(toHexString(key.getRow().getBytes()));
+    }
+  }
+}
+</key></pre>
+This code produces this output:<br />
+<pre>7ffffffa0005
+7ffffffb0004
+7ffffffc0003
+7ffffffd0002
+7ffffffe0001
+</pre>
+I'll leave it to the reader to remove the debugging code.

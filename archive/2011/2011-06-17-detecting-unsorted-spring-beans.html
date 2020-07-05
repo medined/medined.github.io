@@ -1,0 +1,75 @@
+---
+layout: post
+title: Detecting Unsorted Spring Beans
+date: '2011-06-17T07:54:00.002-04:00'
+author: David Medinets
+categories: java
+modified_time: '2011-06-17T07:57:11.685-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-1371802584612695543
+blogger_orig_url: http://affy.blogspot.com/2011/06/detecting-unsorted-spring-beans.html
+year: 2011
+theme: java
+---
+
+I like my Spring Beans definition files to be sorted. So I wrote the following code. Eventually I might turn it into a JUnit test for my continuous integration server.
+
+
+<pre>
+package play;
+
+import java.io.IOException;
+import java.util.ListIterator;
+
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
+public class UnsortedSpringBeans {
+
+ public static void checkSortOrder(final String filename) throws JDOMException, IOException {
+        System.out.println(filename);
+        System.out.println("-------------------------------------------------");
+        String lastBean = null;
+        SAXBuilder parser = new SAXBuilder();
+        Document doc = parser.build(filename);
+        Element root = doc.getRootElement();
+        @SuppressWarnings("unchecked")
+  ListIterator<Element> children = root.getChildren().listIterator();
+        while (children.hasNext()) {
+          Element child = children.next();
+          Attribute id = child.getAttribute("id");
+          if (id == null) {
+              System.out.println("Skipping    : " + child.getName());
+           continue;
+          }
+          if (lastBean != null) {
+              int cmpValue = id.getValue().compareTo(lastBean);
+              if (cmpValue < 0) {
+                  System.out.println("Out Of Order: " + id.getValue());
+              } else {
+                  System.out.println("              " + id.getValue());
+              }
+          } else {
+              System.out.println("              " + id.getValue());
+          }
+          lastBean = id.getValue();
+        }
+        System.out.println("");
+    }
+
+    /**
+     * @param args
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public static void main(String[] args) throws JDOMException, IOException {
+        checkSortOrder("config/bean-definition.xml");
+        checkSortOrder("config/database-beans.xml");
+        checkSortOrder("config/hypersonicContext.xml");
+        checkSortOrder("config/url-processor-beans.xml");
+    }
+
+}
+</pre>

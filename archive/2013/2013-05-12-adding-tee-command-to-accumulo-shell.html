@@ -1,0 +1,83 @@
+---
+layout: post
+title: Adding a tee command to Accumulo Shell
+date: '2013-05-12T11:46:00.000-04:00'
+author: David Medinets
+categories: accumulo
+modified_time: '2013-05-12T11:47:37.090-04:00'
+blogger_id: tag:blogger.com,1999:blog-3207985.post-1603644821769935108
+blogger_orig_url: http://affy.blogspot.com/2013/05/adding-tee-command-to-accumulo-shell.html
+year: 2013
+theme: accumulo
+---
+
+An afternoon project. There are hacks involved. Do not use in production!
+
+
+Some of the iterators that I've been writing are designed to create a problem-oriented dataset; a limited view into the larger dataset.  Once the iterators are put into place in the shell, there isn't a way to easily materialize that sub-set of the data. I'm not even sure it makes sense to materialize it, but it was interesting to experiment with the code.<br />
+<br />
+Because this project was so specific to my whim, I don't feel it's right to add to the official code base.<br />
+<br />
+My first step was an update to the Shell.java file. I added "new TeeCommand()" to the external[] Command array. Then I added a private String attribute called 'teeTableName".  The last change was to the printRecords method. This change was a hack.<br />
+<br />
+<pre>Formatter formatter = FormatterFactory.getFormatter(formatterClass, scanner, printTimestamps);
+if (formatter instanceof TeeFormatter) {
+    ((TeeFormatter)formatter).setConnector(connector);
+    ((TeeFormatter)formatter).setTeeTableName(teeTableName);
+}
+</pre><br />
+The TeeCommand class is fairly simple. The only interesting part of the execute() method. You'll note that the teeTable can't be the same as the current table in the shell. And it is automatically created if it does not exist. Another point to note is that the formatter for the current table is changed *globally*. Another hack. And a dangerous one. I don't see a cleaner way to assign the formatter with larger changes to the Shell class.<br />
+<br />
+<pre>@Override
+    public int execute(String fullCommand, CommandLine cl, Shell shellState) throws AccumuloException, AccumuloSecurityException, TableNotFoundException, TableExistsException {
+        String tableName = cl.getArgs()[0];
+        String currentTableName = shellState.getTableName();
+        if (currentTableName.equals(tableName)) {
+            throw new RuntimeException("You can't tee to the current table.");
+        }
+        if (!shellState.getConnector().tableOperations().exists(tableName)) {
+            shellState.getConnector().tableOperations().create(tableName);
+        }
+
+        String subcommand = cl.getArgs()[1];
+        if ("on".equals(subcommand)) {
+            shellState.setTeeTableName(tableName);
+            shellState.getConnector().tableOperations().setProperty(shellState.getTableName(), Property.TABLE_FORMATTER_CLASS.toString(), TeeFormatter.class.getName());
+
+        } else if ("off".equals(subcommand)) {
+            shellState.setTeeTableName(null);
+            shellState.getConnector().tableOperations().removeProperty(shellState.getTableName(), Property.TABLE_FORMATTER_CLASS.toString());
+        }
+
+        return 0;
+    }
+</pre><br />
+The last change was to develop the TeeFormatter class. It's a copy of the DefaultFormatter except for the addition of a copyEntry method which inefficient in the extreme because it opens a BatchWriter for *every* row in the scan. I'll leave it to the reader to develop a more efficient approach. Note that I choose random number for the createBatchWriter call. More hackery!<br />
+<br />
+<pre>private void copyEntry(Entry<Key,Value> entry) {
+      BatchWriter wr = null;
+      try {
+          wr = connector.createBatchWriter(teeTableName, 10000000, 10000, 5);
+          Key key = entry.getKey();
+          Value value = entry.getValue();
+          Mutation m = new Mutation(key.getRow());
+          m.put(key.getColumnFamily(), key.getColumnQualifier(), new ColumnVisibility(key.getColumnVisibility().toString()), key.getTimestamp(), value);
+          wr.addMutation(m);
+      } catch (TableNotFoundException e) {
+          throw new RuntimeException("Unable to find table " + teeTableName, e);
+      } catch (MutationsRejectedException e) {
+          throw new RuntimeException("Mutation rejected while copying entry to tee table.", e);
+      } finally {
+          if (wr != null) {
+              try {
+                  wr.close();
+              } catch (MutationsRejectedException e) {
+          throw new RuntimeException("Mutation rejected while closng writer to tee table.", e);
+              }
+          }
+      }
+  }
+</pre><br />
+I did not include the whole solution in this email because of length, hackery, and criminal inefficiency. However, if you want this tee command the clues above should let you write your own.<br />
+<br />
+In order to help Accumulo hacking, I've updated my https://github.com/medined/accumulo-at-home project to include a 1.4.3/update-accumulo-1.4.3.sh script.
