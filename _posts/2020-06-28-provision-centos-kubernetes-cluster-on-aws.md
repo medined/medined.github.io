@@ -26,11 +26,13 @@ This work is being done at the request of the Enterprise Container Working Group
 cd /data/project
 ```
 
-* Download project
+* Download kubespray. These command will remove all python packages before installing the ones needed for kubespray. This is done to prevent incompatibilites.
 
 ```bash
 git clone https://github.com/kubernetes-sigs/kubespray.git
 cd kubespray
+pip freeze | xargs pip uninstall -y
+pip install -r requirements.txt
 ```
 
 * Change to the `aws` directory.
@@ -44,9 +46,10 @@ cd contrib/terraform/aws
   * In `./modules/vpc/variables.tf`, remove quotes around `type`.
   * In `./variables.tf`, remove quotes around `type`.
 
-* In `./terraform.tfvars`, set vairables as needed. Note that the inventory file will be created a few levels up in the directory tree.
+* In `./terraform.tfvars`, set variables as needed. Note that the inventory file will be created a few levels up in the directory tree.
 
 ```
+cat <<EOF > terraform.tfvars
 # Global Vars
 aws_cluster_name = "flooper"
 
@@ -79,6 +82,7 @@ default_tags = {
 }
 
 inventory_file = "../../../inventory/hosts"
+EOF
 ```
 
 * In `./credentials.tfvars`, set your AWS credentials. Don't create a cluster unless you have access to a PEM file related to the `AWS_SSH_KEY_NAME` EC2 key pair.
