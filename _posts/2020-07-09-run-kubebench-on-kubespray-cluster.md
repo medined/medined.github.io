@@ -7,10 +7,6 @@ year: 2020
 theme: kubernetes
 ---
 
-# Contents Header
-{:.no_toc}
-
-* a markdown unordered list
 {:toc}
 
 This article shows how to run the five kinds of tests that kube-bench provides.
