@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Run KubeBench on KubeSpray Cluster
+title: xRun KubeBench on KubeSpray Cluster
 author: David Medinets
 categories: kubernetes kubebench kubespray
 year: 2020
@@ -59,6 +59,8 @@ You can see the results from my initial controller test at https://gist.github.c
 ### 2. Etcd
 
 In my cluster, we have `etcd` not running inside kubernetes. It has its own cluster. However, we only need to test one server in the cluster. The following command chooses the first `etcd` server in the Ansible `inventory` file.
+
+Run these commands from the `kubespray` directory.
 
 ```bash
 ETCD_HOST_NAME=$(cat ./inventory/hosts | grep "\[etcd\]" -A 1 | tail -n 1)
