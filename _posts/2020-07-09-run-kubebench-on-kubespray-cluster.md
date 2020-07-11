@@ -9,6 +9,7 @@ theme: kubernetes
 
 # Table of Contents
 {:.no_toc}
+* unordered list
 {:toc}
 
 This article shows how to run the five kinds of tests that kube-bench provides.
