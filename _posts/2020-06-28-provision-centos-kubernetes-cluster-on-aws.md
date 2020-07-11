@@ -124,9 +124,10 @@ data "aws_ami" "distro" {
 terraform init
 ```
 
-* Apply the terraform plan. This is create all of the AWS infrastructure that is needed; including creating a VPC.
+* Apply the terraform plan. This is create all of the AWS infrastructure that is needed; including creating a VPC. Note that I remove two files that might have been created by a previous apply.
 
 ```bash
+rm ../../../inventory/hosts ../../../ssh-bastion.conf
 terraform apply --var-file=credentials.tfvars --auto-approve
 ```
 
@@ -135,7 +136,7 @@ terraform apply --var-file=credentials.tfvars --auto-approve
 * Connect to the `kubespray` directory.
 
 ```bash
-cd /data/project/kubespray
+cd /data/projects/kubespray
 ```
 
 * Export the location of the EC2 key pair PEM file.
@@ -152,11 +153,19 @@ ansible-playbook \
     ./cluster.yml \
     -e ansible_user=centos \
     -e bootstrap_os=centos \
-    -b \
+    --become \
     --become-user=root \
     --flush-cache \
-    -e ansible_ssh_private_key_file=$PKI_PRIVATE_PEM
+    -e ansible_ssh_private_key_file=$PKI_PRIVATE_PEM \
+    | tee /tmp/kubespray-cluster-$(date "+%Y-%m-%d_%H:%M").log
 ```
+
+NOTE: In `/tmp`, you'll see Ansible Fact files named after the hostname. For example, `/tmp/ip-10-250-192-82.ec2.internal`.
+
+NOTE: Setting `-e cloud_provider=aws` does not work.
+-e podsecuritypolicy_enabled=true \
+-e kube_apiserver_enable_admission_plugins=AlwaysPullImages \
+
 
 * Setup `kubectl` so that is can connect to the new cluster. **THIS OVERWRITES YOUR KUBECTL CONFIG FILE!**
 
