@@ -7,6 +7,7 @@ year: 2020
 theme: kubernetes
 ---
 
+{:.no_toc}
 {:toc}
 
 This article shows how to run the five kinds of tests that kube-bench provides.
