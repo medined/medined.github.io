@@ -22,8 +22,8 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 | ------------- | ----: |
 | PASS          | 49 |
 | FAIL          | 23 |
-| WARN          | 32 |
-| JUSTIFICATION | 12 |
+| WARN          | 9 |
+| JUSTIFICATION | 35 |
 | ------------- | ----: |
 | Total         | 116 |
 
@@ -936,225 +936,210 @@ Based on your system, restart the kubelet service. For example:
 * 5.1 RBAC and Service Accounts
 * 5.1.1 Ensure that the cluster-admin role is only used where required (Not Scored)
 
-```
-WARN
-
 Identify all clusterrolebindings to the cluster-admin role. Check if they are used and if they need this role or if they could use a role with fewer privileges.
 
 Where possible, first bind users to a lower privileged role and then remove the clusterrolebinding to the cluster-admin role :
 
   kubectl delete clusterrolebinding [name]
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.1.2 Minimize access to secrets (Not Scored)
 
-```
-WARN
-
 Where possible, remove get, list and watch access to secret objects in the cluster.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.1.3 Minimize wildcard use in Roles and ClusterRoles (Not Scored)
 
-```
-WARN
-
 Where possible replace any use of wildcards in clusterroles and roles with specific objects or actions.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.1.4 Minimize access to create pods (Not Scored)
 
-```
-WARN
-
 Where possible, remove create access to pod objects in the cluster.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.1.5 Ensure that default service accounts are not actively used. (Scored)
 
-```
-WARN
-
 Create explicit service accounts wherever a Kubernetes workload requires specific access to the Kubernetes API server.
 
 Modify the configuration of each default service account to include this value automountServiceAccountToken: false
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.1.6 Ensure that Service Account Tokens are only mounted where necessary (Not Scored)
 
-```
-WARN
-
 Modify the definition of pods and service accounts which do not need to mount service account tokens to disable it.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.2 Pod Security Policies
 * 5.2.1 Minimize the admission of privileged containers (Not Scored)
 
-```
-WARN
-
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.privileged field is omitted or set to false.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.2.2 Minimize the admission of containers wishing to share the host process ID namespace (Scored)
 
-```
-WARN
-
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostPID field is omitted or set to false.
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.2.3 Minimize the admission of containers wishing to share the host IPC namespace (Scored)
 
-```
-WARN
-
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostIPC field is omitted or set to false.
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.2.4 Minimize the admission of containers wishing to share the host network namespace (Scored)
 
-```
-WARN
-
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostNetwork field is omitted or set to false.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.2.5 Minimize the admission of containers with allowPrivilegeEscalation (Scored)
 
-```
-WARN
-
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.allowPrivilegeEscalation field is omitted or set to false.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.2.6 Minimize the admission of root containers (Not Scored)
 
-```
-WARN
-
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.runAsUser.rule is set to either MustRunAsNonRoot or MustRunAs with the range of UIDs not including 0.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.2.7 Minimize the admission of containers with the NET_RAW capability (Not Scored)
 
-```
-WARN
-
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.requiredDropCapabilities is set to include either NET_RAW or ALL.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.2.8 Minimize the admission of containers with added capabilities (Not Scored)
 
-```
-WARN
-
 Ensure that allowedCapabilities is not present in PSPs for the cluster unless it is set to an empty array.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.2.9 Minimize the admission of containers with capabilities assigned (Not Scored)
 
-```
-WARN
-
 Review the use of capabilites in applications runnning on your cluster. Where a namespace contains applicaions which do not require any Linux capabities to operate consider adding a PSP which forbids the admission of containers which do not drop all capabilities.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.3 Network Policies and CNI
 * 5.3.1 Ensure that the CNI in use supports Network Policies (Not Scored)
 
-```
-WARN
+Use network policies to restrict traffic in the cluster. This is a manual, not scored test.
 
-If the CNI plugin in use does not support network policies, consideration should be given to making use of a different plugin, or finding an alternate mechanism for restricting traffic in the Kubernetes cluster.
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.3.2 Ensure that all Namespaces have Network Policies defined (Scored)
 
-```
-WARN
-
 Follow the documentation and create NetworkPolicy objects as you need them.
+
+```
+JUSTIFICATION for WARN
 ```
 
 * 5.4 Secrets Management
 * 5.4.1 Prefer using secrets as files over secrets as environment variables (Not Scored)
 
-```
-WARN
-
 If possible, rewrite application code to read secrets from mounted secret files, rather than from environment variables.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.4.2 Consider external secret storage (Not Scored)
 
-```
-WARN
-
 Refer to the secrets management options offered by your cloud provider or a third-party secrets management solution.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.5 Extensible Admission Control
 * 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Not Scored)
 
+Follow the Kubernetes documentation and setup image provenance.
+
 ```
 WARN
 
-Follow the Kubernetes documentation and setup image provenance.
 ```
 
 * 5.6 General Policies
 * 5.6.1 Create administrative boundaries between resources using namespaces (Not Scored)
 
-```
-WARN
-
 Follow the documentation and create namespaces for objects in your deployment as you need them.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.6.2 Ensure that the seccomp profile is set to docker/default in your pod definitions (Not Scored)
 
+Seccomp is an alpha feature currently. By default, all alpha features are disabled.
+
 ```
-WARN
-
-Seccomp is an alpha feature currently. By default, all alpha features are disabled. So, you would need to enable alpha features in the apiserver by PASSing "--feature- gates=AllAlpha=true" argument.
-
-Edit the /etc/kubernetes/apiserver file on the master node and set the KUBE_API_ARGS parameter to "--feature-gates=AllAlpha=true"
-
-KUBE_API_ARGS="--feature-gates=AllAlpha=true"
-
-Based on your system, restart the kube-apiserver service. For example:
-
-systemctl restart kube-apiserver.service
-
-Use annotations to enable the docker/default seccomp profile in your pod definitions. An example is as below:
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: trustworthy-pod
-  annotations:
-    seccomp.security.alpha.kubernetes.io/pod: docker/default
-spec:
-  containers:
-    - name: trustworthy-container
-      image: sotrustworthy:latest
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.6.3 Apply Security Context to Your Pods and Containers (Not Scored)
 
-```
-WARN
-
 Follow the Kubernetes documentation and apply security contexts to your pods. For a suggested list of security contexts, you may refer to the CIS Security Benchmark for Docker Containers.
+
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 * 5.6.4 The default namespace should not be used (Scored)
 
+Ensure that namespaces are created to allow for appropriate segregation of Kubernetes resources and that all new resources are created in a specific namespace.
+
+This test is scored, but implemented manually. There should only be one service, `kubernetes` running in the `default` namespace. You can verify this using the following command:
+
+```bash
+kubectl -n default get all
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.233.0.1   <none>        443/TCP   3d16h
+```
 
 ```
-WARN
-
-Ensure that namespaces are created to allow for appropriate segregation of Kubernetes resources and that all new resources are created in a specific namespace.
+JUSTIFICATION for WARN (MANUAL)
 ```

@@ -242,7 +242,7 @@ CONTROLLER_HOST_NAME=$(cat ./inventory/hosts | grep "\[kube-master\]" -A 1 | tai
 CONTROLLER_IP=$(cat ./inventory/hosts | grep $CONTROLLER_HOST_NAME | grep ansible_host | cut -d'=' -f2)
 ssh -F ssh-bastion.conf centos@$CONTROLLER_IP
 
-WORKER_HOST_NAME=$(cat ./inventory/hosts | grep "\[kube-worker\]" -A 1 | tail -n 1)
+WORKER_HOST_NAME=$(cat ./inventory/hosts | grep "\[kube-node\]" -A 1 | tail -n 1)
 WORKER_IP=$(cat ./inventory/hosts | grep $WORKER_HOST_NAME | grep ansible_host | cut -d'=' -f2)
 ssh -F ssh-bastion.conf centos@$WORKER_IP
 
