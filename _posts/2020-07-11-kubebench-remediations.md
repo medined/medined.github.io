@@ -14,7 +14,23 @@ theme: kubernetes
 
 * * *
 
+# Table of Contents
+{:.no_toc}
+* unordered list
+{:toc}
+
+* * *
+
 This article shows how I am remediating the results of `kube-bench`. It will be updated over time, hopefully.
+
+## Findings
+
+| Result | Count |
+| ------ | ----: |
+| PASS   | 48 |
+| WARN   | 22 |
+| FAIL   | 34 |
+| Total  | 104 |
 
 ## Master
 
@@ -199,7 +215,7 @@ Pass.
 
 * 1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate
 
-The code below does not have the current certificate authority file but it does show how to resolve this issue when the correct file is identified.
+**The code below does not have the current certificate authority file but it does show how to resolve this issue when the correct file is identified.**
 
 ```
     - name: 1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate
@@ -252,10 +268,24 @@ Pass.
 * 1.2.12 Ensure that the admission control plugin AlwaysPullImages is set
 
 ```
-WARN
+    - name: 1.2.12 Ensure that the admission control plugin AlwaysPullImages is set
+      block:
+        - name: 1.2.12 check AlwaysPullImages exists.
+          command: grep enable-admission-plugins kube-apiserver.yaml | grep AlwaysPullImages
+          register: always_pull_images_flag
+          check_mode: no
+          ignore_errors: yes
+          changed_when: no
+
+        - name: 1.2.12 add AlwaysPullImages
+          replace:
+            path: /etc/kubernetes/manifests/kube-apiserver.yaml
+            regexp: '^(.*enable-admission-plugins=.*)$'
+            replace: '\1,AlwaysPullImages'
+          when: always_pull_images_flag.rc != 0
 ```
 
-* *1.2.13 Ensure that the admission control plugin SecurityContextDeny is set if PodSecurityPolicy is not used
+* 1.2.13 Ensure that the admission control plugin SecurityContextDeny is set if PodSecurityPolicy is not used
 
 ```
 WARN
@@ -525,7 +555,7 @@ master node and set the below parameter.
 * 3.1.1 Client certificate authentication should not be used for users (Not Scored)
 
 ```
-WARN 
+WARN
 
 Alternative mechanisms provided by Kubernetes such as the use of OIDC should be implemented in place of client certificates.
 ```
@@ -534,7 +564,7 @@ Alternative mechanisms provided by Kubernetes such as the use of OIDC should be 
 * 3.2.1 Ensure that a minimal audit policy is created (Scored)
 
 ```
-WARN 
+WARN
 
 Create an audit policy file for your cluster.
 ```
@@ -542,7 +572,7 @@ Create an audit policy file for your cluster.
 * 3.2.2 Ensure that the audit policy covers key security concerns (Not Scored)
 
 ```
-WARN 
+WARN
 
 Consider modification of the audit policy in use on the cluster to include these items, at a minimum.
 ```
@@ -578,7 +608,7 @@ Run the below command (based on the file location on your system) on the each wo
 ```
 FAIL
 
-Run the below command (based on the file location on your system) on the each worker node. For example, 
+Run the below command (based on the file location on your system) on the each worker node. For example,
 
   chown root:root /etc/kubernetes/proxy.conf
 ```
