@@ -20,9 +20,9 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 
 | Result        | Count |
 | ------------- | ----: |
-| PASS          | 49 |
+| PASS          | 50 |
 | FAIL          | 23 |
-| WARN          | 9 |
+| WARN          | 8 |
 | JUSTIFICATION | 35 |
 | ------------- | ----: |
 | Total         | 116 |
@@ -114,7 +114,9 @@ This is how to wait:
 
 * https://cloud.google.com/kubernetes-engine/docs/concepts/cis-benchmarks has some interesting things to say about why some tests are not passing.
 
-## Master
+## Remediations
+
+### Master
 
 * 1 Master Node Security Configuration
 * 1.1 Master Node Configuration Files
@@ -603,7 +605,7 @@ FAIL
 FAIL
 ```
 
-## Etcd
+### 2. Etcd
 
 * 2 Etcd Node Configuration
 * 2 Etcd Node Configuration Files
@@ -673,7 +675,7 @@ master node and set the below parameter.
   --trusted-ca-file=</path/to/ca-file>
 ```
 
-## Controlplane
+### 3. Controlplane
 
 * 3 Control Plane Configuration
 * 3.1 Authentication and Authorization
@@ -702,7 +704,7 @@ WARN
 Consider modification of the audit policy in use on the cluster to include these items, at a minimum.
 ```
 
-## Node
+### 4. Node
 
 * 4 Worker Node Security Configuration
 * 4.1 Worker Node Configuration Files
@@ -912,25 +914,33 @@ Based on your system, restart the kubelet service. For example:
 * 4.2.13 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Not Scored)
 
 ```
-WARN
+PASS
 
-If using a Kubelet config file, edit the file to set TLSCipherSuites: to
+- name: 4.2.13 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers
+  block:
+    - name: 4.2.13 check flag
+      command: grep "^\-\-tls-cipher-suites=" /etc/kubernetes/kubelet.env
+      register: tls_cipher_suites_flag
+      check_mode: no
+      ignore_errors: yes
+      changed_when: no
 
-  TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
+    # This is a long shell command but I don't know any way to shorten it.
+    - name: 4.2.13 add flag
+      shell: sed -i 's^--config=/etc/kubernetes/kubelet-config.yaml \\^--config=/etc/kubernetes/kubelet-config.yaml \\\n--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256 \\^' /etc/kubernetes/kubelet.env
+      args:
+        warn: false
+      when: tls_cipher_suites_flag.rc != 0
 
-or to a subset of these values.
-
-If using executable arguments, edit the kubelet service file /etc/systemd/system/kubelet.service on each worker node and set the --tls-cipher-suites parameter as follows, or to a subset of these values.
-
-  --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
-
-Based on your system, restart the kubelet service. For example:
-
-  systemctl daemon-reload
-  systemctl restart kubelet.service
+    - name: 4.2.13 Restart kubelet
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: kubelet
+        state: restarted
 ```
 
-## Policies
+### 5. Policies
 
 * 5 Kubernetes Policies
 * 5.1 RBAC and Service Accounts
