@@ -55,27 +55,26 @@ cat <<EOF > cis-benchmark-remediation.yml
       no_log: true
 
 - hosts: kube-master
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  become: yes
   gather_facts: False
   roles:
     - { role: kubespray-defaults }
 
-- hosts: kube-worker
+- hosts: kube-node
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   gather_facts: False
   roles:
     - { role: kubespray-defaults }
 
 - hosts: etcd
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  become: yes
   gather_facts: False
   roles:
     - { role: kubespray-defaults }
 
-- hosts: kube-master
-  become: yes
-  gather_facts: False
-  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
-
   tasks:
-
     - debug:
         var: ansible_version
 EOF
