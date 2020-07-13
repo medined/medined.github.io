@@ -116,7 +116,7 @@ This is how to wait:
 
 ## Remediations
 
-### Master
+### 1. Master
 
 * 1 Master Node Security Configuration
 * 1.1 Master Node Configuration Files
