@@ -1,6 +1,6 @@
 ---
 layout: post
-title: yRun KubeBench on KubeSpray Cluster
+title: Run KubeBench on KubeSpray Cluster
 author: David Medinets
 categories: kubernetes kubebench kubespray
 year: 2020

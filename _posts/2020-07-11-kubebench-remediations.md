@@ -20,10 +20,10 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 
 | Result        | Count |
 | ------------- | ----: |
-| PASS          | 50 |
-| FAIL          | 23 |
-| WARN          | 8 |
-| JUSTIFICATION | 35 |
+| PASS          | 54 |
+| FAIL          | 19 |
+| WARN          | 6 |
+| JUSTIFICATION | 37 |
 | ------------- | ----: |
 | Total         | 116 |
 
@@ -468,25 +468,25 @@ PASS
 * 1.2.22 Ensure that the --audit-log-path argument is set
 
 ```
-FAIL
+PASS - see 3.2.1.
 ```
 
 * 1.2.23 Ensure that the --audit-log-maxage argument is set to 30 or as appropriate
 
 ```
-FAIL
+PASS - see 3.2.1.
 ```
 
 * 1.2.24 Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate
 
 ```
-FAIL
+PASS - see 3.2.1.
 ```
 
 * 1.2.25 Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate
 
 ```
-FAIL
+PASS - see 3.2.1.
 ```
 
 * 1.2.26 Ensure that the --request-timeout argument is set as appropriate
@@ -689,18 +689,128 @@ Alternative mechanisms provided by Kubernetes such as the use of OIDC should be 
 * 3.2 Logging
 * 3.2.1 Ensure that a minimal audit policy is created (Scored)
 
-```
-WARN
+This section shows how to set a policy file but does not make a recommendation
+regarding a default policy. An example policy is used.
 
-Create an audit policy file for your cluster.
+The Ansible task shown below allows 1.2.22, 1.2.23, 1.2.24, and 1.2.25 to pass.
+
+The following list of audit log files provide anecdotal proof that
+both audit features and log rotation is enabled.
+
+```
+# ls -lh
+total 556M
+-rw-r--r--. 1 root root 200M Jul 18 14:19 audit-2020-07-18T14-19-40.621.log
+-rw-r--r--. 1 root root 150M Jul 18 14:47 audit-2020-07-18T14-47-28.622.log
+-rw-r--r--. 1 root root 100M Jul 18 15:35 audit-2020-07-18T15-35-00.149.log
+-rw-r--r--. 1 root root 100M Jul 18 16:22 audit-2020-07-18T16-22-39.856.log
+-rw-r--r--. 1 root root 5.2M Jul 18 16:25 audit.log
+```
+
+```
+JUSTIFICATION for WARN (MANUAL)
+
+- name: 3.2.1 Ensure that a minimal audit policy is created
+  block:
+
+  - name: 3.2.1 - Create a directory hold the audit policy.
+    file:
+      path: /etc/kubernetes/policies
+      state: directory
+
+  - name: 3.2.1 - Create policy file.
+    copy:
+      dest: /etc/kubernetes/policies/audit-policy.yaml
+      content: |
+        apiVersion: audit.k8s.io/v1beta1
+        kind: Policy
+        rules:
+          # Do not log from kube-system accounts
+          - level: None
+            userGroups:
+            - system:serviceaccounts:kube-system
+          - level: None
+            users:
+            - system:apiserver
+            - system:kube-scheduler
+            - system:volume-scheduler
+            - system:kube-controller-manager
+            - system:node
+
+          # Do not log from collector
+          - level: None
+            users:
+            - system:serviceaccount:collectorforkubernetes:collectorforkubernetes
+
+          # Don't log nodes communications
+          - level: None
+            userGroups:
+            - system:nodes
+
+          # Don't log these read-only URLs.
+          - level: None
+            nonResourceURLs:
+            - /healthz*
+            - /version
+            - /swagger*
+
+          # Log configmap and secret changes in all namespaces at the metadata level.
+          - level: Metadata
+            resources:
+            - resources: ["secrets", "configmaps"]
+
+          # A catch-all rule to log all other requests at the request level.
+          - level: Request
+
+  #
+  # There might be a lot of changes to the api-server manifest. Each
+  # change would restart the apiserver pod. It might be better to
+  # stop the kubelet and restart it when we are done.
+  - name: Stop kubelet.
+    systemd:
+      state: stopped
+      name: kubelet
+
+  - name: 3.2.1 - Check audit policy flag exists.
+    shell: grep audit-policy-file /etc/kubernetes/manifests/kube-apiserver.yaml | grep audit-policy-file
+    register: audit_policy_file_flag
+    check_mode: no
+    ignore_errors: yes
+    changed_when: no
+
+  - name: 3.2.1 - Add audit parameters.
+    replace:
+      path: /etc/kubernetes/manifests/kube-apiserver.yaml
+      regexp: '^(.*tls-private-key-file=.*)$'
+      replace: '\1\n    - --audit-policy-file=/etc/kubernetes/policies/audit-policy.yaml\n    - --audit-log-path=/var/log/apiserver/audit.log\n    - --audit-log-maxbackup=10\n    - --audit-log-maxage=30\n    - --audit-log-maxsize=100\n    - --feature-gates=AdvancedAuditing=false'
+    when: audit_policy_file_flag.rc != 0
+
+  - name: 3.2.1 - Add volume mounts to end of list.
+    replace:
+      path: /etc/kubernetes/manifests/kube-apiserver.yaml
+      regexp: '^  hostNetwork: true$'
+      replace: '    - mountPath: /etc/kubernetes/policies\n      name: policies\n      readOnly: true\n    - mountPath: /var/log/apiserver\n      name: log\n  hostNetwork: true'
+    when: audit_policy_file_flag.rc != 0
+
+  - name: 3.2.1 - Add volumes to end of list.
+    replace:
+      path: /etc/kubernetes/manifests/kube-apiserver.yaml
+      regexp: '^status: {}$'
+      replace: '  - hostPath:\n      path: /etc/kubernetes/policies\n      type: DirectoryOrCreate\n    name: policies\n  - hostPath:\n      path: /var/log/apiserver\n      type: DirectoryOrCreate\n    name: log\nstatus: {}'
+    when: audit_policy_file_flag.rc != 0
+
+  - name: Start kubelet.
+    systemd:
+      state: started
+      name: kubelet
 ```
 
 * 3.2.2 Ensure that the audit policy covers key security concerns (Not Scored)
 
-```
-WARN
+See section 3.2.1.
 
-Consider modification of the audit policy in use on the cluster to include these items, at a minimum.
+```
+JUSTIFICATION for WARN (MANUAL)
 ```
 
 ### 4. Node
