@@ -55,8 +55,8 @@ aws_cluster_name = "flooper"
 
 # VPC Vars
 aws_vpc_cidr_block       = "10.250.192.0/18"
-aws_cidr_subnets_private = [ "10.250.192.0/20", "10.250.208.0/20" ]
-aws_cidr_subnets_public  = [ "10.250.224.0/20", "10.250.240.0/20" ]
+aws_cidr_subnets_private = ["10.250.192.0/20", "10.250.208.0/20"]
+aws_cidr_subnets_public  = ["10.250.224.0/20", "10.250.240.0/20"]
 
 # Bastion Host
 aws_bastion_size = "t3.medium"
@@ -179,6 +179,10 @@ CONTROLLER_HOST_NAME: $CONTROLLER_HOST_NAME
        CONTROLLER_IP: $CONTROLLER_IP
              LB_HOST: $LB_HOST
 EOF
+
+# Get the controller's SSH fingerprint.
+ssh-keygen -R $CONTROLLER_IP > /dev/null 2>&1
+ssh-keyscan -H $CONTROLLER_IP >> ~/.ssh/known_hosts 2>/dev/null
 
 mkdir -p ~/.kube
 ssh -F ssh-bastion.conf centos@$CONTROLLER_IP "sudo chmod 644 /etc/kubernetes/admin.conf"

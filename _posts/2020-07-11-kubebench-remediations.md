@@ -21,9 +21,9 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 | Result        | Count |
 | ------------- | ----: |
 | PASS          | 54 |
-| FAIL          | 19 |
-| WARN          | 6 |
-| JUSTIFICATION | 37 |
+| FAIL          | 18 |
+| WARN          | 4 |
+| JUSTIFICATION | 40 |
 | ------------- | ----: |
 | Total         | 116 |
 
@@ -38,6 +38,10 @@ cat <<EOF > cis-benchmark-remediation.yml
 ---
 - name: Check ansible version
   import_playbook: ansible_version.yml
+
+#
+# Just a reminder that all include the bastion servers.
+#
 
 - hosts: all
   gather_facts: false
@@ -54,18 +58,43 @@ cat <<EOF > cis-benchmark-remediation.yml
           NO_PROXY: "{{ no_proxy | default ('') }}"
       no_log: true
 
+#
+# Just the controllers
+#
 - hosts: kube-master
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   become: yes
   gather_facts: False
   roles:
     - { role: kubespray-defaults }
+    tasks:
+      - debug:
+          var: ansible_version
 
+#
+# Just the workers
+#
 - hosts: kube-node
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   gather_facts: False
   roles:
     - { role: kubespray-defaults }
+    tasks:
+      - debug:
+          var: ansible_version
+
+#
+# The controllers and the workers
+#
+- hosts: kube-master kube-node
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  gather_facts: False
+  roles:
+    - { role: kubespray-defaults }
+    tasks:
+      - debug:
+          var: ansible_version
+
 
 - hosts: etcd
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
@@ -73,7 +102,6 @@ cat <<EOF > cis-benchmark-remediation.yml
   gather_facts: False
   roles:
     - { role: kubespray-defaults }
-
   tasks:
     - debug:
         var: ansible_version
@@ -545,8 +573,28 @@ FAIL
 
 * 1.2.35 Ensure that the API Server only makes use of Strong Cryptographic Ciphers
 
+Kube-bench is checking for a more permissive list of ciphers. Its check has no flexibility.
+
 ```
-FAIL
+JUSTIFICATION of FAIL
+
+- name: 1.2.35 Ensure that the API Server only makes use of Strong Cryptographic Ciphers
+  block:
+    - name: 1.2.35 check flag
+      command: grep "tls-cipher-suites=" /etc/kubernetes/manifests/kube-apiserver.yaml
+      register: tls_cipher_suites_flag
+      check_mode: no
+      ignore_errors: yes
+      changed_when: no
+
+    # This is a long shell command but I don't know any way to shorten it.
+    - name: 1.2.35 add flag
+      shell: sed -i 's^- kube-apiserver$^- kube-apiserver\n    - --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384^' /etc/kubernetes/manifests/kube-apiserver.yaml
+      args:
+        warn: false
+      when: tls_cipher_suites_flag.rc != 0
+      notify:
+        Restart kubelet
 ```
 
 * 1.3 Controller Manager
@@ -954,31 +1002,30 @@ PASS
 
 * 4.2.8 Ensure that the --hostname-override argument is not set (Not Scored)
 
+The CIS Benchmark says "Some cloud providers may require this flag to ensure that hostname matches names issued
+by the cloud provider. In these environments, this recommendation should not apply." Some research could be done to verify that argument is required for AWS.
+
+However, by manual inspection we can see that the parameter argument is the same as the hostname. Therefore, the hostname is not being overridden, just set to its proper value.
+
+The manual test is this: On a worker node, run `hostname`. This might return `ip-10-250-207-133.ec2.internal`. View the `kubelet` command using `ps -ef | grep kubelet`. You'll see that the `--hostname-override` parameter is the same of the hostname.
+
 ```
-WARN
-
-Edit the kubelet service file /etc/systemd/system/kubelet.service on each worker node and remove the --hostname-override argument from the
-KUBELET_SYSTEM_PODS_ARGS variable.
-
-Based on your system, restart the kubelet service. For example:
-
-  systemctl daemon-reload
-  systemctl restart kubelet.service
+JUSTIFICATION for WARN
 ```
 
 * 4.2.9 Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Not Scored)
 
+`kublet`, in our cluster, is configured in `/etc/kubernetes/kubelet-config.yaml`. The `kube-bench` tool does not test this file. It tests for command-line parameters.
+
+A manual check can done by looking inside the yaml file.
 ```
-WARN
+JUSTIFICATION for WARN
 
-If using a Kubelet config file, edit the file to set eventRecordQPS: to an appropriate level.
-
-If using command line arguments, edit the kubelet service file /etc/systemd/system/kubelet.service on each worker node and set the below parameter in KUBELET_SYSTEM_PODS_ARGS variable.
-
-Based on your system, restart the kubelet service. For example:
-
-  systemctl daemon-reload
-  systemctl restart kubelet.service
+    - name: 4.2.9 Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture
+      lineinfile:
+        path: /etc/kubernetes/kubelet-config.yaml
+        regexp: '^eventRecordQPS'
+        line: 'eventRecordQPS: 5'
 ```
 
 * 4.2.10 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Scored)
