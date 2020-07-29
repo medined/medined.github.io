@@ -16,9 +16,44 @@ Creating a cluster takes two steps:
 
 It should take less than 20 minutes to create a small cluster. I have just one controller node and one worker node. Kubespray also creates two basion nodes. I don't mind one bastion but I don't know why two would be helpful.
 
+## Acknowledgements
+
 This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
 
 ## Provisioning Infrastructure
+
+* Let's define some values ahead of need. The cluster name allows you to have multiple clusters in the same AWS account. Each will have its down VPC. And you'll need to have a different kubespray install for each cluster. I haven't tried to support multiple clusters.
+
+```bash
+export CLUSTER_NAME="flooper"
+export IMAGE_NAME=medined/aws-encryption-provider
+```
+
+* **Encryption at Rest** - If you need this, then create a Docker image of the `aws-encryption-provider`. I was not able to find an official version of this image so I created my own copy.
+
+```bash
+git clone https://github.com/kubernetes-sigs/aws-encryption-provider.git
+cd aws-encryption-provider
+docker build -t $IMAGE_NAME .
+docker login
+docker push $IMAGE_NAME
+```
+
+* **Encryption at Rest** - If you need this, then create a KMS key. Remember the key id using a file. I don't know a better way of tracking this information. I read that using an alias causes a problem. The tags are not displayed on the console. You can source this file to have the environment variables handy. I added AWS_DEFAULT_REGION and other values so you can find them later.
+
+```
+KEY_ID=$(aws kms create-key --tags TagKey=purpose,TagValue=k8s-encryption --query KeyMetadata.KeyId --output text)
+
+export KEY_ARN=$(aws kms describe-key --key-id $KEY_ID --query KeyMetadata.Arn --output text)
+
+cat <<EOF > $HOME/$CLUSTER_NAME-encryption-provider-kms-key.env
+AWS_DEFAULT_REGION=us-east-1
+CLUSTER_NAME=$CLUSTER_NAME
+IMAGE_NAME=$IMAGE_NAME
+KEY_ID=$KEY_ID
+KEY_ARN=$KEY_ARN
+EOF
+```
 
 * Connect to a base project directory. I use `/data/project` which is on a separate partition.
 
@@ -33,6 +68,16 @@ git clone https://github.com/kubernetes-sigs/kubespray.git
 cd kubespray
 pip freeze | xargs pip uninstall -y
 pip install -r requirements.txt
+```
+
+* **Encryption at Rest** - If you need this, then update `contrib/terraform/aws/modules/iam/main.tf` after making a copy. I think that only "kms:ListKeys", "kms:TagResource", "kms:Encrypt", "kms:DescribeKey", and "kms:CreateKey" are needed but just in case I allow all actions. Add the following to the file.
+
+```
+,{
+  "Effect": "Allow",
+  "Action": "kms:*",
+  "Resource": ["*"]
+}
 ```
 
 * Change to the `aws` directory.
@@ -51,7 +96,7 @@ cd contrib/terraform/aws
 ```
 cat <<EOF > terraform.tfvars
 # Global Vars
-aws_cluster_name = "flooper"
+aws_cluster_name = "$CLUSTER_NAME"
 
 # VPC Vars
 aws_vpc_cidr_block       = "10.250.192.0/18"
@@ -149,15 +194,16 @@ export PKI_PRIVATE_PEM=KEYPAIR.pem
 
 ```bash
 ansible-playbook \
-    -i ./inventory/hosts \
-    ./cluster.yml \
-    -e ansible_user=centos \
-    -e bootstrap_os=centos \
-    --become \
-    --become-user=root \
-    --flush-cache \
-    -e ansible_ssh_private_key_file=$PKI_PRIVATE_PEM \
-    | tee /tmp/kubespray-cluster-$(date "+%Y-%m-%d_%H:%M").log
+  -vvvvv \
+  -i ./inventory/hosts \
+  ./cluster.yml \
+  -e ansible_user=centos \
+  -e bootstrap_os=centos \
+  --become \
+  --become-user=root \
+  --flush-cache \
+  -e ansible_ssh_private_key_file=$PKI_PRIVATE_PEM \
+  | tee /tmp/kubespray-cluster-$(date "+%Y-%m-%d_%H:%M").log
 ```
 
 NOTE: In `/tmp`, you'll see Ansible Fact files named after the hostname. For example, `/tmp/ip-10-250-192-82.ec2.internal`.
@@ -166,6 +212,7 @@ NOTE: Setting `-e cloud_provider=aws` does not work.
 -e podsecuritypolicy_enabled=true \
 -e kube_apiserver_enable_admission_plugins=AlwaysPullImages \
 
+NOTE: If you see a failuer with the message `target uses selinux but python bindings (libselinux-python) aren't installed.`, then install the `selinux` python page on the computer running Ansible. The command should be something like `python2 -m pip install selinux`. I also run the command for `python3`.
 
 * Setup `kubectl` so that is can connect to the new cluster. **THIS OVERWRITES YOUR KUBECTL CONFIG FILE!**
 
@@ -190,6 +237,30 @@ scp -F ssh-bastion.conf centos@$CONTROLLER_IP:/etc/kubernetes/admin.conf ~/.kube
 sed -i "s^server:.*^server: https://$LB_HOST:6443^" ~/.kube/config
 kubectl get nodes
 ```
+
+* Create script allowing SSH to controller, worker, and etcd servers.
+
+```bash
+cat <<EOF > ssh-to-controller.sh
+HOST_NAME=$(cat ./inventory/hosts | grep "\[kube-master\]" -A 1 | tail -n 1)
+IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2)
+ssh -F ssh-bastion.conf centos@$IP
+EOF
+
+cat <<EOF > ssh-to-worker.sh
+HOST_NAME=$(cat ./inventory/hosts | grep "\[kube-node\]" -A 1 | tail -n 1)
+IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2)
+ssh -F ssh-bastion.conf centos@$IP
+EOF
+
+cat <<EOF > ssh-to-etcd.sh
+HOST_NAME=$(cat ./inventory/hosts | grep "\[etcd\]" -A 1 | tail -n 1)
+IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2)
+ssh -F ssh-bastion.conf centos@$IP
+EOF
+```
+
+* **Encryption at Rest** - If you need this, visit https://medined.github.io/kubernetes/kubespray/encryption/ansible/add-aws-encryption-provider-to-kubespray/ to complete the cluster creation process.
 
 **The cluster creation is complete.**
 

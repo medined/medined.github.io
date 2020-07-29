@@ -14,6 +14,12 @@ theme: kubernetes
 
 * * *
 
+## Acknowledgements
+
+This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
+
+## Article
+
 This article shows how to run the five kinds of tests that kube-bench provides.
 
 1. Master

@@ -14,6 +14,16 @@ theme: kubernetes
 
 * * *
 
+## Acknowledgements
+
+This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
+
+## Antecedents
+
+https://medined.github.io/centos/terraform/ansible/kubernetes/kubespray/provision-centos-kubernetes-cluster-on-aws/ shows the entire process of provisioning a Kubernetes cluster.
+
+## Overview
+
 This article shows show I added the AWS Encryption Provider (https://github.com/kubernetes-sigs/aws-encryption-provider) to my KubeSpray-based Kubernetes cluster.
 
 This change is to support the CIS Benchmark `1.2.34 Ensure that encryption providers are appropriately configured` element.

@@ -7,6 +7,12 @@ year: 2020
 theme: python
 ---
 
+## Acknowledgements
+
+This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
+
+## Article
+
 This article shows how to interact with Eureka using its REST API. I provide fully working
 examples.
 

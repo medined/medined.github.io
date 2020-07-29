@@ -14,6 +14,12 @@ theme: kubernetes
 
 * * *
 
+## Acknowledgements
+
+This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
+
+## Article
+
 This article shows how I am remediating the results of `kube-bench`. It will be updated over time, hopefully.
 
 ## Findings
@@ -21,11 +27,35 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 | Result        | Count |
 | ------------- | ----: |
 | PASS          | 54 |
-| FAIL          | 18 |
-| WARN          | 4 |
-| JUSTIFICATION | 40 |
+| FAIL          | 17 |
+| WARN          | 3 |
+| JUSTIFICATION | 42 |
 | ------------- | ----: |
 | Total         | 116 |
+
+## Recommendations From Rancher
+
+https://rancher.com/docs/rancher/v2.x/en/security/hardening-2.4/ has some useful information.
+
+Make these changes on all nodes.
+
+* Create a `sysctl` settings file. I have not evaluated these settings.
+
+```bash
+cat <<EOF > /etc/sysctl.d/90-kubelet.conf
+vm.overcommit_memory=1
+vm.panic_on_oom=0
+kernel.panic=10
+kernel.panic_on_oops=1
+kernel.keys.root_maxbytes=25000000
+EOF
+```
+
+* Run `sysctl` to enable the settings.
+
+```bash
+sysctl -p /etc/sysctl.d/90-kubelet.conf
+```
 
 ## How To run Remediation Ansible Playbook
 
@@ -567,8 +597,10 @@ FAIL
 
 * 1.2.34 Ensure that encryption providers are appropriately configured
 
+Kube-bench has this as a manual check. Therefore it will always fail. However, Encryption at Rest is supported at shown by https://medined.github.io/kubernetes/kubespray/encryption/ansible/add-aws-encryption-provider-to-kubespray/. There is a manual proof process which can be automated if needed.
+
 ```
-FAIL
+JUSTIFICATION of FAIL
 ```
 
 * 1.2.35 Ensure that the API Server only makes use of Strong Cryptographic Ciphers
@@ -576,7 +608,7 @@ FAIL
 Kube-bench is checking for a more permissive list of ciphers. Its check has no flexibility.
 
 ```
-JUSTIFICATION of FAIL
+JUSTIFICATION of FAIL (MANUAL)
 
 - name: 1.2.35 Ensure that the API Server only makes use of Strong Cryptographic Ciphers
   block:
@@ -713,13 +745,16 @@ PASS
 
 * 2.7 Ensure that a unique Certificate Authority is used for etcd (Not Scored)
 
-```
-WARN
+This check will always be WARN because it is a manual test.
 
-[Manual test] Follow the etcd documentation and create a dedicated certificate authority setup for the etcd service. Then, edit the etcd pod specification file /etc/kubernetes/manifests/etcd.yaml on the
-master node and set the below parameter.
+KubeSpray runs `etcd` as a separate set of servers. The CA of each etcd server can be checked using the following technique. Run the equivalent for each server in the etcd cluster.
 
-  --trusted-ca-file=</path/to/ca-file>
+```bash
+JUSTIFICATION for WARN (MANUAL)
+
+HOST_NAME=$(cat ./inventory/hosts | grep "\[etcd\]" -A 1 | tail -n 1)
+IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2)
+ssh -F ssh-bastion.conf centos@$IP grep "ETCDCTL_CA_FILE" /etc/etcd.env
 ```
 
 ### 3. Controlplane
