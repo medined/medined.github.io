@@ -7,6 +7,13 @@ year: 2020
 theme: kubernetes
 ---
 
+# Table of Contents
+{:.no_toc}
+* unordered list
+{:toc}
+
+* * *
+
 Let me start by saying that I will be covering no new ground. This post is only to disambiguate building a centos-based kubernetes cluster by showing the exact steps that I used.
 
 Creating a cluster takes two steps:
@@ -15,6 +22,11 @@ Creating a cluster takes two steps:
 * Installing the Kubernetes software.
 
 It should take less than 20 minutes to create a small cluster. I have just one controller node and one worker node. Kubespray also creates two basion nodes. I don't mind one bastion but I don't know why two would be helpful.
+
+Watch for configuration options:
+
+* **Encryption At Rest**
+* **Pod Security Policy**
 
 ## Acknowledgements
 
@@ -69,6 +81,8 @@ cd kubespray
 pip freeze | xargs pip uninstall -y
 pip install -r requirements.txt
 ```
+
+* **Bug Fix** - Visit https://github.com/kubernetes-sigs/kubespray/pull/6487. Then click on "Files Changed". If the pull request was accepted, the change might already be in the `kubespray` project.
 
 * **Encryption at Rest** - If you need this, then update `contrib/terraform/aws/modules/iam/main.tf` after making a copy. I think that only "kms:ListKeys", "kms:TagResource", "kms:Encrypt", "kms:DescribeKey", and "kms:CreateKey" are needed but just in case I allow all actions. Add the following to the file.
 
@@ -260,9 +274,124 @@ ssh -F ssh-bastion.conf centos@$IP
 EOF
 ```
 
+* **Pod Security Policy** - If you need this, run the following command which provides a basic set of policies. Learning about pod security policies is a big topic. We won't cover it here other than to say that before enabling the PodSecurityPolicy admission controller, pod security policies need to be in place so that pods in the kube-system namespace can start. That's what the following command does, it provides a bare minimum set of policies needed to start the apiserver pod. The restricted clusterrole as *zero* rules. If you want normal users to perform commands, you'll need to explicitly create rules. Here is summary of the `restricted` PSP.
+  * Enable read-only root filesystem
+  * Enable security profiles
+  * Prevent host network access
+  * Prevent privileged mode
+  * Prevent root privileges
+  * Whitelist read-only host path
+  * Whitelist volume types
+
+Each time a Gist is changed, the URL for it changes as well. It's important to get the latest version. Visit https://gist.github.com/medined/73cfb72c240a413eaf499392fe4026cf, then click on 'Raw'. Make sure the URL is the same as the one shown below.
+
+```bash
+kubectl apply -f https://gist.githubusercontent.com/medined/73cfb72c240a413eaf499392fe4026cf/raw/a24a6c9da7d1b19195a0b0ac777e9032a3bc8ec3/rbac-for-pod-security-policies.yaml
+```
+
+This command creates these resources:
+
+```
+podsecuritypolicy.policy/privileged unchanged
+podsecuritypolicy.policy/restricted configured
+clusterrole.rbac.authorization.k8s.io/psp:privileged unchanged
+clusterrole.rbac.authorization.k8s.io/psp:restricted unchanged
+clusterrolebinding.rbac.authorization.k8s.io/default:restricted unchanged
+rolebinding.rbac.authorization.k8s.io/default:privileged unchanged
+```
+
+* **Pod Security Policy** - If you need this, find the public IP of the controller node, then SSH to it. `sudo` to be the `root` user. Now edit `/etc/kubernetes/manifests/kube-apiserver.yaml` by adding `PodSecurityPolicy` to the admission plugin list. As soon as you save the file, the `apiserver` pod will be restarted. This will cause connection errors because the api server stops responding. This is normal. Wait a few minutes and the pod will restart and start responds to requests. Check the command using `octant` or another technique. If you don't see the admission controllers in the command, resave the file to restart the pod.
+
+```
+--enable-admission-plugins=NodeRestriction,PodSecurityPolicy
+```
+
 * **Encryption at Rest** - If you need this, visit https://medined.github.io/kubernetes/kubespray/encryption/ansible/add-aws-encryption-provider-to-kubespray/ to complete the cluster creation process.
 
 **The cluster creation is complete.**
+
+## Ingress Controller
+
+See https://docs.nginx.com/nginx-ingress-controller/overview/ for more information.
+
+By default, pods of Kubernetes services are not accessible from the external network, but only by other pods within the Kubernetes cluster. Kubernetes has a built‑in configuration for HTTP load balancing, called Ingress, that defines rules for external connectivity to Kubernetes services. Users who need to provide external access to their Kubernetes services create an Ingress resource that defines rules, including the URI path, backing service name, and other information. **The Ingress controller can then automatically program a front‑end load balancer to enable Ingress configuration.** The NGINX Ingress Controller for Kubernetes is what enables Kubernetes to configure NGINX and NGINX Plus for load balancing Kubernetes services.
+
+* Download the official manifest file.
+
+```bash
+curl -o ingress-nginx-controller-0.34.1.yaml https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.34.1/deploy/static/provider/aws/deploy.yaml
+```
+
+* Add the following to all ClusterRole and Role resources.
+
+```
+- apiGroups:      [policy]
+  resources:      [podsecuritypolicies]
+  resourceNames:  [privileged]
+  verbs:          [use]
+```
+
+* Add the following to the end of the file.
+
+```
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    helm.sh/chart: ingress-nginx-2.11.1
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/version: 0.34.1
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: controller
+  name: ingress-nginx
+  namespace: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ingress-nginx
+subjects:
+  - kind: ServiceAccount
+    name: ingress-nginx
+    namespace: default
+```
+
+* Create the resources.
+
+```bash
+kubectl apply -f ingress-nginx-controller-0.34.1.yaml
+```
+
+This command creates these resources:
+
+```
+namespace/ingress-nginx created
+serviceaccount/ingress-nginx created
+configmap/ingress-nginx-controller created
+clusterrole.rbac.authorization.k8s.io/ingress-nginx created
+clusterrolebinding.rbac.authorization.k8s.io/ingress-nginx created
+role.rbac.authorization.k8s.io/ingress-nginx created
+rolebinding.rbac.authorization.k8s.io/ingress-nginx created
+service/ingress-nginx-controller-admission created
+service/ingress-nginx-controller created
+deployment.apps/ingress-nginx-controller created
+validatingwebhookconfiguration.admissionregistration.k8s.io/ingress-nginx-admission created
+clusterrole.rbac.authorization.k8s.io/ingress-nginx-admission created
+clusterrolebinding.rbac.authorization.k8s.io/ingress-nginx-admission created
+job.batch/ingress-nginx-admission-create created
+job.batch/ingress-nginx-admission-patch created
+role.rbac.authorization.k8s.io/ingress-nginx-admission created
+rolebinding.rbac.authorization.k8s.io/ingress-nginx-admission created
+serviceaccount/ingress-nginx-admission created
+```
+
+* Verify installation
+
+```bash
+kubectl get pods -n ingress-nginx \
+  -l app.kubernetes.io/name=ingress-nginx --watch
+```
 
 # Destroy Cluster
 
