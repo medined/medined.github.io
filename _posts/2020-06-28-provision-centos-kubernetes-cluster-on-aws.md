@@ -187,7 +187,7 @@ terraform init
 
 ```bash
 rm ../../../inventory/hosts ../../../ssh-bastion.conf
-terraform apply --var-file=credentials.tfvars --auto-approve
+time terraform apply --var-file=credentials.tfvars --auto-approve
 ```
 
 ## Install kubernetes
@@ -207,11 +207,12 @@ export PKI_PRIVATE_PEM=KEYPAIR.pem
 * Run the ansible playbook for CentOS.
 
 ```bash
-ansible-playbook \
+time ansible-playbook \
   -vvvvv \
   -i ./inventory/hosts \
   ./cluster.yml \
   -e ansible_user=centos \
+  -e cloud_provider=aws \
   -e bootstrap_os=centos \
   --become \
   --become-user=root \
@@ -222,11 +223,10 @@ ansible-playbook \
 
 NOTE: In `/tmp`, you'll see Ansible Fact files named after the hostname. For example, `/tmp/ip-10-250-192-82.ec2.internal`.
 
-NOTE: Setting `-e cloud_provider=aws` does not work.
--e podsecuritypolicy_enabled=true \
+NOTE: -e podsecuritypolicy_enabled=true \
 -e kube_apiserver_enable_admission_plugins=AlwaysPullImages \
 
-NOTE: If you see a failuer with the message `target uses selinux but python bindings (libselinux-python) aren't installed.`, then install the `selinux` python page on the computer running Ansible. The command should be something like `python2 -m pip install selinux`. I also run the command for `python3`.
+NOTE: If you see a failure with the message `target uses selinux but python bindings (libselinux-python) aren't installed.`, then install the `selinux` python page on the computer running Ansible. The command should be something like `python2 -m pip install selinux`. I also run the command for `python3`.
 
 * Setup `kubectl` so that is can connect to the new cluster. **THIS OVERWRITES YOUR KUBECTL CONFIG FILE!**
 
@@ -322,7 +322,7 @@ By default, pods of Kubernetes services are not accessible from the external net
 curl -o ingress-nginx-controller-0.34.1.yaml https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.34.1/deploy/static/provider/aws/deploy.yaml
 ```
 
-* Add the following to all ClusterRole and Role resources.
+* **Pod Security Policy** - If you need this, add the following to all ClusterRole and Role resources in the downloaded yaml file.
 
 ```
 - apiGroups:      [policy]
@@ -331,7 +331,7 @@ curl -o ingress-nginx-controller-0.34.1.yaml https://raw.githubusercontent.com/k
   verbs:          [use]
 ```
 
-* Add the following to the end of the file.
+* **Pod Security Policy** - If you need this, add the following to the end of the file in the downloaded yaml file.
 
 ```
 ---
