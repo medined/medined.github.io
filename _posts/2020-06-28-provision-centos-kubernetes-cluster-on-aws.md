@@ -34,6 +34,17 @@ This work is being done at the request of the Enterprise Container Working Group
 
 ## Provisioning Infrastructure
 
+* Install Helm. Eventually you'll want to use this tool so let's get it installed now.
+
+```
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
+helm repo update
+helm search repo stable
+```
+
 * Let's define some values ahead of need. The cluster name allows you to have multiple clusters in the same AWS account. Each will have its down VPC. And you'll need to have a different kubespray install for each cluster. I haven't tried to support multiple clusters.
 
 ```bash
@@ -748,6 +759,195 @@ kubectl --namespace text-responder describe secret text-responder-tls
 ```bash
 curl https://$TEXT_RESPONDER_HOST
 ```
+
+## Install KeyCloak
+
+* Create a namespace.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: keycloak
+    labels:
+        name: keycloak
+EOF
+```
+
+* Create a password for the `admin` user. If you follow the process below, your KeyCloak will be on the internet so, at least, the password should be secure. You might be able to use port-forwarding but I haven't done that yet. **Don't loose the password!**. I'll also point out that the password is available to anyone who can read the YAML of the deployment. So, this technique might not be secure enough for your needs.
+
+```bash
+KEYCLOAK_ADMIN_PASSWORD=$(uuid | cut -b-8)
+echo $KEYCLOAK_ADMIN_PASSWORD
+```
+
+* Create a service and deployment for KeyCloak. Check https://quay.io/repository/keycloak/keycloak?tab=tags to see what is the latest image version.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: keycloak
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: quay.io/keycloak/keycloak:11.0.0
+        env:
+        - name: KEYCLOAK_USER
+          value: "admin"
+        - name: KEYCLOAK_PASSWORD
+          value: $KEYCLOAK_ADMIN_PASSWORD
+        - name: PROXY_ADDRESS_FORWARDING
+          value: "true"
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8443
+        readinessProbe:
+          httpGet:
+            path: /auth/realms/master
+            port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  namespace: keycloak
+  labels:
+    app: keycloak
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: keycloak
+EOF
+```
+
+* Check the service is running. You should see the `text-responder` service in the list. The external IP should be `<none>`.
+
+```bash
+kubectl --namespace keycloak get service
+```
+
+* Find your Ingress Nginx Controller load balancer domain. The answer will look something like `aaXXXXf67c55949d8b622XXXX862dce0-bce30cd38eXXXX95.elb.us-east-1.amazonaws.com`.
+
+```bash
+kubectl -n ingress-nginx get service ingress-nginx-controller
+```
+
+* Create a vanity domain for KeyCloak. This domain needs to point to the load balancer found in the previous step. I use Route 53 but you can use any DNS service. Please make sure that your can correctly resolve the domain using `dig`.
+
+```bash
+export KEYCLOAK_HOST="keycloak.david.va-oit.cloud"
+```
+
+* Curl should get the default 404 response. The HTTPS request should fail because the local issuer certificate can't be found.
+
+```bash
+curl http://$KEYCLOAK_HOST
+```
+
+```bash
+curl https://$KEYCLOAK_HOST
+```
+
+* Create an ingress for the vanity domain. Note that I am using the production cluster issuer because I have confidence it will work. If you are not confident, use the staging cluster issuer.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: keycloak-ingress
+  namespace: keycloak
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-production
+spec:
+  tls:
+    - hosts:
+      - $KEYCLOAK_HOST
+      secretName: keycloak-tls
+  rules:
+  - host: $KEYCLOAK_HOST
+    http:
+      paths:
+      - backend:
+          serviceName: keycloak
+          servicePort: 8080
+        path: "/"
+EOF
+```
+
+* Review the certificate that cert-manager has created. You're looking for `The certificate has been successfully issued` in the message section. It may take a minute or two. If the certificate hasn't been issue after five minutes, go looking for problems. Start in the logs of the pods in the `nginx-ingress` namespace.
+
+```bash
+kubectl --namespace keycloak describe certificate keycloak-tls
+```
+
+* Review the secret that is being created by cert-manager.
+
+```bash
+kubectl --namespace keycloak describe secret keycloak-tls
+```
+
+* Display important URLs for KeyCloak
+
+```bash
+cat <<EOF
+echo "Keycloak:                 https://$KEYCLOAK_HOST/auth"
+echo "Keycloak Admin Console:   https://$KEYCLOAK_HOST/auth/admin"
+echo "Keycloak Account Console: https://$KEYCLOAK_HOST/auth/realms/myrealm/account"
+EOF
+```
+
+* Visit KeyCloak.
+
+```bash
+xdg-open http://$KEYCLOAK_HOST/auth
+```
+
+* Follow the procedures at https://www.keycloak.org/getting-started/getting-started-kube starting at "Login to the admin console".
+
+**So far, I am unable to create a user in KeyCloak. This is undoubtably my fault.**
+
+**Note that this KeyCloak as no backup and uses ephemeral drives. Any users and groups will be lost if the pods is restarted. I think.**
+
+## Install Istio
+
+TBD
+
+## Install Custom Docker Registry
+
+TBD
+
+## Install Jenkins
+
+TBD
+
+## Install Krew
+
+TBD
+
+## Install Octant
+
+TBD
 
 # Destroy Cluster
 
