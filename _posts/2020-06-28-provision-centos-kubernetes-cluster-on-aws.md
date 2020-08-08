@@ -393,6 +393,121 @@ kubectl get pods -n ingress-nginx \
   -l app.kubernetes.io/name=ingress-nginx --watch
 ```
 
+## Deploy HTTP Application
+
+In order to make this section work, you'll need to mess around with DNS.
+
+* Find your Ingress Nginx Controller load balancer domain. The answer will look something like `aaXXXXf67c55949d8b622XXXX862dce0-bce30cd38eXXXX95.elb.us-east-1.amazonaws.com`.
+
+```bash
+kubectl -n ingress-nginx get service ingress-nginx-controller
+```
+
+* Create a vanity domain for the service being created in this section. This domain needs to point to the load balancer found in the previous step. I use Route 53 but you can use any DNS service. Please make sure that your can correctly resolve the domain using `dig`.
+
+```bash
+export TEXT_RESPONDER_HOST="text-responder.david.va-oit.cloud"
+```
+
+* Create a namespace.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: text-responder
+    labels:
+        name: text-responder
+EOF
+```
+
+* Deploy a small web server that returns a text message.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: text-responder
+  namespace: text-responder
+spec:
+  selector:
+    matchLabels:
+      app: text-responder
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: text-responder
+    spec:
+      containers:
+      - name: text-responder
+        image: hashicorp/http-echo
+        args:
+        - "-text=silverargint"
+        ports:
+        - containerPort: 5678
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: text-responder
+  namespace: text-responder
+spec:
+  ports:
+  - port: 80
+    targetPort: 5678
+  selector:
+    app: text-responder
+EOF
+```
+
+* Check the service is running. You should see the `text-responder` service in the list. The external IP should be `<none>`.
+
+```bash
+kubectl --namespace text-responder get service
+```
+
+* Curl should get the default 404 response. The HTTPS request should fail because the local issuer certificate can't be found.
+
+```bash
+curl http://$TEXT_RESPONDER_HOST
+```
+
+```bash
+curl https://$TEXT_RESPONDER_HOST
+```
+
+* Route traffic directed at the `text-responder` subdomain within the cluster.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: text-responder-ingress
+  namespace: text-responder
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: $TEXT_RESPONDER_HOST
+    http:
+      paths:
+      - backend:
+          serviceName: text-responder
+          servicePort: 80
+EOF
+```
+
+* Call the service. It should return `silverargint`.
+
+```bash
+curl http://$TEXT_RESPONDER_HOST
+```
+
+
 # Destroy Cluster
 
 ```
