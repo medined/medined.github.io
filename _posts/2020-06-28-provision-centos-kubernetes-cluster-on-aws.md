@@ -507,6 +507,247 @@ EOF
 curl http://$TEXT_RESPONDER_HOST
 ```
 
+## Deploy Certificate Manager
+
+* Create a namespace for `cert-manager`.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: cert-manager
+    labels:
+        name: cert-manager
+EOF
+```
+
+* Install certificate manager. Check the chart versions at https://hub.helm.sh/charts/jetstack/cert-manager to find the latest version number.
+
+```bash
+helm repo add jetstack https://charts.jetstack.io
+helm install cert-manager jetstack/cert-manager --version v0.16.1 --namespace cert-manager --set installCRDs=true
+```
+
+* Check that the pods started.
+
+```bash
+kubectl get pods --namespace cert-manager
+```
+
+* Create an issuer to test the webhook works okay.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager-test
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: test-selfsigned
+  namespace: cert-manager-test
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: selfsigned-cert
+  namespace: cert-manager-test
+spec:
+  dnsNames:
+    - example.com
+  secretName: selfsigned-cert-tls
+  issuerRef:
+    name: test-selfsigned
+EOF
+```
+
+* Check the new certificate. You should see "Certificate issued successfully".
+
+```bash
+kubectl --namespace cert-manager-test describe certificate
+```
+
+* Cleanup the test resources.
+
+```bash
+kubectl delete namespace cert-manager-test
+```
+
+* Create Let's Encrypt ClusterIssuer for staging and production environments. The main difference is the ACME server URL. I use the term `staging` because that is what Let's Encrypt uses.
+
+>Change the email address.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    email: david.medinets@gmail.com
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging-secret
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production
+spec:
+  acme:
+    email: david.medinets@gmail.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-production-secret
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+EOF
+```
+
+* Check on the status of the development issuer. The entries should be ready.
+
+```bash
+kubectl get clusterissuer
+```
+
+* * **Pod Security Policy** - If you need this, cert-manager service account has no permission to use Pod Security Policies. Therfore, it can't create the solver pod needed to create certificates. The following manifest allows cert-manager to issue certificates for a single namespace.
+
+```bash
+kubectl apply -f - <<EOF
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cert-manager-in-text-responder-namespace-role
+  namespace: text-responder
+rules:
+  - apiGroups: ['']
+    resources: [pods]
+    verbs:     [get, list, watch, create, update, patch, delete]
+  - apiGroups:      [policy]
+    resources:      [podsecuritypolicies]
+    resourceNames:  [restricted]
+    verbs:          [use]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cert-manager-in-text-responder-namespace-role-binding
+  namespace: text-responder
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind:     Role
+  name:     cert-manager-in-text-responder-namespace-role
+subjects:
+  - kind: ServiceAccount
+    namespace: cert-manager
+    name: cert-manager
+EOF
+```
+
+* Add annotation to text-responder ingress. This uses the staging Let's Encrypt to avoid being rate limited while testing.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: text-responder-ingress
+  namespace: text-responder
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+spec:
+  tls:
+  - hosts:
+    - text-responder.david.va-oit.cloud
+    secretName: text-responder-tls
+  rules:
+  - host: text-responder.david.va-oit.cloud
+    http:
+      paths:
+      - backend:
+          serviceName: text-responder
+          servicePort: 80
+        path: "/"
+EOF
+```
+
+* Review the certificate that cert-manager has created. You're looking for `The certificate has been successfully issued` in the message section. It may take a minute or two. If the certificate hasn't been issue after five minutes, go looking for problems. Start in the logs of the pods in the `nginx-ingress` namespace.
+
+```bash
+kubectl --namespace text-responder describe certificate text-responder-tls
+```
+
+* Review the secret that is being created by cert-manager.
+
+```bash
+kubectl --namespace text-responder describe secret text-responder-tls
+```
+
+* Add annotation to text-responder ingress.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: text-responder-ingress
+  namespace: text-responder
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-production
+spec:
+  tls:
+  - hosts:
+    - $TEXT_RESPONDER_HOST
+    secretName: text-responder-tls
+  rules:
+  - host: $TEXT_RESPONDER_HOST
+    http:
+      paths:
+      - backend:
+          serviceName: text-responder
+          servicePort: 80
+        path: "/"
+EOF
+```
+
+* Delete secret to get new certificate.
+
+```bash
+kubectl --namespace text-responder delete secret text-responder-tls
+```
+
+* You'll see the certificate is re-issued.
+
+```bash
+kubectl --namespace text-responder describe certificate text-responder-tls
+```
+
+* Wait a few minutes for the certificate to be issues and the pods to settle.
+
+```bash
+kubectl --namespace text-responder describe secret text-responder-tls
+```
+
+* At this point, an HTTPS request should work.
+
+```bash
+curl https://$TEXT_RESPONDER_HOST
+```
 
 # Destroy Cluster
 
