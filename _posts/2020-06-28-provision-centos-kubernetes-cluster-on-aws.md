@@ -234,8 +234,7 @@ time ansible-playbook \
 
 NOTE: In `/tmp`, you'll see Ansible Fact files named after the hostname. For example, `/tmp/ip-10-250-192-82.ec2.internal`.
 
-NOTE: -e podsecuritypolicy_enabled=true \
--e kube_apiserver_enable_admission_plugins=AlwaysPullImages \
+NOTE: -e podsecuritypolicy_enabled=true -e kube_apiserver_enable_admission_plugins=AlwaysPullImages - I tried these parameter options but they did not work for me. I hopefully I will discover that I've done something wrong and can use them in the future. In the meantime, this entry has an alternative to enable Pod Security Policy.
 
 NOTE: If you see a failure with the message `target uses selinux but python bindings (libselinux-python) aren't installed.`, then install the `selinux` python page on the computer running Ansible. The command should be something like `python2 -m pip install selinux`. I also run the command for `python3`.
 
@@ -782,7 +781,10 @@ KEYCLOAK_ADMIN_PASSWORD=$(uuid | cut -b-8)
 echo $KEYCLOAK_ADMIN_PASSWORD
 ```
 
-* Create a service and deployment for KeyCloak. Check https://quay.io/repository/keycloak/keycloak?tab=tags to see what is the latest image version.
+* Create a service and deployment for KeyCloak. Check https://quay.io/repository/keycloak/keycloak?tab=tags to see
+what is the latest image version.
+
+See https://stackoverflow.com/questions/61819264/how-to-deploy-keycloak-on-kubernetes-with-custom-configuration for ideas about specifying a REALM in the `env` section and using a volume mount.
 
 ```bash
 kubectl apply -f - <<EOF
