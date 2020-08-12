@@ -26,8 +26,8 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 
 | Result        | Count |
 | ------------- | ----: |
-| PASS          | 54 |
-| FAIL          | 17 |
+| PASS          | 56 |
+| FAIL          | 15 |
 | WARN          | 3 |
 | JUSTIFICATION | 42 |
 | ------------- | ----: |
@@ -992,18 +992,17 @@ PASS
 * 4.2.4 Ensure that the --read-only-port argument is set to 0 (Scored)
 
 ```
-FAIL
+PASS
 
-If using a Kubelet config file, edit the file to set readOnlyPort to 0.
-
-If using command line arguments, edit the kubelet service file /etc/systemd/system/kubelet.service on each worker node and set the below parameter in KUBELET_SYSTEM_PODS_ARGS variable.
-
---read-only-port=0
-
-Based on your system, restart the kubelet service. For example:
-
-  systemctl daemon-reload
-  systemctl restart kubelet.service
+---
+- name: enable protect kernel defaults
+  hosts:  kube-node
+  tasks:
+  - name: lineinfile for kernel defaults setting  
+    lineinfile:
+      path: /etc/kubernetes/kubelet-config.yaml
+      regexp: '^readOnlyPort'
+      line: 'readOnlyPort: 0'
 ```
 
 * 4.2.5 Ensure that the --streaming-connection-idle-timeout argument is not set to 0 (Scored)
@@ -1015,18 +1014,16 @@ PASS
 * 4.2.6 Ensure that the --protect-kernel-defaults argument is set to true (Scored)
 
 ```
-FAIL
-
-If using a Kubelet config file, edit the file to set protectKernelDefaults: true.
-
-If using command line arguments, edit the kubelet service file /etc/systemd/system/kubelet.service on each worker node and set the below parameter in KUBELET_SYSTEM_PODS_ARGS variable.
-
-  --protect-kernel-defaults=true
-
-Based on your system, restart the kubelet service. For example:
-
-  systemctl daemon-reload
-  systemctl restart kubelet.service
+PASS
+  ---
+  - name: enable protect kernel defaults
+    hosts:  kube-node
+    tasks:
+    - name: lineinfile for kernel defaults setting  
+      lineinfile:
+        path: /etc/kubernetes/kubelet-config.yaml
+        regexp: '^protect'
+        line: 'protectKernelDefaults: true'
 ```
 
 * 4.2.7 Ensure that the --make-iptables-util-chains argument is set to true (Scored)
