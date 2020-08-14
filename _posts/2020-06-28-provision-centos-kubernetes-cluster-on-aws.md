@@ -479,7 +479,7 @@ EOF
 kubectl --namespace text-responder get service
 ```
 
-* Curl should get the default 404 response. The HTTPS request should fail because the local issuer certificate can't be found.
+* Curl should get the default 404 response. The HTTPS request should fail with `308 Permanent Redirect` because the local issuer certificate can't be found.
 
 ```bash
 curl http://$TEXT_RESPONDER_HOST
