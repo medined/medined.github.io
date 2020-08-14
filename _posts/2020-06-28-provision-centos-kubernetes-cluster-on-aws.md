@@ -479,7 +479,7 @@ EOF
 kubectl --namespace text-responder get service
 ```
 
-* Curl should get the default 404 response. The HTTPS request should fail with `308 Permanent Redirect` because the local issuer certificate can't be found.
+* Curl should get the default 404 response. The HTTPS request should fail because the local issuer certificate can't be found.
 
 ```bash
 curl http://$TEXT_RESPONDER_HOST
@@ -757,6 +757,12 @@ kubectl --namespace text-responder describe secret text-responder-tls
 
 ```bash
 curl https://$TEXT_RESPONDER_HOST
+```
+
+* An HTTP request will work as long as you follow the redirect.
+
+```bash
+curl -L http://$TEXT_RESPONDER_HOST
 ```
 
 ## Install KeyCloak
