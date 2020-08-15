@@ -767,6 +767,10 @@ curl -L http://$TEXT_RESPONDER_HOST
 
 ## Install KeyCloak
 
+**Note that this KeyCloak as no backup and uses ephemeral drives. Any users and groups will be lost if the pods is restarted. I think.**
+
+**Once you have KeyCloak integrated into the cluster, you (as the admin) will need to use `--context='admin'` and ``--context='medined'` to select which user to authenticate as.**
+
 * Create a namespace.
 
 ```bash
@@ -847,7 +851,7 @@ spec:
 EOF
 ```
 
-* Check the service is running. You should see the `text-responder` service in the list. The external IP should be `<none>`.
+* Check the service is running. You should see the `keycloak` service in the list. The external IP should be `<none>`.
 
 ```bash
 kubectl --namespace keycloak get service
@@ -928,14 +932,123 @@ EOF
 * Visit KeyCloak.
 
 ```bash
-xdg-open http://$KEYCLOAK_HOST/auth
+xdg-open https://$KEYCLOAK_HOST/auth
 ```
 
 * Follow the procedures at https://www.keycloak.org/getting-started/getting-started-kube starting at "Login to the admin console".
 
-**So far, I am unable to create a user in KeyCloak. This is undoubtably my fault.**
+* Don't create a new realm. Just use `master` unless you are experienced with Keycloak.
 
-**Note that this KeyCloak as no backup and uses ephemeral drives. Any users and groups will be lost if the pods is restarted. I think.**
+* **NOTE** - When creating a client, make sure to set the Access Type to `confidential`. This will ensure that client secrets are available. You'll need to use `/` (just the slash) as the Valid Redirect URIs value. Click on the Credentials tab which only shown **after** you switch to `confidential` as click Save. Make note of the Secret. It is needed when users authenticate.
+
+* Create a client named `kubernetes-cluster`.
+
+* Create a user. Mine is `medined`. Then assign a password to the user.
+
+* Create RBAC for the new user. Change "medined" below to your new username. The role rules are purely here to provide a simple example. Update them to match your own requirements. Especially, the KeyCloak hostname.
+
+**Using `kubectl` without a context parameter works because `~/.kube/config` has not yet been updated.**
+
+```bash
+USERNAME="medined"
+
+kubectl apply -f - <<EOF
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: $USERNAME
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: $USERNAME-role
+  namespace: $USERNAME
+rules:
+  - apiGroups: ['']
+    resources: [pods]
+    verbs:     [get, list, watch, create, update, patch, delete]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: $USERNAME-role-binding
+  namespace: $USERNAME
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: $USERNAME-role
+subjects:
+- kind: User
+  name: https://keycloak.david.va-oit.cloud/auth/realms/master#$USERNAME
+  namespace: $USERNAME
+EOF
+```
+
+* Add a user configration to `~/.kube/config`. Adapt this script to your needs. Especially, the `IDP_ISSUER_URL`. This script is just an example.
+
+```bash
+USERNAME=medined
+
+cat <<EOF > $USERNAME-credential-setup.sh
+#!/bin/bash
+
+CLUSTER_NAME="cluster.local"
+USERNAME="$USERNAME"
+PASSWORD="AAAef999"
+NAMESPACE=$USERNAME
+IDP_ISSUER_URL="https://keycloak.david.va-oit.cloud/auth/realms/master"
+IDP_CLIENT_ID="kubernetes-cluster"
+IDP_CLIENT_SECRET="68d1b483-48dc-4fc2-b07d-4c46c3396813"
+
+IDP_TOKEN=$(curl -X POST \
+  $IDP_ISSUER_URL/protocol/openid-connect/token \
+  -d grant_type=password \
+  -d client_id=$IDP_CLIENT_ID \
+  -d client_secret=$IDP_CLIENT_SECRET \
+  -d username=$USERNAME \
+  -d password=$PASSWORD \
+  -d scope=openid \
+  -d response_type=id_token \
+  | jq -r '.id_token')
+
+REFRESH_TOKEN=$(curl -X POST \
+ $IDP_ISSUER_URL/protocol/openid-connect/token \
+ -d grant_type=password \
+ -d client_id=$IDP_CLIENT_ID \
+ -d client_secret=$IDP_CLIENT_SECRET \
+ -d username=$USERNAME \
+ -d password=$PASSWORD \
+ -d scope=openid \
+ -d response_type=id_token \
+ | jq -r '.refresh_token')
+
+kubectl config set-credentials medined \
+  --auth-provider=oidc \
+  --auth-provider-arg=client-id=$IDP_CLIENT_ID \
+  --auth-provider-arg=client-secret=$IDP_CLIENT_SECRET \
+  --auth-provider-arg=idp-issuer-url=$IDP_ISSUER_URL \
+  --auth-provider-arg=id-token=$IDP_TOKEN \
+  --auth-provider-arg=refresh-token=$REFRESH_TOKEN
+
+kubectl config set-context medined \
+  --cluster=$CLUSTER_NAME \
+  --user=$USERNAME \
+  --namespace=$NAMESPACE
+EOF
+```
+
+* Execute the new script.
+
+```bash
+./$USERNAME-credential-setup.sh
+```
+
+* Now you can use the context in your `kubectl` command like this:
+
+```bash
+kubectl --context=medined get pods
+```
 
 ## Install Istio
 

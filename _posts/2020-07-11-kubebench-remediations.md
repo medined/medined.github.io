@@ -991,6 +991,8 @@ PASS
 
 * 4.2.4 Ensure that the --read-only-port argument is set to 0 (Scored)
 
+Port 10255 is a read only port that kubernetes opens for gathering diagnostics, but can potentially be used for unauthenticated access to sensitive data and so the CIS. Manual inspection shows that although the CIS check would show as a fail because kubelet was not started with the `--read-only-port 0` argument, the kubelet config file at `/etc/kubernetes/kubelet-config.yaml` is configured to disable the read-only api with the `readOnlyPort: 0` configuration and so satisfies this requirement. A manual test to confirm that the configuration file setting is being applied is to run `netstat -tulpn` on the worker nodes and confirm that the server is not listening on port 10255.
+
 ```
 PASS
 
