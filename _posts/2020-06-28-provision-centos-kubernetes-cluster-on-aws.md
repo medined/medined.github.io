@@ -985,7 +985,9 @@ subjects:
 EOF
 ```
 
-* Add a user configration to `~/.kube/config`. Adapt this script to your needs. Especially, the `IDP_ISSUER_URL`. This script is just an example.
+* Create a credential-setup script which add a user configration to `~/.kube/config`. Adapt this script to your needs. Especially, the `IDP_ISSUER_URL`. This script is just an example.
+
+**Add this script to cron in order to never worry about stale tokens! I use `*/30 * * * * /home/medined/medined-credentials-setup.sh`. If you want to get fancy, you can use $LOGNAME instead of hardcoding the user name.**
 
 ```bash
 USERNAME=medined
