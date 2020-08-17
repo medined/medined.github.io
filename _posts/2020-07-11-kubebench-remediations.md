@@ -26,10 +26,10 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 
 | Result        | Count |
 | ------------- | ----: |
-| PASS          | 56 |
-| FAIL          | 15 |
-| WARN          | 3 |
-| JUSTIFICATION | 42 |
+| PASS          | 50 |
+| FAIL          | 11 |
+| WARN          | 2 |
+| JUSTIFICATION | 43 |
 | ------------- | ----: |
 | Total         | 116 |
 
@@ -662,26 +662,70 @@ PASS
 * 1.3.6 Ensure that the RotateKubeletServerCertificate argument is set to true
 
 ```
-FAIL
+PASS
+
+---
+- name: Ensure that the RotateKubeletServerCertificate argument is set to true
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/kubernetes/manifests/kube-controller-manager.yaml
+    insertafter: "- kube-controller-manager$"
+    line: "    - --feature-gates=RotateKubeletServerCertificate=true"
+    firstmatch: yes
+    state: present
 ```
 
 * 1.3.7 Ensure that the --bind-address argument is set to 127.0.0.1
 
 ```
-FAIL
+PASS
+
+---
+- name: Ensure that the --bind-address argument is set to 127.0.0.1
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/kubernetes/manifests/kube-controller-manager.yaml
+    regexp: "--bind-address="
+    line: "    - --bind-address=127.0.0.1"
+    firstmatch: yes
+    state: present
 ```
 
 * 1.4 Scheduler
 * 1.4.1 Ensure that the --profiling argument is set to false
 
 ```
-FAIL
+PASS
+
+---
+- name: Ensure that the RotateKubeletServerCertificate argument is set to true
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/kubernetes/manifests/kube-scheduler.yaml
+    insertafter: "- kube-scheduler$"
+    line: "    - --profiling=false"
+    firstmatch: yes
+    state: present
 ```
 
 * 1.4.2 Ensure that the --bind-address argument is set to 127.0.0.1
 
 ```
-FAIL
+PASS
+
+---
+- name: Ensure that the --bind-address argument is set to 127.0.0.1
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/kubernetes/manifests/kube-scheduler.yaml
+    regexp: "--bind-address="
+    line: "    - --bind-address=127.0.0.1"
+    firstmatch: yes
+    state: present
 ```
 
 ### 2. Etcd
@@ -763,8 +807,12 @@ ssh -F ssh-bastion.conf centos@$IP grep "ETCDCTL_CA_FILE" /etc/etcd.env
 * 3.1 Authentication and Authorization
 * 3.1.1 Client certificate authentication should not be used for users (Not Scored)
 
+There are many ways to add username-based authentication to Kubernetes. One way is to use KeyCloak as the OpenID Connect server. This technique is too complex to show here but https://medined.github.io/centos/terraform/ansible/kubernetes/kubespray/provision-centos-kubernetes-cluster-on-aws/ documents the whole process.
+
+Each user can be provided a separate account in KeyCloak with special RBAC for their particular permission needs.
+
 ```
-WARN
+JUSTIFICATION for WARN
 
 Alternative mechanisms provided by Kubernetes such as the use of OIDC should be implemented in place of client certificates.
 ```
