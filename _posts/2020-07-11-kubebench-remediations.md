@@ -26,8 +26,8 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 
 | Result        | Count |
 | ------------- | ----: |
-| PASS          | 50 |
-| FAIL          | 11 |
+| PASS          | 51 |
+| FAIL          | 10 |
 | WARN          | 2 |
 | JUSTIFICATION | 43 |
 | ------------- | ----: |
@@ -591,8 +591,10 @@ PASS
 
 * 1.2.33 Ensure that the --encryption-provider-config argument is set as appropriate
 
+This check will pass as long as the Encryption At Rest steps are followed when the cluster is created. Those steps are shown at https://medined.github.io/kubernetes/kubespray/encryption/ansible/add-aws-encryption-provider-to-kubespray/.
+
 ```
-FAIL
+PASS
 ```
 
 * 1.2.34 Ensure that encryption providers are appropriately configured
