@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Provision CentOS-based Kubernetes Cluster On AWS With KubeSpray
+title: Add OIDC Using KeyCloak To Kubernetes For User-based Authentication
 author: David Medinets
-categories: centos terraform ansible kubernetes kubespray
+categories: kubernetes keycloak oidc-connect oidc
 year: 2020
 theme: kubernetes
 ---
