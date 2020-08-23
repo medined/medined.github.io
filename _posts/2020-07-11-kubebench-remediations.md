@@ -234,7 +234,7 @@ JUSTIFICATION for FAIL
 This test is a warning because the location of the CNI files can vary between kubernetes distributions. The remediation below will resolve this finding for Kubespray CentOS clusters. The `master.yaml` file can be updated to score this test if needed.
 
 ```
-JUSTIFICATION for WARN
+JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.9 Ensure that the Container Network Interface file permissions are set to 644 or more restrictive
       file:
@@ -249,7 +249,7 @@ JUSTIFICATION for WARN
 This test is a warning because the location of the CNI files can vary between kubernetes distributions. The remediation below will resolve this finding for Kubespray CentOS clusters. The `master.yaml` file can be updated to score this test if needed.
 
 ```
-JUSTIFICATION for WARN
+JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.10 Ensure that the Container Network Interface file ownership is set to root:root
       file:
@@ -281,7 +281,7 @@ JUSTIFICATION for FAIL
 The remediation playbook resolves this issue but kube-bench marks this as a manual test.
 
 ```
-JUSTIFICATION for WARN
+JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.19 Ensure that the Kubernetes PKI directory and file ownership is set to root:root
       file:
@@ -297,7 +297,7 @@ JUSTIFICATION for WARN
 The remediation playbook resolves this issue but kube-bench marks this as a manual test.
 
 ```
-JUSTIFICATION for WARN
+JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive
       block:
@@ -322,7 +322,7 @@ JUSTIFICATION for WARN
 The remediation playbook resolves this issue but kube-bench marks this as a manual test.
 
 ```
-JUSTIFICATION for WARN
+JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.21 Ensure that the Kubernetes PKI key file permissions are set to 600
       block:
@@ -345,10 +345,10 @@ JUSTIFICATION for WARN
 * 1.2 API Server
 * 1.2.1 Ensure that the --anonymous-auth argument is set to false
 
-The `anonymous-auth` is set to true to enable health-checks from load balancers. However, if that is not a concern then this finding can be remediated with the following task.
+The `anonymous-auth` is set to true to enable health-checks from load balancers. Research on this topic shows that communication between nodes and users is fully secured by Principle of Least Privilege. However, if the health check is not a concern then this finding can be remediated with the following task.
 
 ```
-JUSTIFICATION of FAIL
+JUSTIFICATION of FAIL (MANUAL)
 
     # If a change is made, the apiserver is restarted.
     - name: 1.2.1 Ensure that the --anonymous-auth argument is set to false
@@ -384,7 +384,7 @@ PASS
 
 * 1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate
 
-**The code below does not have the current certificate authority file but it does show how to resolve this issue when the correct file is identified.**
+**The code below does not have the correct certificate authority file but it does show how to resolve this issue when the correct file is identified.**
 
 ```
 FAIL
@@ -602,12 +602,12 @@ PASS
 Kube-bench has this as a manual check. Therefore it will always fail. However, Encryption at Rest is supported at shown by https://medined.github.io/kubernetes/kubespray/encryption/ansible/add-aws-encryption-provider-to-kubespray/. There is a manual proof process which can be automated if needed.
 
 ```
-JUSTIFICATION of FAIL
+JUSTIFICATION of FAIL (MANUAL)
 ```
 
 * 1.2.35 Ensure that the API Server only makes use of Strong Cryptographic Ciphers
 
-Kube-bench is checking for a more permissive list of ciphers. Its check has no flexibility.
+Kube-bench is checking for a more permissive list of ciphers. Its check has no flexibility. However, the Ansible playbook will restrict the set as shown below. A security expert should verify the list of cipher suites is correct.
 
 ```
 JUSTIFICATION of FAIL (MANUAL)
