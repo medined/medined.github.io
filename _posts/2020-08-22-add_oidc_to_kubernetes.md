@@ -274,6 +274,18 @@ Keycloak Account Console: https://$KEYCLOAK_HOST/auth/realms/master/account
 EOF
 ```
 
+* Once your KeyCloak is reachable on the internet and has a valid SSL certificate, it is time to let Kubernetes know about it.
+
+* SSH to the controller node.
+
+* Edit the apiserver manifest (/etc/kubernetes/manifests/kube-apiserver.yaml) to add the following lines. Once you save the file, the apiserver node will be restarted. This change will not have any affect until users start connecting using the oidc auth provider as shown a bit later. Make sure that you can run `kubectl get pods -A` after this change. If you can't the check the manifest for typos. You must have a working apiserver before continuing.
+
+```
+- --oidc-issuer-url=https://<KEYCLOAK_HOST>/auth/realms/master
+- --oidc-username-claim=preferred_username
+- --oidc-client-id=kubernetes-cluster
+```
+
 * Visit KeyCloak.
 
 ```bash
