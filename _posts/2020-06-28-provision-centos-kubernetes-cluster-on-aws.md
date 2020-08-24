@@ -332,16 +332,16 @@ By default, pods of Kubernetes services are not accessible from the external net
 curl -o ingress-nginx-controller-0.34.1.yaml https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.34.1/deploy/static/provider/aws/deploy.yaml
 ```
 
-* **Pod Security Policy** - If you need this, add the following to all ClusterRole and Role resources in the downloaded yaml file.
+* **Pod Security Policy** - If you need this, add the following to all ClusterRole and Role resources in the downloaded yaml file. This change lets the service accounts use the `privileged` pod security policy.
 
 ```
-- apiGroups:      [policy]
-  resources:      [podsecuritypolicies]
-  resourceNames:  [privileged]
-  verbs:          [use]
+  - apiGroups:      [policy]
+    resources:      [podsecuritypolicies]
+    resourceNames:  [privileged]
+    verbs:          [use]
 ```
 
-* **Pod Security Policy** - If you need this, add the following to the end of the file in the downloaded yaml file.
+* **Pod Security Policy** - If you need this, add the following to the end of the file in the downloaded yaml file. **I don't recall why this was needed.**
 
 ```
 ---
@@ -517,26 +517,75 @@ EOF
 curl http://$TEXT_RESPONDER_HOST
 ```
 
-## Deploy Certificate Manager
+## Delete Certificate Manager
 
-* Create a namespace for `cert-manager`.
-
-```bash
-kubectl apply -f - <<EOF
-apiVersion: v1
-kind: Namespace
-metadata:
-    name: cert-manager
-    labels:
-        name: cert-manager
-EOF
 ```
+kubectl delete namespace cert-manager
+
+kubectl delete crd certificaterequests.cert-manager.io certificates.cert-manager.io  challenges.acme.cert-manager.io clusterissuers.cert-manager.io issuers.cert-manager.io orders.acme.cert-manager.io
+
+kubectl delete clusterrole cert-manager-cainjector cert-manager-controller-certificates cert-manager-controller-challenges cert-manager-controller-clusterissuers cert-manager-controller-ingress-shim cert-manager-controller-issuers cert-manager-controller-orders cert-manager-edit cert-manager-role cert-manager-view
+
+kubectl delete clusterrolebinding cert-manager-cainjector cert-manager-controller-certificates cert-manager-controller-challenges cert-manager-controller-clusterissuers cert-manager-controller-ingress-shim cert-manager-controller-issuers cert-manager-controller-orders
+
+kubectl -n kube-system delete role cert-manager-cainjector:leaderelection cert-manager:leaderelection
+
+kubectl -n kube-system delete rolebinding cert-manager-cainjector:leaderelection cert-manager:leaderelection
+
+kubectl delete MutatingWebhookConfiguration cert-manager-webhook
+
+kubectl delete ValidatingWebhookConfiguration cert-manager-webhook
+```
+
+## Deploy Certificate Manager
 
 * Install certificate manager. Check the chart versions at https://hub.helm.sh/charts/jetstack/cert-manager to find the latest version number.
 
+* Apply the custom resource definitions.
+
+```bash
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.0-beta.0/cert-manager.crds.yaml
+```
+
+* In this installation process, do not use `global.podSecurityPolicy.enabled=true` because it will set `apparmor` annotations on three pod security polices which get created. The nodes do not support AppArmor. This will result in blocked pods.
+
+* Add the `jetstack` repository.
+
 ```bash
 helm repo add jetstack https://charts.jetstack.io
-helm install cert-manager jetstack/cert-manager --version v0.16.1 --namespace cert-manager --set installCRDs=true
+```
+
+* Get a local copy of the manifest needed for `cert-manager`.
+
+```bash
+helm template cert-manager jetstack/cert-manager --namespace cert-manager > cert-manager.yaml
+```
+
+* **For PodSecurityPolicy** If you need this, insert the following at the top of the `cert-manager.yaml` file.
+
+```
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+  labels:
+    name: cert-manager
+```
+
+* **Pod Security Policy** - If you need this, the `cert-manager` roles have no permission to use Pod Security Policies. Add the following to every role and ClusterRole in the `cert-manager.yaml` file. This is definitly overkill, but I don't have time to experiment to get more granular.
+
+```
+  - apiGroups:      [policy]
+    resources:      [podsecuritypolicies]
+    resourceNames:  [restricted]
+    verbs:          [use]
+```
+
+* Apply the `cert-manager` manifest.
+
+```
+kubectl apply -f cert-manager.yaml
 ```
 
 * Check that the pods started.
@@ -630,41 +679,6 @@ EOF
 
 ```bash
 kubectl get clusterissuer
-```
-
-* * **Pod Security Policy** - If you need this, cert-manager service account has no permission to use Pod Security Policies. Therfore, it can't create the solver pod needed to create certificates. The following manifest allows cert-manager to issue certificates for a single namespace.
-
-```bash
-kubectl apply -f - <<EOF
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: cert-manager-in-text-responder-namespace-role
-  namespace: text-responder
-rules:
-  - apiGroups: ['']
-    resources: [pods]
-    verbs:     [get, list, watch, create, update, patch, delete]
-  - apiGroups:      [policy]
-    resources:      [podsecuritypolicies]
-    resourceNames:  [restricted]
-    verbs:          [use]
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: cert-manager-in-text-responder-namespace-role-binding
-  namespace: text-responder
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind:     Role
-  name:     cert-manager-in-text-responder-namespace-role
-subjects:
-  - kind: ServiceAccount
-    namespace: cert-manager
-    name: cert-manager
-EOF
 ```
 
 * Add annotation to text-responder ingress. This uses the staging Let's Encrypt to avoid being rate limited while testing.
