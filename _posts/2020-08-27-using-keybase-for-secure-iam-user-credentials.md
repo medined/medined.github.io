@@ -14,6 +14,8 @@ theme: aws iam terraform keybase
 
 * * *
 
+**NOTE: The handling of user group membership is incorrect. I'll be fixing it tomorrow.**
+
 # Introduction
 
 See https://github.com/medined/create-iam-users-with-terraform-and-keybase for the copies of the files discussed here.
