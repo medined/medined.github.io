@@ -27,9 +27,9 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 | Result        | Count |
 | ------------- | ----: |
 | PASS          | 51 |
-| FAIL          | 10 |
+| FAIL          | 5 |
 | WARN          | 2 |
-| JUSTIFICATION | 43 |
+| JUSTIFICATION | 48 |
 | ------------- | ----: |
 | Total         | 116 |
 
@@ -345,7 +345,7 @@ JUSTIFICATION for WARN (MANUAL)
 * 1.2 API Server
 * 1.2.1 Ensure that the --anonymous-auth argument is set to false
 
-The `anonymous-auth` is set to true to enable health-checks from load balancers. Research on this topic shows that communication between nodes and users is fully secured by Principle of Least Privilege. However, if the health check is not a concern then this finding can be remediated with the following task.
+The `anonymous-auth` is set to true to enable health-checks from load balancers. Research on this topic shows that communication between nodes and users is fully secured by Principle of Least Privilege. However, if the health check is not a concern then this finding can be remediated with the following task. I advise accepting the default so the health check works.
 
 ```
 JUSTIFICATION of FAIL (MANUAL)
@@ -489,8 +489,12 @@ PASS
 
 * 1.2.16 Ensure that the admission control plugin PodSecurityPolicy is set
 
+When the **Pod Security Policy** option is followed when provisioning the cluster, this plugin is enabled. However, the `apiserver` runs as a K8S static pod.
+
+The `ps` audit test used by kubebench can't find the option even though it is enabled.
+
 ```
-FAIL
+JUSTIFICATION FOR FAIL
 ```
 
 * 1.2.17 Ensure that the admission control plugin NodeRestriction is set
@@ -736,23 +740,35 @@ PASS
 * 2 Etcd Node Configuration Files
 * 2.1 Ensure that the --cert-file and --key-file arguments are set as appropriate (Scored)
 
+The standard KubeSpray installation provides HTTPS communication between K8S servers and the ETCD servers. This can be proven by looking at `/etc/kubernetes/manifests/kube-apiserver.yaml` on the controller node. In that file, you'll see the following parameters are set.
+
 ```
-FAIL
+- --etcd-cafile=/etc/ssl/etcd/ssl/ca.pem
+- --etcd-certfile=/etc/ssl/etcd/ssl/node-ip-10-245-207-223.ec2.internal.pem
+- --etcd-keyfile=/etc/ssl/etcd/ssl/node-ip-10-245-207-223.ec2.internal-key.pem
+- --etcd-servers=https://10.245.207.119:2379
+```
 
-Follow the etcd service documentation and configure TLS encryption Then, edit the etcd pod specification file /etc/kubernetes/manifests/etcd.yaml on the master node and set the below parameters.
+The KubeBench audit looks for an `etcd` process running on the controller node. That process does not exist so the test will always fail.
 
-  --cert-file=</path/to/ca-file>
-  --key-file=</path/to/key-file>
+```
+JUSTIFICATION FOR FAIL
 ```
 
 * 2.2 Ensure that the --client-cert-auth argument is set to true (Scored)
 
+The standard KubeSpray installation provides HTTPS communication between K8S servers and the ETCD servers. In order to prove this check should pass, review the setting with the following code. The result will be `ETCD_CLIENT_CERT_AUTH=true`.
+
 ```
-FAIL
+HOST_NAME=$(cat ./inventory/hosts | grep "\[etcd\]" -A 1 | tail -n 1)
+IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2)
+ssh -F ssh-bastion.conf centos@$IP cat /etc/etcd.env | grep ETCD_CLIENT_CERT_AUTH
+```
 
-Edit the etcd pod specification file /etc/kubernetes/manifests/etcd.yaml on the master node and set the below parameter.
+The KubeBench audit looks for an `etcd` process running on the controller node. That process does not exist so the test will always fail.
 
-  --client-cert-auth="true"
+```
+JUSTIFICATION FOR FAIL
 ```
 
 2.3 Ensure that the --auto-tls argument is not set to true (Scored)
@@ -763,24 +779,30 @@ PASS
 
 * 2.4 Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Scored)
 
+The standard KubeSpray installation provides HTTPS communication between K8S servers and the ETCD servers. In order to prove this check should pass, review the setting with the following code. The result shows that the peer parameters are set.
+
+```bash
+HOST_NAME=$(cat ./inventory/hosts | grep "\[etcd\]" -A 1 | tail -n 1)
+IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2)
+ssh -F ssh-bastion.conf centos@$IP cat /etc/etcd.env | grep ETCD_PEER
 ```
-FAIL
 
-Follow the etcd service documentation and configure peer TLS encryption as appropriate for your etcd cluster. Then, edit the etcd pod specification file /etc/kubernetes/manifests/etcd.yaml on the
-master node and set the below parameters.
-
-  --peer-client-file=</path/to/peer-cert-file>
-  --peer-key-file=</path/to/peer-key-file>
+```
+JUSTIFICATION FOR FAIL
 ```
 
 * 2.5 Ensure that the --peer-client-cert-auth argument is set to true (Scored)
 
+The standard KubeSpray installation provides HTTPS communication between K8S servers and the ETCD servers. In order to prove this check should pass, review the setting with the following code. The result shows that the peer parameters are set.
+
+```bash
+HOST_NAME=$(cat ./inventory/hosts | grep "\[etcd\]" -A 1 | tail -n 1)
+IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2)
+ssh -F ssh-bastion.conf centos@$IP cat /etc/etcd.env | grep ETCD_PEER_CLIENT_AUTH
 ```
-FAIL
 
-Edit the etcd pod specification file /etc/kubernetes/manifests/etcd.yaml on the master node and set the below parameter.
-
-  --peer-client-cert-auth=true
+```
+JUSTIFICATION FOR FAIL
 ```
 
 * 2.6 Ensure that the --peer-auto-tls argument is not set to true (Scored)
