@@ -94,7 +94,8 @@ ssh -F ssh-bastion.conf centos@$ETCD_IP \
     --pid=host \
     --rm=true \
     aquasec/kube-bench:latest \
-    --benchmark cis-1.5 run --targets etcd
+    --benchmark cis-1.5 run --targets etcd \
+    | tee /tmp/kubebench-etcd-findings.log
 ```
 
 You can redirect the SSH output to a file if needed.
