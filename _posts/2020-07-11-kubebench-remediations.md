@@ -27,9 +27,9 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 | Result        | Count |
 | ------------- | ----: |
 | PASS          | 51 |
-| FAIL          | 5 |
+| FAIL          | 3 |
 | WARN          | 2 |
-| JUSTIFICATION | 48 |
+| JUSTIFICATION | 50 |
 | ------------- | ----: |
 | Total         | 116 |
 
@@ -986,22 +986,26 @@ PASS
 
 * 4.1.3 Ensure that the proxy kubeconfig file permissions are set to 644 or more restrictive (Scored)
 
+KubeSpray does not store its kube-proxy configuration on the node file system. Instead it is passed into the pod using a ConfigMap. If your K8S account has the propoer permissions, you can see this ConfigMap using the following command:
+
 ```
-FAIL
+kubectl -n kube-system describe configmap kube-proxy
+```
 
-Run the below command (based on the file location on your system) on the each worker node. For example,
-
-  chmod 644 /etc/kubernetes/proxy.conf
+```
+JUSTIFICATION FOR FAIL
 ```
 
 * 4.1.4 Ensure that the proxy kubeconfig file ownership is set to root:root (Scored)
 
+KubeSpray does not store its kube-proxy configuration on the node file system. Instead it is passed into the pod using a ConfigMap. If your K8S account has the propoer permissions, you can see this ConfigMap using the following command:
+
 ```
-FAIL
+kubectl -n kube-system describe configmap kube-proxy
+```
 
-Run the below command (based on the file location on your system) on the each worker node. For example,
-
-  chown root:root /etc/kubernetes/proxy.conf
+```
+JUSTIFICATION FOR FAIL
 ```
 
 * 4.1.5 Ensure that the kubelet.conf file permissions are set to 644 or more restrictive (Scored)
