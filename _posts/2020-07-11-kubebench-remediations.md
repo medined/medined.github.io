@@ -26,7 +26,7 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 
 | Result        | Count |
 | ------------- | ----: |
-| PASS          | 51 |
+| PASS          | 61 |
 | FAIL          | 3 |
 | WARN          | 2 |
 | JUSTIFICATION | 50 |
