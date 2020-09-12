@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Using direnv To Custom Environment Per Directory
+title: Using direnv To Customize Your Environment Per Directory
 author: David Medinets
 categories: bash
 year: 2020
