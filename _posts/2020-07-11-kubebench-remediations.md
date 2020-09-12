@@ -26,10 +26,10 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 
 | Result        | Count |
 | ------------- | ----: |
-| PASS          | 61 |
-| FAIL          | 3 |
-| WARN          | 2 |
-| JUSTIFICATION | 50 |
+| PASS          | 62 |
+| FAIL          | 1 |
+| WARN          | 1 |
+| JUSTIFICATION | 52 |
 | ------------- | ----: |
 | Total         | 116 |
 
@@ -1022,10 +1022,24 @@ PASS
 
 * 4.1.7 Ensure that the certificate authorities file permissions are set to 644 or more restrictive (Scored)
 
-```
-WARN
+This KubeBench check has no test associated with it. However, the Ansible snippet below is ensure the correct permission is applied to the CA file on the worker nodes.
 
-audit test did not run: There are no tests
+```
+JUSTIFICATION FOR WARN
+
+    - hosts: kube-node
+      any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+      become: yes
+      gather_facts: False
+      roles:
+        - { role: kubespray-defaults }
+      tasks:
+        - name: Include kubespray-default variables
+          include_vars: roles/kubespray-defaults/defaults/main.yaml
+        - name: 4.1.7 Ensure that the certificate authorities file permissions are set to 644 or more restrictive
+          file:
+            path: /etc/kubernetes/ssl/ca.crt
+            mode: "644"
 ```
 
 * 4.1.8 Ensure that the client certificate authorities file ownership is set to root:root (Scored)
@@ -1140,20 +1154,12 @@ JUSTIFICATION for WARN
 
 * 4.2.10 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Scored)
 
+Using command-line parameters for `kubelet` has been deprecated in favor of using a configuration file. KubeSpray uses a configuration file so this test based on `ps` will never pass.
+
+KubeSpray uses `/etc/kubernetes/kubelet-config.yaml` to configure `kubelet`. If the tlsCertFile and tlsPrivateKeyFile are not provided, a self-signed certificate and key are generated for the public address.
+
 ```
-FAIL
-
-If using a Kubelet config file, edit the file to set tlsCertFile to the location of the certificate file to use to identify this Kubelet, and tlsPrivateKeyFile to the location of the corresponding private key file.
-
-If using command line arguments, edit the kubelet service file /etc/systemd/system/kubelet.service on each worker node and set the below parameters in KUBELET_CERTIFICATE_ARGS variable.
-
-  --tls-cert-file=<path/to/tls-certificate-file>
-  --tls-private-key-file=<path/to/tls-key-file>
-
-Based on your system, restart the kubelet service. For example:
-
-  systemctl daemon-reload
-  systemctl restart kubelet.service
+JUSTIFICATION FOR FAIL
 ```
 
 * 4.2.11 Ensure that the --rotate-certificates argument is not set to false (Scored)
@@ -1165,16 +1171,34 @@ PASS
 * 4.2.12 Ensure that the RotateKubeletServerCertificate argument is set to true (Scored)
 
 ```
-FAIL
+PASS
 
-Edit the kubelet service file /etc/systemd/system/kubelet.service on each worker node and set the below parameter in KUBELET_CERTIFICATE_ARGS variable.
+    - name: Restart kubelet
+      systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: kubelet
+        state: restarted
+    tasks:
+      - name: Include kubespray-default variables
+        include_vars: roles/kubespray-defaults/defaults/main.yaml
+      - name: 4.2.12 Ensure that the RotateKubeletServerCertificate argument is set to true
+        block:
+          - name: 4.2.12 check flag
+            command: grep "feature-gates=RotateKubeletServerCertificate=true" /etc/kubernetes/kubelet.env
+            register: rotate_certs_flag
+            check_mode: no
+            ignore_errors: yes
+            changed_when: no
 
-  --feature-gates=RotateKubeletServerCertificate=true
-
-Based on your system, restart the kubelet service. For example:
-
-  systemctl daemon-reload
-  systemctl restart kubelet.service
+          # This is a long shell command but I don't know any way to shorten it.
+          - name: 4.2.12 add flag
+            shell: sed -i 's^KUBELET_ARGS="--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf^KUBELET_ARGS="--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --feature-gates=RotateKubeletServerCertificate=true^' /etc/kubernetes/kubelet.env
+            args:
+              warn: false
+            when: rotate_certs_flag.rc != 0
+            notify:
+              Restart kubelet
 ```
 
 * 4.2.13 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Not Scored)
