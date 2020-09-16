@@ -1068,7 +1068,111 @@ kubectl --context=medined get pods
 
 ## Install Istio
 
-TBD
+* Download Istio.
+
+```bash
+curl -L https://istio.io/downloadIstio | sh -
+```
+
+* Put the download directory in your PATH.
+
+```bash
+export PATH="$PATH:/data/projects/ic1/kubespray/istio-1.7.1/bin"
+```
+
+* Connect to the installation directory.
+
+```bash
+cd istio-1.7.1
+```
+
+* Run the precheck.
+
+```bash
+istioctl x precheck
+```
+
+* Install Istio with the demo configuration profile.
+
+```bash
+istioctl install --set profile=demo
+```
+
+* Create a namespace for testing Istio.
+
+```bash
+kubectl create namespace playground
+```
+
+* Enable Istio in the playground namespace.
+
+```bash
+kubectl label namespace playground istio-injection=enabled
+```
+
+* Deploy the sample application.
+
+```bash
+kubectl --namespace playground apply -f samples/bookinfo/platform/kube/bookinfo.yaml
+```
+
+* Check the pods and services. Keep checking the pods until they are ready.
+
+```bash
+kubectl --namespace playground get services
+kubectl --namespace playground get pods
+```
+
+* Verify the application is running and serving HTML pages. If the application is working correctly, the response will be `<title>Simple Bookstore App</title>`.
+
+```bash
+kubectl --namespace playground exec "$(kubectl --namespace playground get pod -l app=ratings -o jsonpath='{.items[0].metadata.name}')" -c ratings -- curl -s productpage:9080/productpage | grep -o "<title>.*</title>"
+```
+
+* Open the application to outside traffic by associating the application to the istio gateway.
+
+```bash
+kubectl --namespace playground apply -f samples/bookinfo/networking/bookinfo-gateway.yaml
+```
+
+* Check the configuration for errors.
+
+```bash
+istioctl --namespace playground analyze
+```
+
+* Get connection information.
+
+```
+export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')
+export SECURE_INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="https")].port}')
+```
+
+* Set the gateway URL.
+
+```bash
+export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
+```
+
+* Visit the product page in your browser.
+
+```bash
+xdg-open http://$GATEWAY_URL/productpage
+```
+
+* Install the Kiali dashboard, along with Prometheus, Grafana, and Jaeger.
+
+```bash
+kubectl apply -f samples/addons
+while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -n istio-system; do sleep 1; done
+```
+
+* Visit the Kiali dashboard.
+
+```bash
+istioctl dashboard kiali
+```
 
 ## Install Custom Docker Registry
 
