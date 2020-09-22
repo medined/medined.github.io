@@ -26,10 +26,10 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 
 | Result        | Count |
 | ------------- | ----: |
-| PASS          | 62 |
-| FAIL          | 1 |
-| WARN          | 1 |
-| JUSTIFICATION | 52 |
+| PASS          | 63 |
+| FAIL          | 0 |
+| WARN          | 0 |
+| JUSTIFICATION | 53 |
 | ------------- | ----: |
 | Total         | 116 |
 
@@ -384,10 +384,8 @@ PASS
 
 * 1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate
 
-**The code below does not have the correct certificate authority file but it does show how to resolve this issue when the correct file is identified.**
-
 ```
-FAIL
+PASS
 
     - name: 1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate
       block:
@@ -1126,8 +1124,7 @@ PASS
 
 * 4.2.8 Ensure that the --hostname-override argument is not set (Not Scored)
 
-The CIS Benchmark says "Some cloud providers may require this flag to ensure that hostname matches names issued
-by the cloud provider. In these environments, this recommendation should not apply." Some research could be done to verify that argument is required for AWS.
+The CIS Benchmark says "Some cloud providers may require this flag to ensure that hostname matches names issued by the cloud provider. In these environments, this recommendation should not apply." Some research could be done to verify that argument is required for AWS.
 
 However, by manual inspection we can see that the parameter argument is the same as the hostname. Therefore, the hostname is not being overridden, just set to its proper value.
 
@@ -1396,11 +1393,10 @@ JUSTIFICATION for WARN (MANUAL)
 * 5.5 Extensible Admission Control
 * 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Not Scored)
 
-Follow the Kubernetes documentation and setup image provenance.
+Image Provenance can be supported using https://trow.io/.
 
 ```
-WARN
-
+JUSTIFICATION for WARN
 ```
 
 * 5.6 General Policies
