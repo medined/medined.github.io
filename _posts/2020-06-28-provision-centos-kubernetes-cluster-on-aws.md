@@ -25,7 +25,9 @@ It should take less than 20 minutes to create a small cluster. I have just one c
 
 Watch for configuration options:
 
+* **Auditing**
 * **Encryption At Rest**
+* **Kubebench**
 * **Pod Security Policy**
 
 ## Acknowledgements
@@ -103,6 +105,55 @@ pip install -r requirements.txt
   "Action": "kms:*",
   "Resource": ["*"]
 }
+```
+
+* **Auditing** - In order to turn auditing on, edit the `roles/kubernetes/master/defaults/main/main.yml` file so the values in the file match those below:
+
+```
+kubernetes_audit: true
+audit_log_maxbackups: 10
+```
+
+* In order to have an always pull policy for the pods created by KubeSpray, edit `roles/kubespray-defaults/defaults/main.yaml` so the values in the file match those below:
+
+```
+k8s_image_pull_policy: Always
+```
+
+* I prefer to use Octant (https://octant.dev/) or Lens (https://k8slens.dev/) instead of the Kubernetes Dashboard. Therefore, I don't enable it. Edit `roles/kubespray-defaults/defaults/main.yaml` so the values in the file match those below:
+
+```
+dashboard_enabled: false
+```
+
+* Turn on the metrics servers by editting `roles/kubespray-defaults/defaults/main.yaml` so the values in the file match those below. In the cluster, the "kubectl top nodes" command will be supported.
+
+```
+metrics_server_enabled: true
+```
+
+* Have KubeSpray make a copy of kubeconfig in {{ inventory_dir }}/artifacts. This means you don't need to `scp` the generated `admin.conf` file from the controller yourself. Edit `roles/kubespray-defaults/defaults/main.yaml` so the values in the file match those below. After the playbook is complete, copy `inventory/sample/artifacts/admin.conf` to `~/.kube/config`. Remember that this will overwrite any existing kubeconfig file so be careful with this copy!
+
+```
+kubeconfig_localhost: true
+```
+
+* Let KubeSpray install `helm` by `roles/kubespray-defaults/defaults/main.yaml` so the values in the file match those below.
+
+```
+helm_enabled: true
+```
+
+* Let KubeSpray install `registry` by `roles/kubespray-defaults/defaults/main.yaml` so the values in the file match those below.
+
+```
+registry_enabled: true
+```
+
+* Let KubeSpray install `cert-manager` by `roles/kubespray-defaults/defaults/main.yaml` so the values in the file match those below.
+
+```
+cert_manager_enabled: true
 ```
 
 * Change to the `aws` directory.
