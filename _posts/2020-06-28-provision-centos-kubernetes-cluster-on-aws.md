@@ -464,6 +464,8 @@ In order to make this section work, you'll need to mess around with DNS.
 kubectl -n ingress-nginx get service ingress-nginx-controller
 ```
 
+NOTE: If the `EXTERNAL-IP` stays in the `pending` state, verify that you set `-e cloud_provider=aws` when the cluster was created.
+
 * Create a vanity domain for the service being created in this section. This domain needs to point to the load balancer found in the previous step. I use Route 53 but you can use any DNS service. Please make sure that your can correctly resolve the domain using `dig`.
 
 ```bash
