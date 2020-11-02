@@ -14,6 +14,8 @@ theme: kubernetes
 
 * * *
 
+**NOTE: The steps outlined below are outdated. However, they might still be useful when learning about KubeSpray. **
+
 Let me start by saying that I will be covering no new ground. This post is only to disambiguate building a centos-based kubernetes cluster by showing the exact steps that I used.
 
 Creating a cluster takes two steps:
@@ -95,8 +97,6 @@ pip freeze | xargs pip uninstall -y
 pip install -r requirements.txt
 ```
 
-* **Bug Fix** - Visit https://github.com/kubernetes-sigs/kubespray/pull/6487. Then click on "Files Changed". If the pull request was accepted, the change might already be in the `kubespray` project.
-
 * **Encryption at Rest** - If you need this, then update `contrib/terraform/aws/modules/iam/main.tf` after making a copy. I think that only "kms:ListKeys", "kms:TagResource", "kms:Encrypt", "kms:DescribeKey", and "kms:CreateKey" are needed but just in case I allow all actions. Add the following to the file.
 
 ```
@@ -161,11 +161,6 @@ cert_manager_enabled: true
 ```bash
 cd contrib/terraform/aws
 ```
-
-* Fix old syntax. This is not strictly needed but I like to avoid warning messages when possible.
-  * In `./modules/elb/variables.tf`, remove quotes around `type`.
-  * In `./modules/vpc/variables.tf`, remove quotes around `type`.
-  * In `./variables.tf`, remove quotes around `type`.
 
 * In `./terraform.tfvars`, set variables as needed. Note that the inventory file will be created a few levels up in the directory tree.
 
