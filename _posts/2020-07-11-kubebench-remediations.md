@@ -18,6 +18,10 @@ theme: kubernetes
 
 This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
 
+## Updates
+
+2020-11-01 - I have updated some of the remediations to show how to change KubeSpray playbooks before the `cluster.yml` is used. This is a better way to handle remediations.
+
 ## Article
 
 This article shows how I am remediating the results of `kube-bench`. It will be updated over time, hopefully.
@@ -1136,17 +1140,26 @@ JUSTIFICATION for WARN
 
 * 4.2.9 Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Not Scored)
 
-`kublet`, in our cluster, is configured in `/etc/kubernetes/kubelet-config.yaml`. The `kube-bench` tool does not test this file. It tests for command-line parameters.
-
-A manual check can done by looking inside the yaml file.
 ```
 JUSTIFICATION for WARN
+```
 
-    - name: 4.2.9 Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture
-      lineinfile:
-        path: /etc/kubernetes/kubelet-config.yaml
-        regexp: '^eventRecordQPS'
-        line: 'eventRecordQPS: 5'
+`kublet`, in our cluster, is configured in `/etc/kubernetes/kubelet-config.yaml`. The `kube-bench` tool does not test this file. It tests for command-line parameters. The --event-gps argument can be set, before the cluster is created by making the following changes:
+
+In `roles/kubernetes/node/templates/kubelet-config.v1beta1.yaml.j2`, add the following to the end of the file.
+
+```
+{% if kubelet_event_record_qps %}
+eventRecordQPS: {{ kubelet_event_record_qps }}
+{% endif %}
+```
+
+In `roles/kubespray-defaults/defaults/main.yaml`, add the following to the end of the file.
+
+```
+# Sets the eventRecordQPS parameter in kubelet-config.yaml. The default value is 5 (see types.go)
+# Setting it to 0 allows unlimited requests per second.
+kubelet_event_record_qps: 5
 ```
 
 * 4.2.10 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Scored)
@@ -1167,64 +1180,31 @@ PASS
 
 * 4.2.12 Ensure that the RotateKubeletServerCertificate argument is set to true (Scored)
 
+Update `roles/kubespray-defaults/defaults/main.yaml` to have the following:
+
 ```
+kube_feature_gates:
+  - RotateKubeletServerCertificate=true
+
 PASS
-
-    - name: Restart kubelet
-      systemd:
-        daemon_reload: yes
-        enabled: yes
-        name: kubelet
-        state: restarted
-    tasks:
-      - name: Include kubespray-default variables
-        include_vars: roles/kubespray-defaults/defaults/main.yaml
-      - name: 4.2.12 Ensure that the RotateKubeletServerCertificate argument is set to true
-        block:
-          - name: 4.2.12 check flag
-            command: grep "feature-gates=RotateKubeletServerCertificate=true" /etc/kubernetes/kubelet.env
-            register: rotate_certs_flag
-            check_mode: no
-            ignore_errors: yes
-            changed_when: no
-
-          # This is a long shell command but I don't know any way to shorten it.
-          - name: 4.2.12 add flag
-            shell: sed -i 's^KUBELET_ARGS="--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf^KUBELET_ARGS="--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --feature-gates=RotateKubeletServerCertificate=true^' /etc/kubernetes/kubelet.env
-            args:
-              warn: false
-            when: rotate_certs_flag.rc != 0
-            notify:
-              Restart kubelet
 ```
 
 * 4.2.13 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Not Scored)
 
+Update `roles/kubernetes/master/defaults/main/main.yml` to have the following:
+
 ```
+tls_cipher_suites:
+  - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+  - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+  - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+  - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+  - TLS_RSA_WITH_AES_256_GCM_SHA384
+  - TLS_RSA_WITH_AES_128_GCM_SHA256
+
 PASS
-
-- name: 4.2.13 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers
-  block:
-    - name: 4.2.13 check flag
-      command: grep "^\-\-tls-cipher-suites=" /etc/kubernetes/kubelet.env
-      register: tls_cipher_suites_flag
-      check_mode: no
-      ignore_errors: yes
-      changed_when: no
-
-    # This is a long shell command but I don't know any way to shorten it.
-    - name: 4.2.13 add flag
-      shell: sed -i 's^--config=/etc/kubernetes/kubelet-config.yaml \\^--config=/etc/kubernetes/kubelet-config.yaml \\\n--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256 \\^' /etc/kubernetes/kubelet.env
-      args:
-        warn: false
-      when: tls_cipher_suites_flag.rc != 0
-
-    - name: 4.2.13 Restart kubelet
-      systemd:
-        daemon_reload: yes
-        enabled: yes
-        name: kubelet
-        state: restarted
 ```
 
 ### 5. Policies
