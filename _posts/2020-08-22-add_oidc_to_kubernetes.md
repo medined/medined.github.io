@@ -9,6 +9,9 @@ theme: kubernetes
 
 >**NOTE - Every works below except for getting Let's Encrypt to issue the SSL certificates. I'll update the procedure when that issue is resolved.**
 
+>**NOTE - At some thought, below seems like the wrong approach. The authentication server for Kubernetes should not be hosted by Kubernetes. So, while the
+procedure below works, I can't recommend it.
+
 This post shows how to add KeyCloak to an existing Kubernetes cluster to provide OIDC authentiation. This means that each Kubernetes user can use their own username and password to authenticate. In this post, RBAC will be
 used for authorization.
 
