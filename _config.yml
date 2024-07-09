@@ -17,7 +17,7 @@
 title: Codebits by David Medinets
 email: david.medinets@gmail.com
 description: a personal technical blog.
-url: "http://medined.github.io"
+url: http://medined.github.io
 twitter_username: rubybits
 github_username: medined 
 timezone: America/New_York
@@ -30,7 +30,7 @@ markdown: kramdown
 remote_theme: mmistakes/minimal-mistakes
 # Outputting
 permalink: /:categories/:title/
-paginate: 1
+paginate: 2
 paginate_path: /blog/page:num/
 
 include:
@@ -71,7 +71,7 @@ defaults:
       related: true
   # _pages
   - scope:
-      path: "_pages"
+      path: _pages
       type: pages
     values:
       layout: single

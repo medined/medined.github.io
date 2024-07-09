@@ -7,7 +7,7 @@ title: Home
 
   <!-- This loops through the paginated posts -->
   {% for post in paginator.posts %}
-    <h2>{{ post.date | date:"%m/%d/%Y" }}: <a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+    <h2>{{ post.date | date:"%m/%d/%Y" }}: {{ post.title }}</h2>
     <div class="content">{{ post.content }}</div>
   {% endfor %}
 
@@ -27,8 +27,5 @@ title: Home
       <span class="next ">Next</span>
     {% endif %}
   </div>
-
   <hr />
-
-  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
 </div>

@@ -2,13 +2,19 @@
 layout: post
 title: Generate Placeholder Docstrings Using AST
 author: David Medinets
-categories:
-  - "[[python]]"
+categories: python
 year: 2024
 theme: python
 ---
 
-## Goal
+Table of Contents
+{:.no_toc}
+* unordered list
+{:toc}
+
+* * *
+
+# Goal
 
 To generate placeholder docstrings in a legacy code base to reduce pyliny message clutter.
 

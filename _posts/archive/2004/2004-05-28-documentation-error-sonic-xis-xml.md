@@ -1,7 +1,6 @@
 ---
 layout: post
-title: Documentation Error; Sonic XIS XML Database; Setting Address Size and Cache
-Size should be KB not MB.
+title: Documentation Error; Sonic XIS XML Database; Setting Address Size and Cache Size should be KB not MB.
 date: '2004-05-28T14:57:00.000-04:00'
 author: David Medinets
 categories:
