@@ -14,15 +14,15 @@ theme: aws iam terraform keybase
 
 * * *
 
-# Introduction
+## Introduction
 
-See https://github.com/medined/create-iam-users-with-terraform-and-keybase for the copies of the files discussed here.
+See <https://github.com/medined/create-iam-users-with-terraform-and-keybase> for the copies of the files discussed here.
 
 GOAL: Provide a cryptographically secure way to distribute first-time passwords to a team. This means the system administrator (me!) should not know their passwords nor have any way to find them out.
 
 Recently I needed to create a few IAM users for a team. I choose to use Terraform to provision them. My first lesson was that while learning Terraform, create a separate directory for each project. For example, with my current knowledge I would not provision server resources and IAM resources in the same Terraform project.
 
-# File Descriptions
+## File Descriptions
 
 Since there are several files involved, first I will list them with a description.
 
@@ -43,13 +43,13 @@ No secrets are stored in any of the files below. However, some teams might consi
 | user-add.sh | This script creates `iam-user-*.tf` and `iam-group-membership.tf` files that provision users and group membership.
 | variables.tf | This file describes the variables used in the Terraform files. Only `project_name` is used.
 
-# Files
+## Files
 
-## accounts.txt
+### accounts.txt
 
 This file should not be in your code repository. Below is an example. Change to fit your needs. Lines that start with a pound sign are ignored. Note that is prefectly find to use one KeyBase account for multiple IAM users. Whoever owns the KeyBase account can decrypt the passwords. This is a great feature for a tester than needs differently permissioned IAM users.
 
-```
+```properties
 #aws_account,keybase_account,group
 admin,medined,administrators
 programmer01,medined,developers
@@ -58,11 +58,11 @@ tester01,medined,console_users
 tester02,medined,console_users
 ```
 
-## encrypted_password.*.txt
+### encrypted_password.*.txt
 
 The `terraform apply` process will create any AWS resources needed and produce a local file containing the encrypted password. Below is a elided example of the files that will be created. If the user pastes the file content into the decryption form on the KeyBase site, they can decrypt the information to get their temporary AWS console password.
 
-```
+```text
 -----BEGIN PGP MESSAGE-----
 Comment: https://keybase.io/download
 Version: Keybase Go 1.0.10 (linux)
@@ -71,11 +71,11 @@ wcF...ncA
 -----END PGP MESSAGE-----
 ```
 
-## iam-group-membership.tf
+### iam-group-membership.tf
 
 The `user-add.sh` script produces this file using information from `accounts.txt`. This file should not be part of your code repository.
 
-```
+```terraform
 resource "aws_iam_group_membership" "administrators" {
   name = "group-membership-administrators"
   users = [
@@ -99,13 +99,13 @@ resource "aws_iam_group_membership" "developers" {
 }
 ```
 
-## iam-groups.tf
+### iam-groups.tf
 
 This file has three sections. They are groups, policies, and group policy attachments. Each group and policy combination has its own attachment resource. This provides granular management. Delete an attachment to remove the policy from a group.
 
 Please use some prefix in your group names so that several projects can be managed at the same time. Otherwise, "administrators" in project "abcde" will conflict with project "zyxw". Only group names need to be namespaced in this way.
 
-```
+```terraform
 resource "aws_iam_group" "administrators" {
   name = "abcde_administrators"
   path = "/"
@@ -127,12 +127,12 @@ data "aws_iam_policy" "AmazonEC2FullAccess" {
 }
 
 
-# ADMINISTRATORS
+## ADMINISTRATORS
 resource "aws_iam_group_policy_attachment" "administrator" {
   group = aws_iam_group.administrators.name
   policy_arn = data.aws_iam_policy.AdministratorAccess.arn
 }
-# DEVELOPERS
+## DEVELOPERS
 resource "aws_iam_group_policy_attachment" "developers_AmazonS3FullAccess" {
   group = aws_iam_group.developers.name
   policy_arn = data.aws_iam_policy.AmazonS3FullAccess.arn
@@ -143,17 +143,17 @@ resource "aws_iam_group_policy_attachment" "developers_AmazonEC2FullAccess" {
 }
 ```
 
-## iam-user-*.tf
+### iam-user-*.tf
 
 The `user-add.sh` script produces these files using information from `accounts.txt`. These files should not be part of your code repository. Here is an example:
 
-```
-#     _    ____  __  __ ___ _   _
-#    / \  |  _ \|  \/  |_ _| \ | |
-#   / _ \ | | | | |\/| || ||  \| |
-#  / ___ \| |_| | |  | || || |\  |
-# /_/   \_\____/|_|  |_|___|_| \_|
-#                                 
+```terraform
+##     _    ____  __  __ ___ _   _
+##    / \  |  _ \|  \/  |_ _| \ | |
+##   / _ \ | | | | |\/| || ||  \| |
+##  / ___ \| |_| | |  | || || |\  |
+## /_/   \_\____/|_|  |_|___|_| \_|
+##
 
 resource "aws_iam_user" "admin" {
   name = "admin"
@@ -172,12 +172,11 @@ resource "local_file" "admin_password" {
 }
 ```
 
-
-## main.tf
+### main.tf
 
 Define `region` and `aws_profile_name` in `terraform.tfvars`. Otherwise, this is pretty basic.
 
-```
+```terraform
 provider "aws" {
   region  = var.region
   profile = var.aws_profile_name
@@ -185,21 +184,19 @@ provider "aws" {
 }
 ```
 
-## terraform.tfvars
+### terraform.tfvars
 
 Don't add this file to your code repository. It's simple for this project but sometimes it will contain sensitive information.
 
-```
+```terraform
 aws_profile_name = "bluejay"
 region           = "us-east-1"
 ```
 
-## tfa.sh
+### tfa.sh
 
 ```bash
-#!/bin/bash
-
-# Make sure the user files are up to date.
+## Make sure the user files are up to date.
 ./user-add.sh
 
 export TF_LOG=TRACE
@@ -208,24 +205,22 @@ terraform apply --auto-approve
 ls -ltr /tmp/terraform-apply*.log | tail -n 1
 ```
 
-## tfd.sh
+### tfd.sh
 
 ```bash
-#!/bin/bash
-
 export TF_LOG=TRACE
 export TF_LOG_PATH="/tmp/terraform-destroy-$(date "+%Y-%m-%d_%H:%M").log"
 terraform destroy --auto-approve
 ls -ltr /tmp/terraform-destroy*.log | tail -n 1
 ```
 
-## user-add.sh
+### user-add.sh
 
 Please install `figlet` if you don't have that tool. Or remove the usage of it from the file below.
 
 This script is used like this:
 
-```
+```bash
 ./user-add <iam_user> <keybase_account> <iam_group>
 ```
 
@@ -236,16 +231,12 @@ The script is straightforward. It uses a template to produce the user-XXXX.tf fi
 The code is:
 
 ```bash
-#!/bin/bash
+## A script this complex should be written in Python so that the list of
+## valid IAM groups could be automatically generated from the
+## iam-groups.tf file.
 
-#
-# A script this complex should be written in Python so that the list of
-# valid IAM groups could be automatically generated from the
-# iam-groups.tf file.
-#
-
-# Remove the set of user files. This will ensure that users removed from
-# the accounts.txt file are also deleted from AWS.
+## Remove the set of user files. This will ensure that users removed from
+## the accounts.txt file are also deleted from AWS.
 rm -f iam-group-membership.tf iam-user-*.if
 
 VALID_IAM_GROUPS="administrators,console_users,developers"
@@ -355,9 +346,9 @@ resource "aws_iam_group_membership" "developers" {
 EOF
 ```
 
-## variables.tf
+### variables.tf
 
-```
+```terraform
 variable "aws_profile_name" {
   description = "Profile name from ~/.aws/credentials"
 }
@@ -380,18 +371,18 @@ When you have the project files assembled, here are the steps.
 
 * Email the encrypted files to users with a procedure they should follow. For example,
 
-```
-* Log into the KeyBase website.
+```text
+  * Log into the KeyBase website.
 
-* In the decryption section, paste the contents of the attached file into the form.
+  * In the decryption section, paste the contents of the attached file into the form.
 
-* Visit https://AWS_ACCOUNT.signin.aws.amazon.com/console. Use the following information to log into the AWS console.
+  * Visit https://AWS_ACCOUNT.signin.aws.amazon.com/console. Use the following information to log into the AWS console.
 
-Account: AWS_ACCOUNT
-Username: IAM_USER
-Password: <decrypted from above>
+  Account: AWS_ACCOUNT
+  Username: IAM_USER
+  Password: <decrypted from above>
 
-You have XXXXXX access. Let me know if you need additional permissions.
+  You have XXXXXX access. Let me know if you need additional permissions.
 
-Let me know when you have logged in.
+  Let me know when you have logged in.
 ```
