@@ -18,7 +18,7 @@ In July 2024, Running PyLint on the [[https://github.com/OpenDevin|OpenDevin]] c
 
 Additionally, having a large number of PyLint messages make it hard to find important messages. For example, this message might be important enough to fix since when check is True a CalledProcessError exception will be raised when the sub-process returns a non-zero exit code.
 
-```
+```python
 opendevin/runtime/docker/local_box.py:31:32: W1510: Using subprocess.run without explicitly set `check` is not recommended. (subprocess-run-check)
 ```
 
@@ -32,7 +32,7 @@ The following python script will add module, class, and function placeholder doc
 
 NOTE: If an existing docstring contains a null byte ("\x00") then the script below will convert that docstring into a single-quote string instead of a triple-quote string. This is an issue with how python and the aster package handles the null byte. Replace your "\0x00" with "\\x00" to avoid this issue.
 
-```
+```python
 """Placeholder Module Docstring"""
 import os
 import ast
