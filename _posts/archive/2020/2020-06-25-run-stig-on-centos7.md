@@ -9,7 +9,7 @@ theme: stig
 
 This is going to be a long post. We'll start from scratch and develop the ability to run the MindPoint Group RHEL7 STIG on Centos 7. If you want to go farther, there is also discussion of Lynis. Just running the STIG playbook results in the server having a Lynis hardening index of 73. It can be better.
 
-This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
+This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - <https://www.oit.va.gov/> at the Department of Veteran Affairs.
 
 ## Overview
 
@@ -92,7 +92,7 @@ variable "sha_crypt_min_rounds" {
 
 * Create `tr_ansible_vars_file.yml.tpl`. This template is used to generate `tr_ansible_vars_file.yml` which is read by the Ansible playbook.
 
-```
+```properties
 ansible_python_interpreter: ${ansible_python_interpreter}
 centos_user_password: ${centos_user_password}
 ```
@@ -428,11 +428,11 @@ chmod +x run-stig-playbook.sh
 
 ## STIG Results
 
-The results are too long to include directly. See https://gist.github.com/medined/52d814466fa11d4a633561011c29ccf1.
+The results are too long to include directly. See <https://gist.github.com/medined/52d814466fa11d4a633561011c29ccf1>.
 
 ## Lynis Results
 
-The results are too long to include directly. See https://gist.github.com/medined/1d15a0c5b599fed8fc2515bcd0c212ad.
+The results are too long to include directly. See <https://gist.github.com/medined/1d15a0c5b599fed8fc2515bcd0c212ad>.
 
 ## Improving Lynis Hardening Index
 

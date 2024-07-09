@@ -14,14 +14,7 @@ year: 2004
 
 Documentation Error; Sonic XIS XML Database; Setting Address Size and Cache
 
+* public void setAddressSpaceSize(long size) - The documentation says that size is "the size in megabytes". However, it really needs to be the size in kilobytes.
+* public void setSize(long size) - The documentation says that size is "the size in megabytes". However, it really needs to be the size in kilobytes.
 
-<p><code>public void setAddressSpaceSize(long size)</code> - The documentation says that <code>size</code> is 'the size
-  in megabytes.' However, it really needs to be the size in kilobytes.</p>
-
-<p><code>public void setSize(long size)</code> - The documentation says that <code>size</code> is 'the size in
-  megabytes.' However, it really needs to be the size in kilobytes.</p>
-
-<p>Most of the time, you won't be dynamically changing the sizes so it's probably better to use the
-  <code>com.exln.dxe.defaultcachesize</code> and <code>com.exln.dxe.defaultassize</code> parameters in the
-  <code>xlnserver.properties</code> file. Note that <b>these</b> values should be in bytes!
-</p>
+Most of the time, you won't be dynamically changing the sizes so it's probably better to use the `com.exln.dxe.defaultcachesize` and `com.exln.dxe.defaultassize` parameters in the `xlnserver.properties` file. Note that these values should be in bytes!

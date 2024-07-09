@@ -8,15 +8,17 @@ theme: kubernetes
 ---
 
 # Table of Contents
-{:.no_toc}
-* unordered list
-{:toc}
 
-* * *
+{:.no_toc}
+
+- unordered list
+  {:toc}
+
+---
 
 ## Acknowledgements
 
-This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.
+This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - <https://www.oit.va.gov/>) at the Department of Veteran Affairs.
 
 ## Updates
 
@@ -30,20 +32,20 @@ This article shows how I am remediating the results of `kube-bench`. It will be 
 
 | Result        | Count |
 | ------------- | ----: |
-| PASS          | 63 |
-| FAIL          | 0 |
-| WARN          | 0 |
-| JUSTIFICATION | 53 |
+| PASS          |    63 |
+| FAIL          |     0 |
+| WARN          |     0 |
+| JUSTIFICATION |    53 |
 | ------------- | ----: |
-| Total         | 116 |
+| Total         |   116 |
 
 ## Recommendations From Rancher
 
-https://rancher.com/docs/rancher/v2.x/en/security/hardening-2.4/ has some useful information.
+<https://rancher.com/docs/rancher/v2.x/en/security/hardening-2.4/> has some useful information.
 
 Make these changes on all nodes.
 
-* Create a `sysctl` settings file. I have not evaluated these settings.
+- Create a `sysctl` settings file. I have not evaluated these settings.
 
 ```bash
 cat <<EOF > /etc/sysctl.d/90-kubelet.conf
@@ -55,7 +57,7 @@ kernel.keys.root_maxbytes=25000000
 EOF
 ```
 
-* Run `sysctl` to enable the settings.
+- Run `sysctl` to enable the settings.
 
 ```bash
 sysctl -p /etc/sysctl.d/90-kubelet.conf
@@ -73,9 +75,7 @@ cat <<EOF > cis-benchmark-remediation.yml
 - name: Check ansible version
   import_playbook: ansible_version.yml
 
-#
-# Just a reminder that all include the bastion servers.
-#
+## Just a reminder that all include the bastion servers.
 
 - hosts: all
   gather_facts: false
@@ -92,9 +92,8 @@ cat <<EOF > cis-benchmark-remediation.yml
           NO_PROXY: "{{ no_proxy | default ('') }}"
       no_log: true
 
-#
-# Just the controllers
-#
+## Just the controllers
+
 - hosts: kube-master
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   become: yes
@@ -105,9 +104,8 @@ cat <<EOF > cis-benchmark-remediation.yml
       - debug:
           var: ansible_version
 
-#
-# Just the workers
-#
+## Just the workers
+
 - hosts: kube-node
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   gather_facts: False
@@ -117,9 +115,8 @@ cat <<EOF > cis-benchmark-remediation.yml
       - debug:
           var: ansible_version
 
-#
-# The controllers and the workers
-#
+## The controllers and the workers
+
 - hosts: kube-master kube-node
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   gather_facts: False
@@ -164,80 +161,80 @@ When you change the apiserver manifest, that static pod will automatically resta
 This is how to wait:
 
 ```yaml
-        - name: Wait for k8s apiserver
-          wait_for:
-            host: "{{ kube_apiserver_access_address }}"
-            port: "{{ kube_apiserver_port }}"
-            timeout: 180
+- name: Wait for k8s apiserver
+  wait_for:
+    host: "{{ kube_apiserver_access_address }}"
+    port: "{{ kube_apiserver_port }}"
+    timeout: 180
 ```
 
 ## References
 
-* https://cloud.google.com/kubernetes-engine/docs/concepts/cis-benchmarks has some interesting things to say about why some tests are not passing.
+- <https://cloud.google.com/kubernetes-engine/docs/concepts/cis-benchmarks> has some interesting things to say about why some tests are not passing.
 
 ## Remediations
 
 ### 1. Master
 
-* 1 Master Node Security Configuration
-* 1.1 Master Node Configuration Files
-* 1.1.1 Ensure that the API server pod specification file permissions are set to 644 or more restrictive
+- 1 Master Node Security Configuration
+- 1.1 Master Node Configuration Files
+- 1.1.1 Ensure that the API server pod specification file permissions are set to 644 or more restrictive
 
-```
+```text
 PASS
 ```
 
-* 1.1.2 Ensure that the API server pod specification file ownership is set to root:root
+- 1.1.2 Ensure that the API server pod specification file ownership is set to root:root
 
-```
+```text
 PASS
 ```
 
-* 1.1.3 Ensure that the controller manager pod specification file permissions are set to 644 or more restrictive
+- 1.1.3 Ensure that the controller manager pod specification file permissions are set to 644 or more restrictive
 
-```
+```text
 PASS
 ```
 
-* 1.1.4 Ensure that the controller manager pod specification file ownership is set to root:root
+- 1.1.4 Ensure that the controller manager pod specification file ownership is set to root:root
 
-```
+```text
 PASS
 ```
 
-* 1.1.5 Ensure that the scheduler pod specification file permissions are set to 644 or more restrictive
+- 1.1.5 Ensure that the scheduler pod specification file permissions are set to 644 or more restrictive
 
-```
+```text
 PASS
 ```
 
-* 1.1.6 Ensure that the scheduler pod specification file ownership is set to root:root
+- 1.1.6 Ensure that the scheduler pod specification file ownership is set to root:root
 
-```
+```text
 PASS
 ```
 
-* 1.1.7 Ensure that the etcd pod specification file permissions are set to 644 or more restrictive
+- 1.1.7 Ensure that the etcd pod specification file permissions are set to 644 or more restrictive
 
 Kubespray creates an "etcd" cluster separate from the controller node. Therefore, the etcd.yaml file does not exist.
 
-```
+```text
 JUSTIFICATION for FAIL
 ```
 
-* 1.1.8 Ensure that the etcd pod specification file ownership is set to root:root
+- 1.1.8 Ensure that the etcd pod specification file ownership is set to root:root
 
 Kubespray creates an "etcd" cluster separate from the controller node. Therefore, the etcd.yaml file does not exist.
 
-```
+```text
 JUSTIFICATION for FAIL
 ```
 
-* 1.1.9 Ensure that the Container Network Interface file permissions are set to 644 or more restrictive
+- 1.1.9 Ensure that the Container Network Interface file permissions are set to 644 or more restrictive
 
 This test is a warning because the location of the CNI files can vary between kubernetes distributions. The remediation below will resolve this finding for Kubespray CentOS clusters. The `master.yaml` file can be updated to score this test if needed.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.9 Ensure that the Container Network Interface file permissions are set to 644 or more restrictive
@@ -248,11 +245,11 @@ JUSTIFICATION for WARN (MANUAL)
         state: directory
 ```
 
-* 1.1.10 Ensure that the Container Network Interface file ownership is set to root:root
+- 1.1.10 Ensure that the Container Network Interface file ownership is set to root:root
 
 This test is a warning because the location of the CNI files can vary between kubernetes distributions. The remediation below will resolve this finding for Kubespray CentOS clusters. The `master.yaml` file can be updated to score this test if needed.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.10 Ensure that the Container Network Interface file ownership is set to root:root
@@ -264,27 +261,27 @@ JUSTIFICATION for WARN (MANUAL)
         state: directory
 ```
 
-* 1.1.11 Ensure that the etcd data directory permissions are set to 700 or more restrictive
+- 1.1.11 Ensure that the etcd data directory permissions are set to 700 or more restrictive
 
 Kubespray creates an independent `etcd` cluster from the control plane node. Therefore, the etcd.yaml file does not exist.
 
-```
+```text
 JUSTIFICATION for FAIL
 ```
 
-* 1.1.12 Ensure that the etcd data directory ownership is set to etcd:etcd
+- 1.1.12 Ensure that the etcd data directory ownership is set to etcd:etcd
 
 Kubespray creates an independent `etcd` cluster from the control plane node. Therefore, the etcd.yaml file does not exist.
 
-```
+```text
 JUSTIFICATION for FAIL
 ```
 
-* 1.1.19 Ensure that the Kubernetes PKI directory and file ownership is set to root:root
+- 1.1.19 Ensure that the Kubernetes PKI directory and file ownership is set to root:root
 
 The remediation playbook resolves this issue but kube-bench marks this as a manual test.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.19 Ensure that the Kubernetes PKI directory and file ownership is set to root:root
@@ -296,11 +293,11 @@ JUSTIFICATION for WARN (MANUAL)
         state: directory
 ```
 
-* 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive
+- 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive
 
 The remediation playbook resolves this issue but kube-bench marks this as a manual test.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.20 Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive
@@ -321,11 +318,11 @@ JUSTIFICATION for WARN (MANUAL)
             - "{{ crt_glob.files }}"
 ```
 
-* 1.1.21 Ensure that the Kubernetes PKI key file permissions are set to 600
+- 1.1.21 Ensure that the Kubernetes PKI key file permissions are set to 600
 
 The remediation playbook resolves this issue but kube-bench marks this as a manual test.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 
     - name: 1.1.21 Ensure that the Kubernetes PKI key file permissions are set to 600
@@ -346,12 +343,12 @@ JUSTIFICATION for WARN (MANUAL)
             - "{{ key_glob.files }}"
 ```
 
-* 1.2 API Server
-* 1.2.1 Ensure that the --anonymous-auth argument is set to false
+- 1.2 API Server
+- 1.2.1 Ensure that the --anonymous-auth argument is set to false
 
 The `anonymous-auth` is set to true to enable health-checks from load balancers. Research on this topic shows that communication between nodes and users is fully secured by Principle of Least Privilege. However, if the health check is not a concern then this finding can be remediated with the following task. I advise accepting the default so the health check works.
 
-```
+```text
 JUSTIFICATION of FAIL (MANUAL)
 
     # If a change is made, the apiserver is restarted.
@@ -362,33 +359,33 @@ JUSTIFICATION of FAIL (MANUAL)
         line: "    - --anonymous-auth=False"
 ```
 
-* 1.2.2 Ensure that the --basic-auth-file argument is not set
+- 1.2.2 Ensure that the --basic-auth-file argument is not set
 
-```
+```text
 PASS
 ```
 
-* 1.2.3 Ensure that the --token-auth-file parameter is not set
+- 1.2.3 Ensure that the --token-auth-file parameter is not set
 
-```
+```text
 PASS
 ```
 
-* 1.2.4 Ensure that the --kubelet-https argument is set to true
+- 1.2.4 Ensure that the --kubelet-https argument is set to true
 
-```
+```text
 PASS
 ```
 
-* 1.2.5 Ensure that the --kubelet-client-certificate and --kubelet-client-key arguments are set as appropriate
+- 1.2.5 Ensure that the --kubelet-client-certificate and --kubelet-client-key arguments are set as appropriate
 
-```
+```text
 PASS
 ```
 
-* 1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate
+- 1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate
 
-```
+```text
 PASS
 
     - name: 1.2.6 Ensure that the --kubelet-certificate-authority argument is set as appropriate
@@ -408,41 +405,41 @@ PASS
           when: kca_flag.rc != 0
 ```
 
-* 1.2.7 Ensure that the --authorization-mode argument is not set to AlwaysAllow
+- 1.2.7 Ensure that the --authorization-mode argument is not set to AlwaysAllow
 
-```
+```text
 PASS
 ```
 
-* 1.2.8 Ensure that the --authorization-mode argument includes Node
+- 1.2.8 Ensure that the --authorization-mode argument includes Node
 
-```
+```text
 PASS
 ```
 
-* 1.2.9 Ensure that the --authorization-mode argument includes RBAC
+- 1.2.9 Ensure that the --authorization-mode argument includes RBAC
 
-```
+```text
 PASS
 ```
 
-* 1.2.10 Ensure that the admission control plugin EventRateLimit is set
+- 1.2.10 Ensure that the admission control plugin EventRateLimit is set
 
-This is an alpha feature. See https://github.com/kubernetes/kubernetes/issues/62861 for commentary.
+This is an alpha feature. See <https://github.com/kubernetes/kubernetes/issues/62861> for commentary.
 
-```
+```text
 JUSTIFICATION of WARN
 ```
 
-* 1.2.11 Ensure that the admission control plugin AlwaysAdmit is not set
+- 1.2.11 Ensure that the admission control plugin AlwaysAdmit is not set
 
-```
+```text
 PASS
 ```
 
-* 1.2.12 Ensure that the admission control plugin AlwaysPullImages is set
+- 1.2.12 Ensure that the admission control plugin AlwaysPullImages is set
 
-```
+```text
 PASS
 
     - name: 1.2.12 Ensure that the admission control plugin AlwaysPullImages is set
@@ -462,11 +459,11 @@ PASS
           when: always_pull_images_flag.rc != 0
 ```
 
-* 1.2.13 Ensure that the admission control plugin SecurityContextDeny is set if PodSecurityPolicy is not used
+- 1.2.13 Ensure that the admission control plugin SecurityContextDeny is set if PodSecurityPolicy is not used
 
 The `master.yaml` only tests that the `SecurityContextDeny` admission control plugin is not being used. We are using the `PodSecurityPolicy` admission controller. The task below verifies that SecurityContextDeny is not being used.
 
-```
+```text
 JUSTIFICATION for WARN
 
     - name: 1.2.13 Ensure that the admission control plugin SecurityContextDeny is set if PodSecurityPolicy is not used
@@ -477,145 +474,145 @@ JUSTIFICATION for WARN
       failed_when: security_content_deny_flag.rc == 0
 ```
 
-* 1.2.14 Ensure that the admission control plugin ServiceAccount is set
+- 1.2.14 Ensure that the admission control plugin ServiceAccount is set
 
-```
+```text
 PASS
 ```
 
-* 1.2.15 Ensure that the admission control plugin NamespaceLifecycle is set
+- 1.2.15 Ensure that the admission control plugin NamespaceLifecycle is set
 
-```
+```text
 PASS
 ```
 
-* 1.2.16 Ensure that the admission control plugin PodSecurityPolicy is set
+- 1.2.16 Ensure that the admission control plugin PodSecurityPolicy is set
 
 When the **Pod Security Policy** option is followed when provisioning the cluster, this plugin is enabled. However, the `apiserver` runs as a K8S static pod.
 
 The `ps` audit test used by kubebench can't find the option even though it is enabled.
 
-```
+```text
 JUSTIFICATION FOR FAIL
 ```
 
-* 1.2.17 Ensure that the admission control plugin NodeRestriction is set
+- 1.2.17 Ensure that the admission control plugin NodeRestriction is set
 
-```
+```text
 PASS
 ```
 
-* 1.2.18 Ensure that the --insecure-bind-address argument is not set
+- 1.2.18 Ensure that the --insecure-bind-address argument is not set
 
-```
+```text
 PASS
 ```
 
-* 1.2.19 Ensure that the --insecure-port argument is set to 0
+- 1.2.19 Ensure that the --insecure-port argument is set to 0
 
-```
+```text
 PASS
 ```
 
-* 1.2.20 Ensure that the --secure-port argument is not set to 0
+- 1.2.20 Ensure that the --secure-port argument is not set to 0
 
-```
+```text
 PASS
 ```
 
-* 1.2.21 Ensure that the --profiling argument is set to false
+- 1.2.21 Ensure that the --profiling argument is set to false
 
-```
+```text
 PASS
 ```
 
-* 1.2.22 Ensure that the --audit-log-path argument is set
+- 1.2.22 Ensure that the --audit-log-path argument is set
 
-```
+```text
 PASS - see 3.2.1.
 ```
 
-* 1.2.23 Ensure that the --audit-log-maxage argument is set to 30 or as appropriate
+- 1.2.23 Ensure that the --audit-log-maxage argument is set to 30 or as appropriate
 
-```
+```text
 PASS - see 3.2.1.
 ```
 
-* 1.2.24 Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate
+- 1.2.24 Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate
 
-```
+```text
 PASS - see 3.2.1.
 ```
 
-* 1.2.25 Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate
+- 1.2.25 Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate
 
-```
+```text
 PASS - see 3.2.1.
 ```
 
-* 1.2.26 Ensure that the --request-timeout argument is set as appropriate
+- 1.2.26 Ensure that the --request-timeout argument is set as appropriate
 
-```
+```text
 PASS
 ```
 
-* 1.2.27 Ensure that the --service-account-lookup argument is set to true
+- 1.2.27 Ensure that the --service-account-lookup argument is set to true
 
-```
+```text
 PASS
 ```
 
-* 1.2.28 Ensure that the --service-account-key-file argument is set as appropriate
+- 1.2.28 Ensure that the --service-account-key-file argument is set as appropriate
 
-```
+```text
 PASS
 ```
 
-* 1.2.29 Ensure that the --etcd-certfile and --etcd-keyfile arguments are set as appropriate
+- 1.2.29 Ensure that the --etcd-certfile and --etcd-keyfile arguments are set as appropriate
 
-```
+```text
 PASS
 ```
 
-* 1.2.30 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate
+- 1.2.30 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate
 
-```
+```text
 PASS
 ```
 
-* 1.2.31 Ensure that the --client-ca-file argument is set as appropriate
+- 1.2.31 Ensure that the --client-ca-file argument is set as appropriate
 
-```
+```text
 PASS
 ```
 
-* 1.2.32 Ensure that the --etcd-cafile argument is set as appropriate
+- 1.2.32 Ensure that the --etcd-cafile argument is set as appropriate
 
-```
+```text
 PASS
 ```
 
-* 1.2.33 Ensure that the --encryption-provider-config argument is set as appropriate
+- 1.2.33 Ensure that the --encryption-provider-config argument is set as appropriate
 
-This check will pass as long as the Encryption At Rest steps are followed when the cluster is created. Those steps are shown at https://medined.github.io/kubernetes/kubespray/encryption/ansible/add-aws-encryption-provider-to-kubespray/.
+This check will pass as long as the Encryption At Rest steps are followed when the cluster is created. Those steps are shown at <https://medined.github.io/kubernetes/kubespray/encryption/ansible/add-aws-encryption-provider-to-kubespray/>.
 
-```
+```text
 PASS
 ```
 
-* 1.2.34 Ensure that encryption providers are appropriately configured
+- 1.2.34 Ensure that encryption providers are appropriately configured
 
-Kube-bench has this as a manual check. Therefore it will always fail. However, Encryption at Rest is supported at shown by https://medined.github.io/kubernetes/kubespray/encryption/ansible/add-aws-encryption-provider-to-kubespray/. There is a manual proof process which can be automated if needed.
+Kube-bench has this as a manual check. Therefore it will always fail. However, Encryption at Rest is supported at shown by <https://medined.github.io/kubernetes/kubespray/encryption/ansible/add-aws-encryption-provider-to-kubespray/>. There is a manual proof process which can be automated if needed.
 
-```
+```text
 JUSTIFICATION of FAIL (MANUAL)
 ```
 
-* 1.2.35 Ensure that the API Server only makes use of Strong Cryptographic Ciphers
+- 1.2.35 Ensure that the API Server only makes use of Strong Cryptographic Ciphers
 
 Kube-bench is checking for a more permissive list of ciphers. Its check has no flexibility. However, the Ansible playbook will restrict the set as shown below. A security expert should verify the list of cipher suites is correct.
 
-```
+```text
 JUSTIFICATION of FAIL (MANUAL)
 
 - name: 1.2.35 Ensure that the API Server only makes use of Strong Cryptographic Ciphers
@@ -637,39 +634,40 @@ JUSTIFICATION of FAIL (MANUAL)
         Restart kubelet
 ```
 
-* 1.3 Controller Manager
-* 1.3.1 Ensure that the --terminated-pod-gc-threshold argument is set as appropriate
+- 1.3 Controller Manager
+- 1.3.1 Ensure that the --terminated-pod-gc-threshold argument is set as appropriate
 
-```
-PASS
-```
-* 1.3.2 Ensure that the --profiling argument is set to false
-
-```
+```text
 PASS
 ```
 
-* 1.3.3 Ensure that the --use-service-account-credentials argument is set to true
+- 1.3.2 Ensure that the --profiling argument is set to false
 
-```
+```text
 PASS
 ```
 
-* 1.3.4 Ensure that the --service-account-private-key-file argument is set as appropriate
+- 1.3.3 Ensure that the --use-service-account-credentials argument is set to true
 
-```
+```text
 PASS
 ```
 
-* 1.3.5 Ensure that the --root-ca-file argument is set as appropriate
+- 1.3.4 Ensure that the --service-account-private-key-file argument is set as appropriate
 
-```
+```text
 PASS
 ```
 
-* 1.3.6 Ensure that the RotateKubeletServerCertificate argument is set to true
+- 1.3.5 Ensure that the --root-ca-file argument is set as appropriate
 
+```text
+PASS
 ```
+
+- 1.3.6 Ensure that the RotateKubeletServerCertificate argument is set to true
+
+```text
 PASS
 
 ---
@@ -684,9 +682,9 @@ PASS
     state: present
 ```
 
-* 1.3.7 Ensure that the --bind-address argument is set to 127.0.0.1
+- 1.3.7 Ensure that the --bind-address argument is set to 127.0.0.1
 
-```
+```text
 PASS
 
 ---
@@ -701,10 +699,10 @@ PASS
     state: present
 ```
 
-* 1.4 Scheduler
-* 1.4.1 Ensure that the --profiling argument is set to false
+- 1.4 Scheduler
+- 1.4.1 Ensure that the --profiling argument is set to false
 
-```
+```text
 PASS
 
 ---
@@ -719,9 +717,9 @@ PASS
     state: present
 ```
 
-* 1.4.2 Ensure that the --bind-address argument is set to 127.0.0.1
+- 1.4.2 Ensure that the --bind-address argument is set to 127.0.0.1
 
-```
+```text
 PASS
 
 ---
@@ -738,13 +736,13 @@ PASS
 
 ### 2. Etcd
 
-* 2 Etcd Node Configuration
-* 2 Etcd Node Configuration Files
-* 2.1 Ensure that the --cert-file and --key-file arguments are set as appropriate (Scored)
+- 2 Etcd Node Configuration
+- 2 Etcd Node Configuration Files
+- 2.1 Ensure that the --cert-file and --key-file arguments are set as appropriate (Scored)
 
 The standard KubeSpray installation provides HTTPS communication between K8S servers and the ETCD servers. This can be proven by looking at `/etc/kubernetes/manifests/kube-apiserver.yaml` on the controller node. In that file, you'll see the following parameters are set.
 
-```
+```text
 - --etcd-cafile=/etc/ssl/etcd/ssl/ca.pem
 - --etcd-certfile=/etc/ssl/etcd/ssl/node-ip-10-245-207-223.ec2.internal.pem
 - --etcd-keyfile=/etc/ssl/etcd/ssl/node-ip-10-245-207-223.ec2.internal-key.pem
@@ -753,15 +751,15 @@ The standard KubeSpray installation provides HTTPS communication between K8S ser
 
 The KubeBench audit looks for an `etcd` process running on the controller node. That process does not exist so the test will always fail.
 
-```
+```text
 JUSTIFICATION FOR FAIL
 ```
 
-* 2.2 Ensure that the --client-cert-auth argument is set to true (Scored)
+- 2.2 Ensure that the --client-cert-auth argument is set to true (Scored)
 
 The standard KubeSpray installation provides HTTPS communication between K8S servers and the ETCD servers. In order to prove this check should pass, review the setting with the following code. The result will be `ETCD_CLIENT_CERT_AUTH=true`.
 
-```
+```text
 HOST_NAME=$(cat ./inventory/hosts | grep "\[etcd\]" -A 1 | tail -n 1)
 IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2)
 ssh -F ssh-bastion.conf centos@$IP cat /etc/etcd.env | grep ETCD_CLIENT_CERT_AUTH
@@ -769,17 +767,17 @@ ssh -F ssh-bastion.conf centos@$IP cat /etc/etcd.env | grep ETCD_CLIENT_CERT_AUT
 
 The KubeBench audit looks for an `etcd` process running on the controller node. That process does not exist so the test will always fail.
 
-```
+```text
 JUSTIFICATION FOR FAIL
 ```
 
 2.3 Ensure that the --auto-tls argument is not set to true (Scored)
 
-```
+```text
 PASS
 ```
 
-* 2.4 Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Scored)
+- 2.4 Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Scored)
 
 The standard KubeSpray installation provides HTTPS communication between K8S servers and the ETCD servers. In order to prove this check should pass, review the setting with the following code. The result shows that the peer parameters are set.
 
@@ -789,11 +787,11 @@ IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2
 ssh -F ssh-bastion.conf centos@$IP cat /etc/etcd.env | grep ETCD_PEER
 ```
 
-```
+```text
 JUSTIFICATION FOR FAIL
 ```
 
-* 2.5 Ensure that the --peer-client-cert-auth argument is set to true (Scored)
+- 2.5 Ensure that the --peer-client-cert-auth argument is set to true (Scored)
 
 The standard KubeSpray installation provides HTTPS communication between K8S servers and the ETCD servers. In order to prove this check should pass, review the setting with the following code. The result shows that the peer parameters are set.
 
@@ -803,17 +801,17 @@ IP=$(cat ./inventory/hosts | grep $HOST_NAME | grep ansible_host | cut -d'=' -f2
 ssh -F ssh-bastion.conf centos@$IP cat /etc/etcd.env | grep ETCD_PEER_CLIENT_AUTH
 ```
 
-```
+```text
 JUSTIFICATION FOR FAIL
 ```
 
-* 2.6 Ensure that the --peer-auto-tls argument is not set to true (Scored)
+- 2.6 Ensure that the --peer-auto-tls argument is not set to true (Scored)
 
-```
+```text
 PASS
 ```
 
-* 2.7 Ensure that a unique Certificate Authority is used for etcd (Not Scored)
+- 2.7 Ensure that a unique Certificate Authority is used for etcd (Not Scored)
 
 This check will always be WARN because it is a manual test.
 
@@ -829,22 +827,22 @@ ssh -F ssh-bastion.conf centos@$IP grep "ETCDCTL_CA_FILE" /etc/etcd.env
 
 ### 3. Controlplane
 
-* 3 Control Plane Configuration
-* 3.1 Authentication and Authorization
-* 3.1.1 Client certificate authentication should not be used for users (Not Scored)
+- 3 Control Plane Configuration
+- 3.1 Authentication and Authorization
+- 3.1.1 Client certificate authentication should not be used for users (Not Scored)
 
-There are many ways to add username-based authentication to Kubernetes. One way is to use KeyCloak as the OpenID Connect server. This technique is too complex to show here but https://medined.github.io/centos/terraform/ansible/kubernetes/kubespray/provision-centos-kubernetes-cluster-on-aws/ documents the whole process.
+There are many ways to add username-based authentication to Kubernetes. One way is to use KeyCloak as the OpenID Connect server. This technique is too complex to show here but <https://medined.github.io/centos/terraform/ansible/kubernetes/kubespray/provision-centos-kubernetes-cluster-on-aws/> documents the whole process.
 
 Each user can be provided a separate account in KeyCloak with special RBAC for their particular permission needs.
 
-```
+```text
 JUSTIFICATION for WARN
 
 Alternative mechanisms provided by Kubernetes such as the use of OIDC should be implemented in place of client certificates.
 ```
 
-* 3.2 Logging
-* 3.2.1 Ensure that a minimal audit policy is created (Scored)
+- 3.2 Logging
+- 3.2.1 Ensure that a minimal audit policy is created (Scored)
 
 This section shows how to set a policy file but does not make a recommendation
 regarding a default policy. An example policy is used.
@@ -854,8 +852,8 @@ The Ansible task shown below allows 1.2.22, 1.2.23, 1.2.24, and 1.2.25 to pass.
 The following list of audit log files provide anecdotal proof that
 both audit features and log rotation is enabled.
 
-```
-# ls -lh
+```text
+$ ls -lh
 total 556M
 -rw-r--r--. 1 root root 200M Jul 18 14:19 audit-2020-07-18T14-19-40.621.log
 -rw-r--r--. 1 root root 150M Jul 18 14:47 audit-2020-07-18T14-47-28.622.log
@@ -864,9 +862,11 @@ total 556M
 -rw-r--r--. 1 root root 5.2M Jul 18 16:25 audit.log
 ```
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
+```
 
+```yaml
 - name: 3.2.1 Ensure that a minimal audit policy is created
   block:
 
@@ -919,10 +919,10 @@ JUSTIFICATION for WARN (MANUAL)
           # A catch-all rule to log all other requests at the request level.
           - level: Request
 
-  #
-  # There might be a lot of changes to the api-server manifest. Each
-  # change would restart the apiserver pod. It might be better to
-  # stop the kubelet and restart it when we are done.
+  ## There might be a lot of changes to the api-server manifest. Each
+  ## change would restart the apiserver pod. It might be better to
+  ## stop the kubelet and restart it when we are done.
+
   - name: Stop kubelet.
     systemd:
       state: stopped
@@ -962,73 +962,75 @@ JUSTIFICATION for WARN (MANUAL)
       name: kubelet
 ```
 
-* 3.2.2 Ensure that the audit policy covers key security concerns (Not Scored)
+- 3.2.2 Ensure that the audit policy covers key security concerns (Not Scored)
 
 See section 3.2.1.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
 ### 4. Node
 
-* 4 Worker Node Security Configuration
-* 4.1 Worker Node Configuration Files
-* 4.1.1 Ensure that the kubelet service file permissions are set to 644 or more restrictive (Scored)
+- 4 Worker Node Security Configuration
+- 4.1 Worker Node Configuration Files
+- 4.1.1 Ensure that the kubelet service file permissions are set to 644 or more restrictive (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.1.2 Ensure that the kubelet service file ownership is set to root:root (Scored)
+- 4.1.2 Ensure that the kubelet service file ownership is set to root:root (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.1.3 Ensure that the proxy kubeconfig file permissions are set to 644 or more restrictive (Scored)
+- 4.1.3 Ensure that the proxy kubeconfig file permissions are set to 644 or more restrictive (Scored)
 
 KubeSpray does not store its kube-proxy configuration on the node file system. Instead it is passed into the pod using a ConfigMap. If your K8S account has the propoer permissions, you can see this ConfigMap using the following command:
 
-```
+```bash
 kubectl -n kube-system describe configmap kube-proxy
 ```
 
-```
+```text
 JUSTIFICATION FOR FAIL
 ```
 
-* 4.1.4 Ensure that the proxy kubeconfig file ownership is set to root:root (Scored)
+- 4.1.4 Ensure that the proxy kubeconfig file ownership is set to root:root (Scored)
 
 KubeSpray does not store its kube-proxy configuration on the node file system. Instead it is passed into the pod using a ConfigMap. If your K8S account has the propoer permissions, you can see this ConfigMap using the following command:
 
-```
+```bash
 kubectl -n kube-system describe configmap kube-proxy
 ```
 
-```
+```text
 JUSTIFICATION FOR FAIL
 ```
 
-* 4.1.5 Ensure that the kubelet.conf file permissions are set to 644 or more restrictive (Scored)
+- 4.1.5 Ensure that the kubelet.conf file permissions are set to 644 or more restrictive (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.1.6 Ensure that the kubelet.conf file ownership is set to root:root (Scored)
+- 4.1.6 Ensure that the kubelet.conf file ownership is set to root:root (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.1.7 Ensure that the certificate authorities file permissions are set to 644 or more restrictive (Scored)
+- 4.1.7 Ensure that the certificate authorities file permissions are set to 644 or more restrictive (Scored)
 
 This KubeBench check has no test associated with it. However, the Ansible snippet below is ensure the correct permission is applied to the CA file on the worker nodes.
 
-```
+```text
 JUSTIFICATION FOR WARN
+```
 
+```yaml
     - hosts: kube-node
       any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
       become: yes
@@ -1044,89 +1046,92 @@ JUSTIFICATION FOR WARN
             mode: "644"
 ```
 
-* 4.1.8 Ensure that the client certificate authorities file ownership is set to root:root (Scored)
+- 4.1.8 Ensure that the client certificate authorities file ownership is set to root:root (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.1.9 Ensure that the kubelet configuration file has permissions set to 644 or more restrictive (Scored)
+- 4.1.9 Ensure that the kubelet configuration file has permissions set to 644 or more restrictive (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.1.10 Ensure that the kubelet configuration file ownership is set to root:root (Scored)
+- 4.1.10 Ensure that the kubelet configuration file ownership is set to root:root (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.2 Kubelet
-* 4.2.1 Ensure that the --anonymous-auth argument is set to false (Scored)
+- 4.2 Kubelet
+- 4.2.1 Ensure that the --anonymous-auth argument is set to false (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.2.2 Ensure that the --authorization-mode argument is not set to AlwaysAllow (Scored)
+- 4.2.2 Ensure that the --authorization-mode argument is not set to AlwaysAllow (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.2.3 Ensure that the --client-ca-file argument is set as appropriate (Scored)
+- 4.2.3 Ensure that the --client-ca-file argument is set as appropriate (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.2.4 Ensure that the --read-only-port argument is set to 0 (Scored)
+- 4.2.4 Ensure that the --read-only-port argument is set to 0 (Scored)
 
 Port 10255 is a read only port that kubernetes opens for gathering diagnostics, but can potentially be used for unauthenticated access to sensitive data and so the CIS. Manual inspection shows that although the CIS check would show as a fail because kubelet was not started with the `--read-only-port 0` argument, the kubelet config file at `/etc/kubernetes/kubelet-config.yaml` is configured to disable the read-only api with the `readOnlyPort: 0` configuration and so satisfies this requirement. A manual test to confirm that the configuration file setting is being applied is to run `netstat -tulpn` on the worker nodes and confirm that the server is not listening on port 10255.
 
-```
+```text
 PASS
 
 ---
 - name: enable protect kernel defaults
   hosts:  kube-node
   tasks:
-  - name: lineinfile for kernel defaults setting  
+  - name: lineinfile for kernel defaults setting
     lineinfile:
       path: /etc/kubernetes/kubelet-config.yaml
       regexp: '^readOnlyPort'
       line: 'readOnlyPort: 0'
 ```
 
-* 4.2.5 Ensure that the --streaming-connection-idle-timeout argument is not set to 0 (Scored)
+- 4.2.5 Ensure that the --streaming-connection-idle-timeout argument is not set to 0 (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.2.6 Ensure that the --protect-kernel-defaults argument is set to true (Scored)
+- 4.2.6 Ensure that the --protect-kernel-defaults argument is set to true (Scored)
 
-```
+```text
 PASS
+```
+
+```yaml
   ---
   - name: enable protect kernel defaults
     hosts:  kube-node
     tasks:
-    - name: lineinfile for kernel defaults setting  
+    - name: lineinfile for kernel defaults setting
       lineinfile:
         path: /etc/kubernetes/kubelet-config.yaml
         regexp: '^protect'
         line: 'protectKernelDefaults: true'
 ```
 
-* 4.2.7 Ensure that the --make-iptables-util-chains argument is set to true (Scored)
+- 4.2.7 Ensure that the --make-iptables-util-chains argument is set to true (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.2.8 Ensure that the --hostname-override argument is not set (Not Scored)
+- 4.2.8 Ensure that the --hostname-override argument is not set (Not Scored)
 
 The CIS Benchmark says "Some cloud providers may require this flag to ensure that hostname matches names issued by the cloud provider. In these environments, this recommendation should not apply." Some research could be done to verify that argument is required for AWS.
 
@@ -1134,13 +1139,13 @@ However, by manual inspection we can see that the parameter argument is the same
 
 The manual test is this: On a worker node, run `hostname`. This might return `ip-10-250-207-133.ec2.internal`. View the `kubelet` command using `ps -ef | grep kubelet`. You'll see that the `--hostname-override` parameter is the same of the hostname.
 
-```
+```text
 JUSTIFICATION for WARN
 ```
 
-* 4.2.9 Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Not Scored)
+- 4.2.9 Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Not Scored)
 
-```
+```text
 JUSTIFICATION for WARN
 ```
 
@@ -1148,7 +1153,7 @@ JUSTIFICATION for WARN
 
 In `roles/kubernetes/node/templates/kubelet-config.v1beta1.yaml.j2`, add the following to the end of the file.
 
-```
+```text
 {% if kubelet_event_record_qps %}
 eventRecordQPS: {{ kubelet_event_record_qps }}
 {% endif %}
@@ -1156,44 +1161,44 @@ eventRecordQPS: {{ kubelet_event_record_qps }}
 
 In `roles/kubespray-defaults/defaults/main.yaml`, add the following to the end of the file.
 
-```
-# Sets the eventRecordQPS parameter in kubelet-config.yaml. The default value is 5 (see types.go)
-# Setting it to 0 allows unlimited requests per second.
+```text
+## Sets the eventRecordQPS parameter in kubelet-config.yaml. The default value is 5 (see types.go)
+## Setting it to 0 allows unlimited requests per second.
 kubelet_event_record_qps: 5
 ```
 
-* 4.2.10 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Scored)
+- 4.2.10 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Scored)
 
 Using command-line parameters for `kubelet` has been deprecated in favor of using a configuration file. KubeSpray uses a configuration file so this test based on `ps` will never pass.
 
 KubeSpray uses `/etc/kubernetes/kubelet-config.yaml` to configure `kubelet`. If the tlsCertFile and tlsPrivateKeyFile are not provided, a self-signed certificate and key are generated for the public address.
 
-```
+```text
 JUSTIFICATION FOR FAIL
 ```
 
-* 4.2.11 Ensure that the --rotate-certificates argument is not set to false (Scored)
+- 4.2.11 Ensure that the --rotate-certificates argument is not set to false (Scored)
 
-```
+```text
 PASS
 ```
 
-* 4.2.12 Ensure that the RotateKubeletServerCertificate argument is set to true (Scored)
+- 4.2.12 Ensure that the RotateKubeletServerCertificate argument is set to true (Scored)
 
 Update `roles/kubespray-defaults/defaults/main.yaml` to have the following:
 
-```
+```text
 kube_feature_gates:
   - RotateKubeletServerCertificate=true
 
 PASS
 ```
 
-* 4.2.13 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Not Scored)
+- 4.2.13 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Not Scored)
 
 Update `roles/kubernetes/master/defaults/main/main.yml` to have the following:
 
-```
+```text
 tls_cipher_suites:
   - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
   - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
@@ -1209,202 +1214,204 @@ PASS
 
 ### 5. Policies
 
-* 5 Kubernetes Policies
-* 5.1 RBAC and Service Accounts
-* 5.1.1 Ensure that the cluster-admin role is only used where required (Not Scored)
+- 5 Kubernetes Policies
+- 5.1 RBAC and Service Accounts
+- 5.1.1 Ensure that the cluster-admin role is only used where required (Not Scored)
 
 Identify all clusterrolebindings to the cluster-admin role. Check if they are used and if they need this role or if they could use a role with fewer privileges.
 
 Where possible, first bind users to a lower privileged role and then remove the clusterrolebinding to the cluster-admin role :
 
-  kubectl delete clusterrolebinding [name]
+kubectl delete clusterrolebinding [name]
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.1.2 Minimize access to secrets (Not Scored)
+- 5.1.2 Minimize access to secrets (Not Scored)
 
 Where possible, remove get, list and watch access to secret objects in the cluster.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.1.3 Minimize wildcard use in Roles and ClusterRoles (Not Scored)
+- 5.1.3 Minimize wildcard use in Roles and ClusterRoles (Not Scored)
 
 Where possible replace any use of wildcards in clusterroles and roles with specific objects or actions.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.1.4 Minimize access to create pods (Not Scored)
+- 5.1.4 Minimize access to create pods (Not Scored)
 
 Where possible, remove create access to pod objects in the cluster.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.1.5 Ensure that default service accounts are not actively used. (Scored)
+- 5.1.5 Ensure that default service accounts are not actively used. (Scored)
 
 Create explicit service accounts wherever a Kubernetes workload requires specific access to the Kubernetes API server.
 
 Modify the configuration of each default service account to include this value automountServiceAccountToken: false
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.1.6 Ensure that Service Account Tokens are only mounted where necessary (Not Scored)
+- 5.1.6 Ensure that Service Account Tokens are only mounted where necessary (Not Scored)
 
 Modify the definition of pods and service accounts which do not need to mount service account tokens to disable it.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.2 Pod Security Policies
-* 5.2.1 Minimize the admission of privileged containers (Not Scored)
+- 5.2 Pod Security Policies
+- 5.2.1 Minimize the admission of privileged containers (Not Scored)
 
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.privileged field is omitted or set to false.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.2.2 Minimize the admission of containers wishing to share the host process ID namespace (Scored)
+- 5.2.2 Minimize the admission of containers wishing to share the host process ID namespace (Scored)
 
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostPID field is omitted or set to false.
-```
+
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.2.3 Minimize the admission of containers wishing to share the host IPC namespace (Scored)
+- 5.2.3 Minimize the admission of containers wishing to share the host IPC namespace (Scored)
 
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostIPC field is omitted or set to false.
-```
+
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.2.4 Minimize the admission of containers wishing to share the host network namespace (Scored)
+- 5.2.4 Minimize the admission of containers wishing to share the host network namespace (Scored)
 
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostNetwork field is omitted or set to false.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.2.5 Minimize the admission of containers with allowPrivilegeEscalation (Scored)
+- 5.2.5 Minimize the admission of containers with allowPrivilegeEscalation (Scored)
 
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.allowPrivilegeEscalation field is omitted or set to false.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.2.6 Minimize the admission of root containers (Not Scored)
+- 5.2.6 Minimize the admission of root containers (Not Scored)
 
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.runAsUser.rule is set to either MustRunAsNonRoot or MustRunAs with the range of UIDs not including 0.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.2.7 Minimize the admission of containers with the NET_RAW capability (Not Scored)
+- 5.2.7 Minimize the admission of containers with the NET_RAW capability (Not Scored)
 
 Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.requiredDropCapabilities is set to include either NET_RAW or ALL.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.2.8 Minimize the admission of containers with added capabilities (Not Scored)
+- 5.2.8 Minimize the admission of containers with added capabilities (Not Scored)
 
 Ensure that allowedCapabilities is not present in PSPs for the cluster unless it is set to an empty array.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.2.9 Minimize the admission of containers with capabilities assigned (Not Scored)
+- 5.2.9 Minimize the admission of containers with capabilities assigned (Not Scored)
 
 Review the use of capabilites in applications runnning on your cluster. Where a namespace contains applicaions which do not require any Linux capabities to operate consider adding a PSP which forbids the admission of containers which do not drop all capabilities.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.3 Network Policies and CNI
-* 5.3.1 Ensure that the CNI in use supports Network Policies (Not Scored)
+- 5.3 Network Policies and CNI
+- 5.3.1 Ensure that the CNI in use supports Network Policies (Not Scored)
 
 Use network policies to restrict traffic in the cluster. This is a manual, not scored test.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.3.2 Ensure that all Namespaces have Network Policies defined (Scored)
+- 5.3.2 Ensure that all Namespaces have Network Policies defined (Scored)
 
 Follow the documentation and create NetworkPolicy objects as you need them.
 
-```
+```text
 JUSTIFICATION for WARN
 ```
 
-* 5.4 Secrets Management
-* 5.4.1 Prefer using secrets as files over secrets as environment variables (Not Scored)
+- 5.4 Secrets Management
+- 5.4.1 Prefer using secrets as files over secrets as environment variables (Not Scored)
 
 If possible, rewrite application code to read secrets from mounted secret files, rather than from environment variables.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.4.2 Consider external secret storage (Not Scored)
+- 5.4.2 Consider external secret storage (Not Scored)
 
 Refer to the secrets management options offered by your cloud provider or a third-party secrets management solution.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.5 Extensible Admission Control
-* 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Not Scored)
+- 5.5 Extensible Admission Control
+- 5.5.1 Configure Image Provenance using ImagePolicyWebhook admission controller (Not Scored)
 
-Image Provenance can be supported using https://trow.io/.
+Image Provenance can be supported using <https://trow.io/>.
 
-```
+```text
 JUSTIFICATION for WARN
 ```
 
-* 5.6 General Policies
-* 5.6.1 Create administrative boundaries between resources using namespaces (Not Scored)
+- 5.6 General Policies
+- 5.6.1 Create administrative boundaries between resources using namespaces (Not Scored)
 
 Follow the documentation and create namespaces for objects in your deployment as you need them.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.6.2 Ensure that the seccomp profile is set to docker/default in your pod definitions (Not Scored)
+- 5.6.2 Ensure that the seccomp profile is set to docker/default in your pod definitions (Not Scored)
 
 Seccomp is an alpha feature currently. By default, all alpha features are disabled.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.6.3 Apply Security Context to Your Pods and Containers (Not Scored)
+- 5.6.3 Apply Security Context to Your Pods and Containers (Not Scored)
 
 Follow the Kubernetes documentation and apply security contexts to your pods. For a suggested list of security contexts, you may refer to the CIS Security Benchmark for Docker Containers.
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
 
-* 5.6.4 The default namespace should not be used (Scored)
+- 5.6.4 The default namespace should not be used (Scored)
 
 Ensure that namespaces are created to allow for appropriate segregation of Kubernetes resources and that all new resources are created in a specific namespace.
 
@@ -1416,6 +1423,6 @@ NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 service/kubernetes   ClusterIP   10.233.0.1   <none>        443/TCP   3d16h
 ```
 
-```
+```text
 JUSTIFICATION for WARN (MANUAL)
 ```
