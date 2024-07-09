@@ -2,7 +2,8 @@
 layout: post
 title: Bordeaux Trip
 author: David Medinets
-categories: travel
+categories:
+- "[[travel]]"
 year: 2003
 ---
 

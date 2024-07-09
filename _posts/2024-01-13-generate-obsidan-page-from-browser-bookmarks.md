@@ -2,7 +2,9 @@
 layout: post
 title: Generate Obsidan Page From Browser Bookmarks
 author: David Medinets
-categories: LLM, Python
+categories:
+  - "[[llm]]"
+  - "[[python]]"
 year: 2024
 theme: LLM
 ---

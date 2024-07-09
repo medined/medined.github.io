@@ -2,11 +2,14 @@
 layout: post
 title: Using Boto3 To Create NS Hosted Zone Record Set
 author: David Medinets
-categories: python boto3 aws route53
+categories:
+  - "[[python]]"
+  - "[[aws]]"
+  - "[[boto3]]"
+  - "[[route53]]"
 year: 2020
 theme: aws
 ---
-
 ## Acknowledgements
 
 This work is being done at the request of the Enterprise Container Working Group (ECWG) of the Office of Information and Technology (OIT - https://www.oit.va.gov/) at the Department of Veteran Affairs.

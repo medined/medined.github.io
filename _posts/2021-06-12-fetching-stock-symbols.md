@@ -2,7 +2,8 @@
 layout: post
 title: Fetching Stock Symbols
 author: David Medinets
-categories: investing
+categories:
+  - "[[investing]]"
 year: 2021
 theme: investing
 ---

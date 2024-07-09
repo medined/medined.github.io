@@ -1,0 +1,173 @@
+{
+  "main": {
+    "id": "b614a2a6239f0bbd",
+    "type": "split",
+    "children": [
+      {
+        "id": "63a58496b10d8d31",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3e6e677b7c950f25",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6ff42057510aa92c",
+    "type": "split",
+    "children": [
+      {
+        "id": "beced0c19c5238e4",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0adf13c18bcbb6c2",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "d43c75030102d7dc",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "e413ad52076bf839",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 539.5
+  },
+  "right": {
+    "id": "f2715de1abe837e7",
+    "type": "split",
+    "children": [
+      {
+        "id": "408e25611cfe5f84",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d15a17a06abc78ac",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "b977a97758d2ffe3",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "63724514997c4267",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "c7c2298e1c064e2d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "3e6e677b7c950f25",
+  "lastOpenFiles": [
+    "_posts/archive/2002/2002-06-03-ive-found-neat-way-to-delete.md",
+    "_posts/archive/2006/2006-12-22-using-stored-procedure-to-insert.md",
+    "_posts/archive/2006/2006-12-22-per-user-connection-pooling-for-spring.md",
+    "_posts/archive/2006/2006-12-21-solving-second-level-cache-is-not.md",
+    "_posts/archive/2006/2006-11-22-pericentury.md",
+    "_posts/archive/2006/2006-11-08-apache-derby-ws-resources.md",
+    "_posts/archive/2006/2006-10-31-fixing-no-java-compiler-available.md",
+    "_posts/archive/2006/2006-10-31-embedded-tomcat-fixing-no-java.md",
+    "_posts/archive/2006/2006-10-31-embedded-tomcat-5517-eclipse-project.md",
+    "_posts/archive/2006/2006-10-26-running-httpservertestapp-as-eclipse.md",
+    "_posts/archive/2006/2006-10-25-use-css-to-ensure-common-navigation.md",
+    "_posts/archive/2006/2006-10-08-using-xml-to-reduce-accidental.md",
+    "_posts/archive/2006/2006-10-08-using-composite-object-for-hash-key.md",
+    "_posts/archive/2006/2006-09-15-tar-file-with-all-linux-from-scratch.md",
+    "_posts/archive/2006/2006-06-29-spring-hibernate-super-simple-dao.md",
+    "_posts/archive/2006/2006-06-28-ubuntu-disk-partition-sizes.md",
+    "_posts/archive/2006/2006-06-28-spring-beanstoredefinitionexception.md",
+    "_posts/archive/2006/2006-06-28-postgresql-connecting-to-postgresql.md",
+    "_posts/archive/2006/2006-06-25-ubuntu-oracle-installation-no-response_25.md",
+    "_posts/archive/2006/2006-06-19-spring-applicationcontext-sqlupdate.md",
+    "_posts/archive/2006/2006-06-01-segmentation-fault-caused-by-devzero.md",
+    "_posts/archive/2006/2006-04-23-getting-hibernate-to-create-schema.md",
+    "_posts/archive/2006/2006-04-12-spring-fluent-apis-and-beaninfo.md",
+    "_posts/archive/2006/2006-02-22-using-ibmjce-outside-of-websphere.md",
+    "_posts/archive/2006/2006-02-07-selenium-ide-rocks.md",
+    "Untitled 1.canvas",
+    "_posts/archive/2005/2005-11-03-spring-and-rife-creating-database.md",
+    "Untitled.canvas",
+    "_posts/archive/2001"
+  ]
+}
